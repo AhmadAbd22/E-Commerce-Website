@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ThemedApp.Models.Dtos
+namespace ECommerceWebsite.Models.Dtos
 {
     public class SignUpDto
     {

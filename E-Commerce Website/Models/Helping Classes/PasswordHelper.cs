@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace ThemedApp.Models.Helping_Classes
+namespace ECommerceWebsite.Models.Helping_Classes
 {
     public class PasswordHelper
     {

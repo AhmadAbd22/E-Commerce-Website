@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ThemedApp.Models.Context;
-using ThemedApp.Models.Dtos;
-using ThemedApp.Models.Helping_Classes;
+using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Dtos;
+using ECommerceWebsite.Models.Helping_Classes;
 
-namespace ThemedApp.Controllers
+namespace ECommerceWebsite.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly ThemedAppDbContext _context;
+        private readonly ECommerceWebsiteDbContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LoginController(ThemedAppDbContext context, IHttpContextAccessor httpContextAccessor)
+        public LoginController(ECommerceWebsiteDbContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _httpContextAccessor = httpContextAccessor;

@@ -1,17 +1,17 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using ThemedApp.Models;
-using ThemedApp.Models.Context;
-using ThemedApp.Models.Dtos;
-using ThemedApp.Models.Helping_Classes;
+using ECommerceWebsite.Models;
+using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Dtos;
+using ECommerceWebsite.Models.Helping_Classes;
 
-namespace ThemedApp.Controllers
+namespace ECommerceWebsite.Controllers
 {
     public class SignUpController : Controller
     {
-        private readonly ThemedAppDbContext _context;
+        private readonly ECommerceWebsiteDbContext _context;
 
-        public SignUpController(ThemedAppDbContext context)
+        public SignUpController(ECommerceWebsiteDbContext context)
         {
             _context = context;
         }

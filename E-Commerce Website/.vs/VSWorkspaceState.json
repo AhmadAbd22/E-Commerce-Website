@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "\\Controllers",
+    "\\Models",
+    "\\Models\\Context",
+    "\\Models\\Dtos",
+    "\\Models\\Helping Classes",
+    "\\Views",
+    "\\Views\\Home",
+    "\\Views\\Login",
+    "\\Views\\Shared",
+    "\\Views\\SignUp"
+  ],
+  "PreviewInSolutionExplorer": false
+}

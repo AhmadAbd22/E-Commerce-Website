@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\ThemedApp.csproj": {}
+    "C:\\Users\\Administrator\\source\\repos\\ECommerceWebsite\\ECommerceWebsite\\ECommerceWebsite.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\ThemedApp.csproj": {
+    "C:\\Users\\Administrator\\source\\repos\\ECommerceWebsite\\ECommerceWebsite\\ECommerceWebsite.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\ThemedApp.csproj",
-        "projectName": "ThemedApp",
-        "projectPath": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\ThemedApp.csproj",
+        "projectUniqueName": "C:\\Users\\Administrator\\source\\repos\\ECommerceWebsite\\ECommerceWebsite\\ECommerceWebsite.csproj",
+        "projectName": "ECommerceWebsite",
+        "projectPath": "C:\\Users\\Administrator\\source\\repos\\ECommerceWebsite\\ECommerceWebsite\\ECommerceWebsite.csproj",
         "packagesPath": "C:\\Users\\Administrator\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\obj\\",
+        "outputPath": "C:\\Users\\Administrator\\source\\repos\\ECommerceWebsite\\ECommerceWebsite\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

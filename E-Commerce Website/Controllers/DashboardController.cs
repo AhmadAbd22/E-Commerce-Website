@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ThemedApp.Controllers
+namespace ECommerceWebsite.Controllers
 {
     public class DashboardController : Controller
     {

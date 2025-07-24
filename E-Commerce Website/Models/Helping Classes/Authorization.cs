@@ -2,9 +2,9 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
-using ThemedApp.Models.Dtos;
+using ECommerceWebsite.Models.Dtos;
 
-namespace ThemedApp.Models.Helping_Classes
+namespace ECommerceWebsite.Models.Helping_Classes
 {
     public class Authorization
     {

@@ -1,0 +1,839 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\helping classes\\authorization.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\helping classes\\authorization.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\helping classes\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\helping classes\\passwordhelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\dtos\\userdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\controllers\\logincontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\login\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\login\\login.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\controllers\\dashboardcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\controllers\\homecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\controllers\\signupcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\controllers\\signupcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\signup\\signup.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\signup\\signup.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\dtos\\logindto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\dtos\\signupdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\dtos\\signupdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\models\\context\\themedappdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\models\\context\\themedappdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_footer.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_footer.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_minimumlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_minimumlayout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Data\\LoginAppDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_validationscriptspartial.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_layout.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\dashboard\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\dashboard\\dashboard.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_layout.cshtml.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\_viewimports.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\home\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\_viewstart.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_sidebar.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_sidebar.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\home\\privacy.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\css\\components.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\css\\components.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\views\\shared\\_navbar.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\views\\shared\\_navbar.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\core\\app.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\core\\app.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|c:\\users\\administrator\\source\\repos\\themedapp\\themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{713B61E0-029B-40F8-B772-51C2121DB385}|ThemedApp\\ThemedApp.csproj|solutionrelative:themedapp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 140,
+          "SelectedChildIndex": 28,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{eefa5220-e298-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{b1e99781-ab81-11d0-b683-00aa00a3ee26}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6d4078d1-5951-4ed1-ac0e-0a8099c1cce5}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{e1b7d1f8-9b3c-49b1-8f4f-bfc63a88835d}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{13b12e3e-c1b4-4539-9371-4fe9a0d523fc}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:131:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:132:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:133:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:134:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:135:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:130:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Authorization.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Helping Classes\\Authorization.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Helping Classes\\Authorization.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Helping Classes\\Authorization.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Helping Classes\\Authorization.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAADkAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T07:25:17.958Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "PasswordHelper.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Helping Classes\\PasswordHelper.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Helping Classes\\PasswordHelper.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Helping Classes\\PasswordHelper.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Helping Classes\\PasswordHelper.cs",
+              "ViewState": "AgIAAAEAAAAAAAAAAADwvwQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T07:09:19.613Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "SignUp.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\SignUp\\SignUp.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\SignUp\\SignUp.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\SignUp\\SignUp.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\SignUp\\SignUp.cshtml",
+              "ViewState": "AgIAAKIAAAAAAAAAAAAAALQAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T03:48:00.132Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "SignUpController.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\SignUpController.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Controllers\\SignUpController.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\SignUpController.cs",
+              "RelativeToolTip": "ThemedApp\\Controllers\\SignUpController.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAiwDUAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T03:46:14.8Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Program.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Program.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Program.cs",
+              "RelativeToolTip": "ThemedApp\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-23T12:43:04.627Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "_Footer.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Footer.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_Footer.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Footer.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_Footer.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T07:44:57.941Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LoginController.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\LoginController.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Controllers\\LoginController.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\LoginController.cs",
+              "RelativeToolTip": "ThemedApp\\Controllers\\LoginController.cs",
+              "ViewState": "AgIAACkAAAAAAAAAAAAwwB8AAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T03:46:01.411Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "DashboardController.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\DashboardController.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Controllers\\DashboardController.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\DashboardController.cs",
+              "RelativeToolTip": "ThemedApp\\Controllers\\DashboardController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-23T12:20:04.482Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "HomeController.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\HomeController.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Controllers\\HomeController.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Controllers\\HomeController.cs",
+              "RelativeToolTip": "ThemedApp\\Controllers\\HomeController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-23T12:44:58.13Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Login.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Login\\Login.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Login\\Login.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Login\\Login.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Login\\Login.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEoAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T03:35:52.46Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\User.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\User.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\User.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T04:31:19.862Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "UserDto.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\UserDto.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Dtos\\UserDto.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\UserDto.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Dtos\\UserDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T07:30:00.472Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "_MinimumLayout.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_MinimumLayout.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_MinimumLayout.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_MinimumLayout.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_MinimumLayout.cshtml",
+              "ViewState": "AgIAAA8AAAAAAAAAAAAAACQAAAAHAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T04:09:16.205Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "SignUpDto.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\SignUpDto.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Dtos\\SignUpDto.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\SignUpDto.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Dtos\\SignUpDto.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAuwBEAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T04:24:21.156Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "LoginDto.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\LoginDto.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Dtos\\LoginDto.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Dtos\\LoginDto.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Dtos\\LoginDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T06:23:46.847Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Program.cs",
+              "RelativeDocumentMoniker": "..\\LoginApp\\LoginApp\\Program.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Program.cs",
+              "RelativeToolTip": "..\\LoginApp\\LoginApp\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T05:30:04.404Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "ThemedAppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Context\\ThemedAppDbContext.cs",
+              "RelativeDocumentMoniker": "ThemedApp\\Models\\Context\\ThemedAppDbContext.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Models\\Context\\ThemedAppDbContext.cs",
+              "RelativeToolTip": "ThemedApp\\Models\\Context\\ThemedAppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAqwAYAAABiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T05:10:18.056Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\appsettings.json",
+              "RelativeDocumentMoniker": "ThemedApp\\appsettings.json",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\appsettings.json",
+              "RelativeToolTip": "ThemedApp\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-07-24T05:19:27.114Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "LoginAppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Data\\LoginAppDbContext.cs",
+              "RelativeDocumentMoniker": "..\\LoginApp\\LoginApp\\Data\\LoginAppDbContext.cs",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\LoginApp\\LoginApp\\Data\\LoginAppDbContext.cs",
+              "RelativeToolTip": "..\\LoginApp\\LoginApp\\Data\\LoginAppDbContext.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-07-24T05:32:35.296Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "_ValidationScriptsPartial.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_ValidationScriptsPartial.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T05:43:18.601Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "_Layout.cshtml.css",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Layout.cshtml.css",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_Layout.cshtml.css",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Layout.cshtml.css",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_Layout.cshtml.css",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-07-24T04:04:42.96Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "_ViewImports.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\_ViewImports.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\_ViewImports.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\_ViewImports.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\_ViewImports.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-24T03:33:10.073Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "Dashboard.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Dashboard\\Dashboard.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Dashboard\\Dashboard.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Dashboard\\Dashboard.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Dashboard\\Dashboard.cshtml",
+              "ViewState": "AgIAACwGAAAAAAAAAADgvzkGAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T12:20:23.198Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "Index.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Home\\Index.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Home\\Index.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Home\\Index.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Home\\Index.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T07:28:06.24Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "_Layout.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_Layout.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Layout.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_Layout.cshtml",
+              "ViewState": "AgIAABsAAAAAAAAAAADwvzUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T07:21:21.904Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "components.css",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\css\\components.css",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\css\\components.css",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\css\\components.css",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\css\\components.css",
+              "ViewState": "AgIAAOgAAAAAAAAAAAAuwPYAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-07-23T10:33:48.786Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "_Sidebar.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Sidebar.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_Sidebar.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Sidebar.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_Sidebar.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAIBZwAYAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T07:44:41.299Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "styles.css",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\css\\icons\\icomoon\\styles.css",
+              "ViewState": "AgIAAAQEAAAAAAAAAAAswGMEAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-07-23T10:44:24.265Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "_ViewStart.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\_ViewStart.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\_ViewStart.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\_ViewStart.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\_ViewStart.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T08:48:09.8Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "app.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\core\\app.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\core\\app.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\core\\app.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\core\\app.js",
+              "ViewState": "AgIAAAkAAAAAAAAAAIBZwCYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T11:21:32.88Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "Privacy.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Home\\Privacy.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Home\\Privacy.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Home\\Privacy.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Home\\Privacy.cshtml",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T12:56:34.88Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "alpaca_advanced.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_advanced.js",
+              "ViewState": "AgIAAEQAAAAAAAAAAIBZwGYAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:52:24.054Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "alpaca_basic.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\pages\\alpaca_basic.js",
+              "ViewState": "AgIAAFMBAAAAAAAAAAAYwGMBAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:52:41.645Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "area_horizontal.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal.js",
+              "ViewState": "AgIAAAEAAAAAAAAAAAAYwBUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:52:46.123Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "_Navbar.cshtml",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Navbar.cshtml",
+              "RelativeDocumentMoniker": "ThemedApp\\Views\\Shared\\_Navbar.cshtml",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\Views\\Shared\\_Navbar.cshtml",
+              "RelativeToolTip": "ThemedApp\\Views\\Shared\\_Navbar.cshtml",
+              "ViewState": "AgIAAJ0AAAAAAAAAAAAowBQBAAAGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-07-23T07:44:02.862Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "bootstrap.css.map",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap.css.map",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAD7OQcAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-07-23T08:14:56.808Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "alpaca.min.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\plugins\\forms\\inputs\\alpaca\\alpaca.min.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:18:21.986Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "area_horizontal_grouped.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\charts\\dimple\\area\\area_horizontal_grouped.js",
+              "ViewState": "AgIAAA4AAAAAAAAAAIBZwBYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:52:48.64Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "additional-methods.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\lib\\jquery-validation\\dist\\additional-methods.js",
+              "ViewState": "AgIAADICAAAAAAAAAAAuwEUCAABEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:14:03.279Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "ace.js",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\assets\\js\\plugins\\editors\\ace\\ace.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAA5AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-07-23T08:13:54.956Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "bootstrap-grid.css.map",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.css.map",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAftgIAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-07-23T08:14:14.457Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "bootstrap-grid.rtl.css.map",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-grid.rtl.css.map",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAjtgIAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-07-23T08:14:16.896Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "bootstrap-reboot.css.map",
+              "DocumentMoniker": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+              "RelativeDocumentMoniker": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+              "ToolTip": "C:\\Users\\Administrator\\source\\repos\\ThemedApp\\ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+              "RelativeToolTip": "ThemedApp\\wwwroot\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.css.map",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAACYcQEAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2025-07-23T08:14:18.034Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 202,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{6324226f-61b6-4f28-92ee-18d4b5fe1e48}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

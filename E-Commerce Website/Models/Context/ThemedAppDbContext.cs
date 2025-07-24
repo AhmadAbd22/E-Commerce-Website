@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ThemedApp.Models;
-namespace ThemedApp.Models.Context
+using ECommerceWebsite.Models;
+namespace ECommerceWebsite.Models.Context
 {
-        public class ThemedAppDbContext : DbContext
+        public class ECommerceWebsiteDbContext : DbContext
     {
-        public ThemedAppDbContext(DbContextOptions<ThemedAppDbContext> options) : base(options) { }
+        public ECommerceWebsiteDbContext(DbContextOptions<ECommerceWebsiteDbContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
     }
 }

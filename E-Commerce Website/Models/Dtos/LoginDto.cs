@@ -1,4 +1,4 @@
-﻿namespace ThemedApp.Models.Dtos
+﻿namespace ECommerceWebsite.Models.Dtos
 {
     public class LoginDto
     {

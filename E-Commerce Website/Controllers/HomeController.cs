@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using ThemedApp.Models;
+using ECommerceWebsite.Models;
 
-namespace ThemedApp.Controllers
+namespace ECommerceWebsite.Controllers
 {
     public class HomeController : Controller
     {
