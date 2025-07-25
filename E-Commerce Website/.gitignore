@@ -1,0 +1,20 @@
+# Visual Studio build files
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# VS Code & Visual Studio folders
+.vscode/
+.vs/
+
+# Mac or Linux system files
+.DS_Store
+
+# Rider IDE
+.idea/
+
+# Auto-generated files
+Generated_Code/
