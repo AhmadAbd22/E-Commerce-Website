@@ -17,69 +17,67 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = ECommerceWebsite
 build_property.RootNamespace = ECommerceWebsite
-build_property.ProjectDir = C:\Users\Administrator\source\repos\E-Commerce Website\E-Commerce Website\
+build_property.ProjectDir = /media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\Administrator\source\repos\E-Commerce Website\E-Commerce Website
+build_property.MSBuildProjectDirectory = /media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website
 build_property._RazorSourceGeneratorDebug = 
-build_property.EffectiveAnalysisLevelStyle = 8.0
-build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Dashboard/Dashboard.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGFzaGJvYXJkXERhc2hib2FyZC5jc2h0bWw=
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Dashboard/Dashboard.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvRGFzaGJvYXJkL0Rhc2hib2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Home/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Home/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9JbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Home/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Home/Privacy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvSG9tZS9Qcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Login/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTG9naW5cTG9naW4uY3NodG1s
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Login/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvTG9naW4vTG9naW4uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL0Vycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Footer.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Gb290ZXIuY3NodG1s
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Footer.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19Gb290ZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_MinimumLayout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9NaW5pbXVtTGF5b3V0LmNzaHRtbA==
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_MinimumLayout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19NaW5pbXVtTGF5b3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Navbar.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9OYXZiYXIuY3NodG1s
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Navbar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19OYXZiYXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Sidebar.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9TaWRlYmFyLmNzaHRtbA==
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Sidebar.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19TaWRlYmFyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/SignUp/SignUp.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2lnblVwXFNpZ25VcC5jc2h0bWw=
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/SignUp/SignUp.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2lnblVwL1NpZ25VcC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Layout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = b-xa7l1khx67
+[/media/ahmad/01DBEF843F1899E0/Users/Administrator/source/repos/E-Commerce Website/E-Commerce Website/Views/Shared/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3MvU2hhcmVkL19MYXlvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = b-if1yysnmkg
