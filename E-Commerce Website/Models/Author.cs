@@ -2,10 +2,11 @@
 
 namespace ECommerceWebsite.Models
 {
-    public class Category : BaseModel
+    public class Author : BaseModel
     {
         [Required]
-        public string CategoryType { get; set; } = string.Empty;
+        public string AuthorName { get; set; } = string.Empty;
+
         public ICollection<Book>? Books { get; set; }
 
     }
