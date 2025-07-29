@@ -5,11 +5,11 @@ namespace ECommerceWebsite.Models.Repository
 {
     public interface ICategoryRepository
     {
-        Task<IEnumerable<Category>> GetAllCategoriesAsync();
-        Task<Category?> GetCategoryByIdAsync(Guid id);
-        Task AddCategoryAsync(Category category);
-        Task UpdateCategoryAsync(Category category);
-        Task DeleteCategoryAsync(Guid id);
+        Task<IEnumerable<Category>> GetAllCategoriesAsync(); //READ
+        Task<Category?> GetCategoryByIdAsync(Guid id); 
+        Task AddCategoryAsync(Category category);           //CREATE
+        Task UpdateCategoryAsync(Category category);        //UPDATE
+        Task DeleteCategoryAsync(Guid id);                  //DELETE
     }
 
     public class CategoryRepository

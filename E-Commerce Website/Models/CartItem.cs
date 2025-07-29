@@ -7,16 +7,12 @@ namespace ECommerceWebsite.Models
     {
         public int Quantity { get; set; }
 
-        [Required]
-        public Guid BookId { get; set; }
-
         [ForeignKey("BookId")]
         public Book? Book { get; set; }
-
-        [Required]
-        public Guid UserId { get; set; }
+        public Guid? BookId { get; set; }
 
         [ForeignKey("UserId")]
+        public Guid? UserId { get; set; }
         public User? User { get; set; }
     }
 }

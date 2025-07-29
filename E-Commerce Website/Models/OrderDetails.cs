@@ -6,12 +6,6 @@ namespace ECommerceWebsite.Models
     public class OrderDetails : BaseModel
     {
         [Required]
-        public Guid UserId { get; set; }
-
-        [ForeignKey("UserId")]
-        public User? User { get; set; }
-
-        [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
 
@@ -34,7 +28,9 @@ namespace ECommerceWebsite.Models
         [Column(TypeName = "nvarchar(15)")]
         public string PhoneNumber { get; set; } = string.Empty;
 
-        // Navigation Property
-        public ICollection<OrderItem> OrderItems { get; set; }
+        [ForeignKey("UserId")]
+        public Guid? UserId { get; set; }
+        public User? User { get; set; }
+        public ICollection<OrderItem>? OrderItems { get; set; }
     }
 }

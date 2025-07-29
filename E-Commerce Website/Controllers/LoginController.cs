@@ -55,7 +55,7 @@ namespace ECommerceWebsite.Controllers
             var auth  = new Authorization(_httpContextAccessor);
             await auth.SetUserClaims(user);
 
-            return RedirectToAction("Dashboard", "Dashboard");
+            return RedirectToAction("UserHome", "UserHome");
         }
     }
 }
