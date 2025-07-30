@@ -1,8 +1,7 @@
 ﻿@model IEnumerable<Book>
 @{
-	Layout = "_MinimumLayout";
+	Layout = "_Layout";
 }
-
 
 <!-- Main content -->
 <div class="content-wrapper">
@@ -11,14 +10,6 @@
 		<div class="page-header-content">
 			<div class="page-title">
 				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">ECommerce</span> - Product Grid</h4>
-			</div>
-
-			<div class="heading-elements">
-				<div class="heading-btn-group">
-					<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-bars-alt text-primary"></i><span>Statistics</span></a>
-					<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-calculator text-primary"></i> <span>Invoices</span></a>
-					<a href="#" class="btn btn-link btn-float text-size-small has-text"><i class="icon-calendar5 text-primary"></i> <span>Schedule</span></a>
-				</div>
 			</div>
 		</div>
 
@@ -29,33 +20,33 @@
 				<li class="active">Stats widgets</li>
 			</ul>
 
-			<ul class="breadcrumb-elements">
-				<li><a href="#"><i class="icon-comment-discussion position-left"></i> Support</a></li>
-				<li class="dropdown">
-					<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-						<i class="icon-gear position-left"></i>
-						Settings
-						<span class="caret"></span>
-					</a>
-
-					<ul class="dropdown-menu dropdown-menu-right">
-						<li><a href="#"><i class="icon-user-lock"></i> Account security</a></li>
-						<li><a href="#"><i class="icon-statistics"></i> Analytics</a></li>
-						<li><a href="#"><i class="icon-accessibility"></i> Accessibility</a></li>
-						<li class="divider"></li>
-						<li><a href="#"><i class="icon-gear"></i> All settings</a></li>
-					</ul>
-				</li>
-			</ul>
 		</div>
 	</div>
 	<!-- /page header -->
+	<div class="searchbar">
+		@* searhbar *@
+		<div class="form-group has-feedback has-feedback-left">
+			<input type="text" id="hot_search_basic_input" class="form-control" placeholder="Search">
+			<div class="form-control-feedback">
+				<i class="icon-search4 text-size-small"></i>
+			</div>
+		</div>
+	</div>
 	<!-- Content area -->
 	<div class="content">
 
 		<!-- Detached content -->
 		<div class="container-detached">
 			<div class="content-detached">
+
+				@* Rounded Button *@
+
+				@* <div class="panel panel-body border-top-primary text-center"> *@
+				@* 	<h6 class="no-margin text-semibold">Rounded button</h6> *@
+				@* 	<p class="text-muted content-group-sm">Works with all button types</p> *@
+				@* 	<button type="button" class="btn btn-danger btn-rounded">Rounded button</button> *@
+				@* </div> *@
+
 
 				<!-- Grid -->
 				<div class="row">
@@ -104,6 +95,16 @@
 					
 				</div>
 				<!-- /grid -->
+				<!-- Detached sidebar -->
+				<div class="sidebar-detached">
+					<div class="sidebar sidebar-default sidebar-separate">
+						<div class="sidebar-content">
+						</div>
+					</div>
+				</div>
+				<!-- /detached sidebar -->
+
+
 				<!-- Pagination -->
 				<div class="text-center content-group-lg pt-20">
 					<ul class="pagination">
@@ -121,493 +122,7 @@
 			</div>
 		</div>
 		<!-- /detached content -->
-		<!-- Detached sidebar -->
-		<div class="sidebar-detached">
-			<div class="sidebar sidebar-default sidebar-separate">
-				<div class="sidebar-content">
-
-					<!-- Categories -->
-					<div class="sidebar-category">
-						<div class="category-title">
-							<span>Categories</span>
-							<ul class="icons-list">
-								<li><a href="#" data-action="collapse"></a></li>
-							</ul>
-						</div>
-
-						<div class="category-content">
-							<div class="has-feedback has-feedback-left form-group">
-								<input type="search" class="form-control" placeholder="Search...">
-								<div class="form-control-feedback">
-									<i class="icon-search4 text-size-small text-muted"></i>
-								</div>
-							</div>
-						</div>
-
-						<div class="category-content no-padding">
-							<ul class="navigation navigation-alt navigation-accordion navigation-sm no-padding-top">
-								<li>
-									<a href="#">Street wear</a>
-
-									<ul>
-										<li><a href="#">Hoodies</a></li>
-										<li><a href="#">Jackets</a></li>
-										<li class="active"><a href="#">Pants</a></li>
-										<li><a href="#">Shirts</a></li>
-										<li><a href="#">Sweaters</a></li>
-										<li><a href="#">Tank tops</a></li>
-										<li><a href="#">Underwear</a></li>
-									</ul>
-								</li>
-
-								<li>
-									<a href="#">Snow wear</a>
-
-									<ul>
-										<li><a href="#">Fleece jackets</a></li>
-										<li><a href="#">Gloves</a></li>
-										<li><a href="#">Ski jackets</a></li>
-										<li><a href="#">Ski pants</a></li>
-										<li><a href="#">Snowboard jackets</a></li>
-										<li><a href="#">Snowboard pants</a></li>
-										<li><a href="#">Technical underwear</a></li>
-									</ul>
-								</li>
-
-								<li>
-									<a href="#">Shoes</a>
-
-									<ul>
-										<li><a href="#">Laces</a></li>
-										<li><a href="#">Sandals</a></li>
-										<li><a href="#">Skate shoes</a></li>
-										<li><a href="#">Slip ons</a></li>
-										<li><a href="#">Sneakers</a></li>
-										<li><a href="#">Winter shoes</a></li>
-									</ul>
-								</li>
-
-								<li>
-									<a href="#">Accessories</a>
-
-									<ul>
-										<li><a href="#">Beanies</a></li>
-										<li><a href="#">Belts</a></li>
-										<li><a href="#">Caps</a></li>
-										<li><a href="#">Sunglasses</a></li>
-										<li><a href="#">Headphones</a></li>
-										<li><a href="#">Video cameras</a></li>
-										<li><a href="#">Wallets</a></li>
-										<li><a href="#">Watches</a></li>
-									</ul>
-								</li>
-							</ul>
-						</div>
-					</div>
-					<!-- /categories -->
-					<!-- Filter -->
-					<div class="sidebar-category">
-						<div class="category-title">
-							<span>Filter products</span>
-							<ul class="icons-list">
-								<li><a href="#" data-action="collapse"></a></li>
-							</ul>
-						</div>
-
-						<div class="category-content">
-							<form action="#">
-								<div class="form-group">
-									<div class="has-feedback has-feedback-left form-group">
-										<input type="search" class="form-control" placeholder="Search brand">
-										<div class="form-control-feedback">
-											<i class="icon-search4 text-size-small text-muted"></i>
-										</div>
-									</div>
-
-									<div class="has-scroll">
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												686
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												A.Lab
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Adidas
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												ALIS
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Analog
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Burton
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Atomic
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Armada
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												O'Neill
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Baja
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Baker
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Blue Parks
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Billabong
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Bonfire
-											</label>
-										</div>
-
-										<div class="checkbox">
-											<label class="display-block">
-												<input type="checkbox" class="styled">
-												Brixton
-											</label>
-										</div>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Items for</legend>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Men
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Women
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Kids
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Unisex
-										</label>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Size</legend>
-
-									<div class="row row-labels">
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">XXS</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">XS</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">S</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-warning text-warning-800">M</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">L</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">XL</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">XXL</a></div>
-										<div class="col-xs-3"><a href="#" class="label label-flat border-grey text-grey-800">XXXL</a></div>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Fit</legend>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Slim fit
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Skinny fit
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Regular fit
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Loose fit
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Long cut
-										</label>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Color</legend>
-
-									<div class="row row-colors">
-										<div class="col-xs-4">
-											<a href="#" class="bg-primary"></a>
-											<span>Blue</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-warning"></a>
-											<span>Orange</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-teal"></a>
-											<span>Teal</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-pink">
-												<i class="icon-checkmark3"></i>
-											</a>
-											<span>Pink</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-grey-800"></a>
-											<span>Black</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-purple"></a>
-											<span>Purple</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-success"></a>
-											<span>Green</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-danger"></a>
-											<span>Red</span>
-										</div>
-
-										<div class="col-xs-4">
-											<a href="#" class="bg-info"></a>
-											<span>Cyan</span>
-										</div>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Features</legend>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Crew neck
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Chest pocket
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Raglan sleeves
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Polo neck
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											V-neck
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											High collar
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Hood
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Button strip
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Wide neck
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Kangaroo pocket
-										</label>
-									</div>
-								</div>
-
-								<div class="form-group">
-									<legend class="text-size-mini text-muted no-border no-padding">Material features</legend>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Canvas
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Lined
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Merino
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Quick drying
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Stretch
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Water repellent
-										</label>
-									</div>
-
-									<div class="checkbox">
-										<label class="display-block">
-											<input type="checkbox" class="styled">
-											Windproof
-										</label>
-									</div>
-								</div>
-
-								<button type="submit" class="btn bg-blue btn-block">Filter</button>
-							</form>
-						</div>
-					</div>
-					<!-- /filter -->
-
-				</div>
-			</div>
-		</div>
-		<!-- /detached sidebar -->
+		
 		<!-- Footer -->
 		<div class="footer text-muted">
 			&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
@@ -621,23 +136,9 @@
 <!-- /main content -->
 
 
-@* searhbar *@
-<div class="form-group has-feedback has-feedback-left">
-	<input type="text" id="hot_search_basic_input" class="form-control" placeholder="Search">
-	<div class="form-control-feedback">
-		<i class="icon-search4 text-size-small"></i>
-	</div>
-</div>
 
 
 
 
-@* Rounded Button *@
-
-<div class="panel panel-body border-top-primary text-center">
-	<h6 class="no-margin text-semibold">Rounded button</h6>
-	<p class="text-muted content-group-sm">Works with all button types</p>
-	<button type="button" class="btn btn-danger btn-rounded">Rounded button</button>
-</div>
 
 

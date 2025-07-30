@@ -12,7 +12,7 @@ namespace ECommerceWebsite.Models.Repository
         Task DeleteCategoryAsync(Guid id);                  //DELETE
     }
 
-    public class CategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly ECommerceWebsiteDbContext _context;
 

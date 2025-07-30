@@ -1,0 +1,61 @@
+﻿@model IEnumerable<ECommerceWebsite.Models.Book>
+@{
+    ViewBag.Title = "Admin Dashboard";
+    Layout = "_Layout";
+}
+
+<div class="page-header">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-books4 position-left"></i> <span class="text-semibold">Admin Panel</span> - Manage Books</h4>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+
+    <div class="row mb-3">
+        <div class="col-md-12 d-flex justify-content-between align-items-center">
+            <form action="@Url.Action("Search", "Admin")" method="get" class="form-inline">
+                <div class="form-group">
+                    <input type="text" name="term" class="form-control" placeholder="Search books...">
+                    <button type="submit" class="btn btn-primary ml-2"><i class="icon-search4"></i></button>
+                </div>
+            </form>
+
+            <div>
+                <a href="@Url.Action("Create", "Admin")" class="btn btn-success"><i class="icon-plus-circle2"></i> Add Book</a>
+                <a href="@Url.Action("DeletedBooks", "Admin")" class="btn btn-warning"><i class="icon-bin"></i> Deleted Books</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        @foreach (var book in Model)
+        {
+            <div class="col-xl-3 col-md-6 col-sm-12">
+                <div class="panel panel-body border-top-primary text-left">
+                    <h5 class="text-semibold">@book.Title</h5>
+                    <p class="mb-1"><strong>Author:</strong> @book.Author?.AuthorName</p>
+                    <p class="mb-1"><strong>Category:</strong> @book.Category?.CategoryType</p>
+                    <p class="mb-1"><strong>Price:</strong> Rs. @book.Price</p>
+                    <p class="mb-1"><strong>Stock:</strong> @book.StockQuantity</p>
+                    <p class="mb-2"><strong>Published:</strong> @book.PublicationDate.ToString()</p>
+
+                    <div class="d-flex justify-content-between mt-2">
+                        <a href="@Url.Action("Edit", "Admin", new { id = book.Id })" class="btn btn-sm btn-primary">
+                            <i class="icon-pencil7"></i> Edit
+                        </a>
+
+                        <form action="@Url.Action("Delete", "Admin", new { id = book.Id })" method="post" onsubmit="return confirm('Are you sure?');">
+                            <button type="submit" class="btn btn-sm btn-danger">
+                                <i class="icon-bin"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+</div>

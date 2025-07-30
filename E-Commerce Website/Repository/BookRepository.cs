@@ -5,8 +5,6 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ECommerceWebsite.Repository
 {
-    public interface IBookRepository
-    {
         //1. AddBook (Create)
         //2. DeleteBook (Delete)
         //3. UpdateBook (Update)
@@ -15,105 +13,196 @@ namespace ECommerceWebsite.Repository
         //6. GetBookByAuthor (List)
         //7. GetBooksByCategory (List)
         //8. GetAllBooks (List)
-        Task AddBookAsync(Book book);
-        Task DeleteBookAsync(Guid id);
-        Task UpdateBookAsync(Book book);
-        Task<Book> GetBookByIdAsync(Guid id);
-        Task<Book> GetBooksByTitle(string title);
-        Task<IEnumerable<Book>> GetBooksByAuthorAsync(string name); //IEnumerable for eager loading on home page
-        Task<IEnumerable<Book>> GetBooksByCategoryAsync(string categoryName);
-        Task<IEnumerable<Book>> GetAllBooksAsync(); 
-
-    }
-
-    public class BookRepository : IBookRepository
-    {
-        private readonly ECommerceWebsiteDbContext _context;
-        public BookRepository(ECommerceWebsiteDbContext context)
+        public interface IBookRepository
         {
-            _context = context;
-        }
-        public async Task AddBookAsync(Book book)
-        {
-            await _context.Books.AddAsync(book);
-            await _context.SaveChangesAsync();
+            Task AddBookAsync(Book book);
+            Task UpdateBookAsync(Book book);
+            Task<Book?> GetBookByIdAsync(Guid id);
+            Task<Book?> GetActiveBookByIdAsync(Guid id);
+            Task<IEnumerable<Book>> GetActiveBooksAsync();
+            Task<IEnumerable<Book>> GetAllBooksAsync();
+            Task DeleteBookAsync(Guid id);
+            Task<bool> IsBookInCartAsync(Guid bookId);
+            Task<IEnumerable<Book>> SearchActiveBooksAsync(string searchTerm);
+            Task<Book?> GetBooksByTitle(string title);
+            Task<IEnumerable<Book>> GetBooksByAuthorAsync(string name);
+            Task<IEnumerable<Book>> GetBooksByCategoryAsync(string categoryName);
+            Task<int> GetTotalBooksCountAsync(); // total books
+            Task<IEnumerable<Book>> GetRecentBooksAsync(int count); // latest books
+            Task<IEnumerable<Book>> GetDeletedBooksAsync();
+            Task<IEnumerable<Book>> GetBooksByAuthorAsync(Guid authorId);
+            Task<IEnumerable<Book>> GetBooksByCategoryAsync(Guid categoryId);
         }
 
-        public async Task DeleteBookAsync(Guid id)
+        public class BookRepository : IBookRepository
         {
-            await GetBookByIdAsync(id);
-            var book = await _context.Books.FindAsync(id);
-            if (book != null)
+            private readonly ECommerceWebsiteDbContext _context;
+
+            public BookRepository(ECommerceWebsiteDbContext context)
             {
-                _context.Books.Remove(book);
+                _context = context;
+            }
+
+            public async Task AddBookAsync(Book book)
+            {
+                await _context.Books.AddAsync(book);
                 await _context.SaveChangesAsync();
             }
-            else
+
+            public async Task UpdateBookAsync(Book book)
             {
-                throw new KeyNotFoundException("Book not found");
+                var existingBook = await _context.Books.FindAsync(book.Id);
+                if (existingBook == null)
+                    throw new KeyNotFoundException("Book not found");
+
+                existingBook.Title = book.Title;
+                existingBook.Description = book.Description;
+                existingBook.Price = book.Price;
+                existingBook.StockQuantity = book.StockQuantity;
+                existingBook.CategoryId = book.CategoryId;
+                existingBook.AuthorId = book.AuthorId;
+                existingBook.ImageUrl = book.ImageUrl;
+                existingBook.PublicationDate = book.PublicationDate;
+
+                await _context.SaveChangesAsync();
             }
-        }
 
-        public async Task<IEnumerable<Book>> GetAllBooksAsync()
-        {
-           return await _context.Books.ToListAsync();
-        }
-
-        public async Task<Book> GetBookByIdAsync(Guid id)
-        {
-           return await _context.Books.FindAsync(id);
-        }
-
-        public async Task<Book> GetBooksByTitle(string title)
-        {
-            if (string.IsNullOrWhiteSpace(title))
+            public async Task<Book?> GetBookByIdAsync(Guid id)
             {
-                throw new ArgumentNullException(nameof(title), "Title cannot be null or empty");
+                return await _context.Books.FindAsync(id);
             }
-            title = title.Trim().ToLower();
+
+            public async Task<Book?> GetActiveBookByIdAsync(Guid id)
+            {
+                return await _context.Books
+                    .FirstOrDefaultAsync(b => b.Id == id && b.isActive);
+            }
+
+            public async Task<IEnumerable<Book>> GetActiveBooksAsync()
+            {
+                return await _context.Books
+                    .Where(b => b.isActive)
+                    .OrderByDescending(b => b.CreatedAt)
+                    .ToListAsync();
+            }
+
+            public async Task<IEnumerable<Book>> GetAllBooksAsync()
+            {
+                return await _context.Books.ToListAsync();
+            }
+
+            public async Task DeleteBookAsync(Guid id)
+            {
+                var book = await _context.Books.FindAsync(id);
+                if (book != null)
+                {
+                    book.isActive = false; // soft delete
+                    _context.Books.Update(book);
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    throw new KeyNotFoundException("Book not found");
+                }
+            }
+
+            public async Task<bool> IsBookInCartAsync(Guid bookId)
+            {
+                return await _context.CartItems.AnyAsync(c => c.BookId == bookId);
+            }
+
+            public async Task<IEnumerable<Book>> SearchActiveBooksAsync(string searchTerm)
+            {
+                if (string.IsNullOrWhiteSpace(searchTerm))
+                    return await GetActiveBooksAsync();
+
+                searchTerm = searchTerm.Trim().ToLower();
+
+                return await _context.Books
+                    .Where(b => b.isActive &&
+                           (b.Title.ToLower().Contains(searchTerm) ||
+                            b.Description.ToLower().Contains(searchTerm)))
+                    .OrderByDescending(b => b.CreatedAt)
+                    .ToListAsync();
+            }
+
+            public async Task<Book?> GetBooksByTitle(string title)
+            {
+                if (string.IsNullOrWhiteSpace(title))
+                    throw new ArgumentNullException(nameof(title));
+
+                title = title.Trim().ToLower();
+
+                return await _context.Books
+                    .FirstOrDefaultAsync(b => b.Title.ToLower().Contains(title));
+            }
+
+            public async Task<IEnumerable<Book>> GetBooksByAuthorAsync(string name)
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                    throw new ArgumentNullException(nameof(name));
+
+                name = name.Trim().ToLower();
+
+                return await _context.Books
+                    .Where(b => b.Author != null &&
+                                b.Author.AuthorName.ToLower().Contains(name))
+                    .ToListAsync();
+            }
+
+            public async Task<IEnumerable<Book>> GetBooksByCategoryAsync(string categoryName)
+            {
+                if (string.IsNullOrWhiteSpace(categoryName))
+                    throw new ArgumentNullException(nameof(categoryName));
+
+                categoryName = categoryName.Trim().ToLower();
+
+                return await _context.Books
+                    .Where(b => b.Category != null &&
+                                b.Category.CategoryType.ToLower().Contains(categoryName))
+                    .ToListAsync();
+            }
+
+            public async Task<int> GetTotalBooksCountAsync()
+            {
+                return await _context.Books.CountAsync();
+            }
+
+            public async Task<IEnumerable<Book>> GetRecentBooksAsync(int count)
+            {
+                return await _context.Books
+                    .Where(b => b.isActive)
+                    .OrderByDescending(b => b.CreatedAt)
+                    .Take(count)
+                    .ToListAsync();
+            }
+
+        public async Task<IEnumerable<Book>> GetDeletedBooksAsync()
+        {
             return await _context.Books
-                   .FirstOrDefaultAsync(b => b.Title.Trim().ToLower().Contains(title));
-        }
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .Where(b => !b.isActive)
+                .ToListAsync();
+        }   
 
-        public async Task<IEnumerable<Book>> GetBooksByAuthorAsync(string name)
+        public async Task<IEnumerable<Book>> GetBooksByAuthorAsync(Guid authorId)
         {
-           if(string.IsNullOrWhiteSpace(name))
-            {
-                throw new ArgumentNullException(nameof(name), "Author name cannot be null");
-            }
-
-            name = name.Trim().ToLower();
-            return await _context.Books.Where(b=> b.Author != null && b.Author.AuthorName.ToLower().Contains(name))
+            return await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .Where(b => b.isActive && b.AuthorId == authorId)
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Book>> GetBooksByCategoryAsync(string categoryName)
+        public async Task<IEnumerable<Book>> GetBooksByCategoryAsync(Guid categoryId)
         {
-            if(string.IsNullOrWhiteSpace(categoryName))
-            {
-                throw new ArgumentNullException(nameof(categoryName), "Category name cannot be null or empty");
-            }
-            categoryName = categoryName.Trim().ToLower();
-            return await _context.Books.Where(b=> b.Category.CategoryType.Trim().ToLower().Contains(categoryName))
+            return await _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .Where(b => b.isActive && b.CategoryId == categoryId)
                 .ToListAsync();
-        }
-
-        public async Task UpdateBookAsync(Book book)
-        {
-            var existingBook = await _context.Books.FindAsync(book.Id);
-            if (existingBook == null)
-            {
-                throw new KeyNotFoundException("Book not found");
-            }
-            existingBook.Title = book.Title;
-            existingBook.Description = book.Description;
-            existingBook.Price = book.Price;
-            existingBook.StockQuantity = book.StockQuantity;
-            existingBook.CategoryId = book.CategoryId;
-            existingBook.AuthorId = book.AuthorId;
-            existingBook.ImageUrl = book.ImageUrl;
-            existingBook.PublicationDate = book.PublicationDate;
-            await _context.SaveChangesAsync();
         }
     }
 }
+

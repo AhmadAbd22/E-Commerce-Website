@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerceWebsite.Models
 {
-    public class Book : BaseModel
+    public class    Book : BaseModel
     {
         [Required]
         [Column(TypeName = "nvarchar(100)")]

@@ -2,6 +2,7 @@
 using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Models.Helping_Classes;
+using ECommerceWebsite.Models.Enums;
 
 namespace ECommerceWebsite.Controllers
 {
@@ -51,11 +52,22 @@ namespace ECommerceWebsite.Controllers
                 TempData["Error"] = "Incorrect password.";
                 return View(loginDto);
             }
+            if(user.Role == (int)enumRole.Admin)
+            {
+                var auth = new Authorization(_httpContextAccessor);
+                await auth.SetUserClaims(user);
+                return RedirectToAction("Admin", "Admin");
+            }
+            else
+            {
+                var auth = new Authorization(_httpContextAccessor);
+                await auth.SetUserClaims(user);
 
-            var auth  = new Authorization(_httpContextAccessor);
-            await auth.SetUserClaims(user);
+                return RedirectToAction("UserHome", "UserHome");
 
-            return RedirectToAction("UserHome", "UserHome");
+            }
+
+               
         }
     }
 }
