@@ -26,7 +26,22 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Admin()
         {
             var books = await _bookRepo.GetAllBooksAsync();
-            return View(books);
+            var dtos = books.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Price = book.Price,
+                Stock = book.StockQuantity,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId,
+                ImageUrl = book.ImageUrl,
+                PublicationDate = book.PublicationDate,
+                Author = book.Author,
+                Category = book.Category
+            }).ToList();
+
+            return View(dtos);
         }
 
         // GET: /Admin/DeletedBooks
@@ -36,24 +51,43 @@ namespace ECommerceWebsite.Controllers
             return View(deletedBooks);
         }
 
-        // GET: e
+        // GET
+        [HttpGet]
         public async Task<IActionResult> Create()
         {
-            await LoadDropdowns();
-            return RedirectToAction("Admin");
+            var categories = await _categoryRepo.GetAllCategoriesAsync();
+            var dto = new BookDto
+            {
+                CategoriesList = categories.ToList()
+            };
+            return View(dto);
         }
 
-        // POST:
+
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(BookDto dto)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrWhiteSpace(dto.Title) ||
+                dto.Price <= 0 ||
+                dto.Stock < 0 ||
+                dto.AuthorId == Guid.Empty ||
+                dto.CategoryId == null ||
+                string.IsNullOrWhiteSpace(dto.ImageUrl) ||
+                dto.PublicationDate == null)
             {
-                await LoadDropdowns();
-                return RedirectToAction("Admin", dto);
+                ViewData["Message"] = "All fields are required and must be valid.";
+
+                dto.CategoriesList = (await _categoryRepo.GetAllCategoriesAsync()).ToList();
+                return View(dto);
             }
 
+            if (!ModelState.IsValid)
+            {
+                dto.CategoriesList = (await _categoryRepo.GetAllCategoriesAsync()).ToList();
+                return View(dto);
+            }
+
+            //create a new book
             var book = new Book
             {
                 Id = Guid.NewGuid(),
@@ -70,7 +104,7 @@ namespace ECommerceWebsite.Controllers
             };
 
             await _bookRepo.AddBookAsync(book);
-            return RedirectToAction("Index");
+            return RedirectToAction("Admin");
         }
 
         // GEt
@@ -93,7 +127,6 @@ namespace ECommerceWebsite.Controllers
                 PublicationDate = book.PublicationDate
             };
 
-            await LoadDropdowns();
             return View(dto);
         }
 
@@ -103,7 +136,6 @@ namespace ECommerceWebsite.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await LoadDropdowns();
                 return View(dto);
             }
 
@@ -121,7 +153,7 @@ namespace ECommerceWebsite.Controllers
             book.PublicationDate = dto.PublicationDate;
 
             await _bookRepo.UpdateBookAsync(book);
-            return RedirectToAction("Index");
+            return RedirectToAction("Admin");
         }
 
         [HttpPost]
@@ -135,7 +167,7 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Search(string term)
         {
             var books = await _bookRepo.SearchActiveBooksAsync(term);
-            return View("Index", books);
+            return View("Admin", books);
         }
 
         // GET
@@ -151,14 +183,61 @@ namespace ECommerceWebsite.Controllers
             var books = await _bookRepo.GetBooksByCategoryAsync(categoryId.ToString());
             return View("Index", books);
         }
-
-        private async Task LoadDropdowns()
+        
+        [HttpGet]
+        public async Task<IActionResult> AddAuthor()
         {
-            var authors = await _authorRepo.GetAllAuthorsAsync();
-            var categories = await _categoryRepo.GetAllCategoriesAsync();
+            return View();
+        }
 
-            ViewBag.Authors = new SelectList(authors, "Id", "AuthorName");
-            ViewBag.Categories = new SelectList(categories, "Id", "CategoryType");
+        [HttpGet]
+        public async Task<IActionResult> AddCategory()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddCategory(CategoryDto catDto)
+        {
+            if (catDto == null || string.IsNullOrWhiteSpace(catDto.CategoryType))
+            {
+                ViewData["Message"] = "Invalid category data!";
+                return View(catDto);
+            }
+
+            var categories = await _categoryRepo.GetAllCategoriesAsync();
+            if (categories.Any(c => c.CategoryType.Equals(catDto.CategoryType.Trim(), StringComparison.OrdinalIgnoreCase)))
+            {
+                ViewData["Existing"] = "Category Already Exists";
+                return View(catDto);
+            }
+
+            var category = new Category
+            {
+                Id = Guid.NewGuid(),
+                CategoryType = catDto.CategoryType.Trim(),
+            };
+
+            await _categoryRepo.AddCategoryAsync(category);
+            ViewData["Message"] = "Category added successfully!";
+            return RedirectToAction("Admin", "Admin");
+        }
+
+        public async Task RemoveCategory(CategoryDto categoryDto)
+        {
+            if (categoryDto == null || categoryDto.Id == Guid.Empty)
+            {
+                ViewData["Message"] = "Invalid category data!";
+                return;
+            }
+            var category = await _categoryRepo.GetCategoryByIdAsync(categoryDto.Id);
+            if (category == null)
+            {
+                ViewData["Message"] = "Category not found!";
+                return;
+            }
+            await _categoryRepo.DeleteCategoryAsync(categoryDto.Id);
+            ViewData["Message"] = "Category deleted successfully!";
         }
     }
 }

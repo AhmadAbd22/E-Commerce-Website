@@ -1,0 +1,40 @@
+﻿@using ECommerceWebsite.Models.Dtos
+@model CategoryDto
+@{
+    Layout = "_MinimumLayout"; 
+}
+
+<!-- Centered forms -->
+<div class="row modal-dialog-centered">
+	<div class="col-md-6">
+		<form action="@Url.Action("AddCategory", "Admin")" method="post">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-md-10 col-md-offset-1">
+							<h1 class="panel-title">Add Category</h1>
+						</div>	
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-10 col-md-offset-1">
+							<div class="form-group">
+								<label><h4>Category Name</h4></label>
+								<input type="hidden" name="CategoryId" class="form-control">
+								<input type="text" name="CategoryType" class="form-control" placeholder="Category Name">
+							</div>
+						</div>
+					</div>
+							<div class="text-center">
+								<button type="submit" class="btn btn-primary" style="margin-bottom:8px">Add Category</button>
+							</div>
+
+					<div class="text-center">
+						<a href="@Url.Action("Admin", "Admin")" class="btn btn-secondary">Back to Home</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

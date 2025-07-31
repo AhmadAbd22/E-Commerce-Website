@@ -1,61 +1,90 @@
-﻿@model IEnumerable<ECommerceWebsite.Models.Book>
+﻿@model IEnumerable<BookDto>
 @{
-    ViewBag.Title = "Admin Dashboard";
-    Layout = "_Layout";
+	ViewData["Title"] = "Admin Dashboard";
+	Layout = "_MinimumLayout"; 
 }
+@if (ViewData["Message"] != null)
+{
+	<div class="alert alert-success" role="alert">
+		@ViewData["Message"]
+	</div>
+}
+<div class="content-wrapper">
+	<!-- Page header -->
+	<div class="page-header page-header-default">
+		<div class="page-header-content">
+			<div class="page-title">
+				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Admin</span> - Product Grid</h4>
+			</div>
+		</div>
+	</div>
 
-<div class="page-header">
-    <div class="page-header-content">
-        <div class="page-title">
-            <h4><i class="icon-books4 position-left"></i> <span class="text-semibold">Admin Panel</span> - Manage Books</h4>
-        </div>
-    </div>
-</div>
+	<a href="@Url.Action("Create", "Admin")" class="btn btn-primary legitRipple">+ Add Books</a>
+	<a href="@Url.Action("AddCategory", "Admin")" class="btn btn-primary legitRipple">Add Categories</a>
 
-<div class="content">
+	<!-- Content area -->
+	<div class="content">
+		<div class="container-detached">
+			<div class="content-detached">
 
-    <div class="row mb-3">
-        <div class="col-md-12 d-flex justify-content-between align-items-center">
-            <form action="@Url.Action("Search", "Admin")" method="get" class="form-inline">
-                <div class="form-group">
-                    <input type="text" name="term" class="form-control" placeholder="Search books...">
-                    <button type="submit" class="btn btn-primary ml-2"><i class="icon-search4"></i></button>
-                </div>
-            </form>
-
-            <div>
-                <a href="@Url.Action("Create", "Admin")" class="btn btn-success"><i class="icon-plus-circle2"></i> Add Book</a>
-                <a href="@Url.Action("DeletedBooks", "Admin")" class="btn btn-warning"><i class="icon-bin"></i> Deleted Books</a>
-            </div>
-        </div>
-    </div>
-
-    <div class="row">
-        @foreach (var book in Model)
-        {
-            <div class="col-xl-3 col-md-6 col-sm-12">
-                <div class="panel panel-body border-top-primary text-left">
-                    <h5 class="text-semibold">@book.Title</h5>
-                    <p class="mb-1"><strong>Author:</strong> @book.Author?.AuthorName</p>
-                    <p class="mb-1"><strong>Category:</strong> @book.Category?.CategoryType</p>
-                    <p class="mb-1"><strong>Price:</strong> Rs. @book.Price</p>
-                    <p class="mb-1"><strong>Stock:</strong> @book.StockQuantity</p>
-                    <p class="mb-2"><strong>Published:</strong> @book.PublicationDate.ToString()</p>
-
-                    <div class="d-flex justify-content-between mt-2">
-                        <a href="@Url.Action("Edit", "Admin", new { id = book.Id })" class="btn btn-sm btn-primary">
-                            <i class="icon-pencil7"></i> Edit
-                        </a>
-
-                        <form action="@Url.Action("Delete", "Admin", new { id = book.Id })" method="post" onsubmit="return confirm('Are you sure?');">
-                            <button type="submit" class="btn btn-sm btn-danger">
-                                <i class="icon-bin"></i> Delete
-                            </button>
-                        </form>
+				<!-- Grid of Books -->
+				<div class="row">
+                    <div class="row">
+                        <p>Test content</p>
+                        @foreach (var book in Model) { @book.Title}
                     </div>
-                </div>
-            </div>
-        }
-    </div>
+					@foreach (var book in Model)
+					{
+						<div class="col-lg-3 col-sm-6">
+							<div class="panel">
+								<div class="panel-body">
+									<div class="thumb thumb-fixed">
+										<a href="@book.ImageUrl" data-popup="lightbox">
+											<img src="@book.ImageUrl" alt="@book.Title" />
+											<span class="zoom-image"><i class="icon-plus2"></i></span>
+										</a>
+									</div>
+								</div>
 
+								<div class="panel-body panel-body-accent text-center">
+									<h6 class="text-semibold no-margin">
+										<a href="#" class="text-default">@book.Title</a>
+									</h6>
+
+									<ul class="list-inline list-inline-separate mb-10">
+										<li><a href="#" class="text-muted">@book.Category</a></li>
+									</ul>
+
+									<h3 class="no-margin text-semibold">Rs. @book.Price</h3>
+
+									<div class="text-nowrap">
+										<i class="icon-star-full2 text-size-base text-warning-300"></i>
+										<i class="icon-star-full2 text-size-base text-warning-300"></i>
+										<i class="icon-star-full2 text-size-base text-warning-300"></i>
+										<i class="icon-star-full2 text-size-base text-warning-300"></i>
+										<i class="icon-star-full2 text-size-base text-warning-300"></i>
+									</div>
+
+									<div class="text-muted">0 reviews</div>
+
+									<!-- Admin Actions -->
+									<div class="mt-10">
+										<a href="@Url.Action("EditBook", "Admin")" class="btn btn-sm btn-warning">Edit</a>
+										<a href="/Admin/Delete/@book.Id" class="btn btn-sm btn-danger">Delete</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+				<!-- /grid -->
+
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="footer text-muted">
+			&copy; 2025. <a href="#">ECommerce</a> by <a href="#" target="_blank">You</a>
+		</div>
+	</div>
 </div>
