@@ -12,7 +12,7 @@ namespace ECommerceWebsite.Models
         public DateTime? DeletedAt { get; set; } = null;
         public string CreatedBy { get; set; } = string.Empty;
         public int? Role { get; set; }
-        public bool isActive { get; set; }
+        public int? isActive { get; set; }
 
     }
 }

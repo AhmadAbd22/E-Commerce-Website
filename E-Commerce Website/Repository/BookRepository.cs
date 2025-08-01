@@ -1,5 +1,6 @@
 ﻿using ECommerceWebsite.Models;
 using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -75,13 +76,13 @@ namespace ECommerceWebsite.Repository
             public async Task<Book?> GetActiveBookByIdAsync(Guid id)
             {
                 return await _context.Books
-                    .FirstOrDefaultAsync(b => b.Id == id && b.isActive);
+                    .FirstOrDefaultAsync(b => b.Id == id && b.isActive == (int)enumStatus.Active);
             }
 
             public async Task<IEnumerable<Book>> GetActiveBooksAsync()
             {
                 return await _context.Books
-                    .Where(b => b.isActive)
+                    .Where(b => b.isActive == (int)enumStatus.Active)
                     .OrderByDescending(b => b.CreatedAt)
                     .ToListAsync();
             }
@@ -96,7 +97,7 @@ namespace ECommerceWebsite.Repository
                 var book = await _context.Books.FindAsync(id);
                 if (book != null)
                 {
-                    book.isActive = false; // soft delete
+                    book.isActive = (int)enumStatus.Inactive;
                     _context.Books.Update(book);
                     await _context.SaveChangesAsync();
                 }
@@ -119,7 +120,7 @@ namespace ECommerceWebsite.Repository
                 searchTerm = searchTerm.Trim().ToLower();
 
                 return await _context.Books
-                    .Where(b => b.isActive &&
+                    .Where(b => b.isActive == (int)enumStatus.Active &&
                            (b.Title.ToLower().Contains(searchTerm) ||
                             b.Description.ToLower().Contains(searchTerm)))
                     .OrderByDescending(b => b.CreatedAt)
@@ -171,7 +172,7 @@ namespace ECommerceWebsite.Repository
             public async Task<IEnumerable<Book>> GetRecentBooksAsync(int count)
             {
                 return await _context.Books
-                    .Where(b => b.isActive)
+                    .Where(b => b.isActive == (int)enumStatus.Active)
                     .OrderByDescending(b => b.CreatedAt)
                     .Take(count)
                     .ToListAsync();
@@ -182,7 +183,7 @@ namespace ECommerceWebsite.Repository
             return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Category)
-                .Where(b => !b.isActive)
+                .Where(b => b.isActive == (int)enumStatus.Inactive )
                 .ToListAsync();
         }   
 
@@ -191,7 +192,7 @@ namespace ECommerceWebsite.Repository
             return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Category)
-                .Where(b => b.isActive && b.AuthorId == authorId)
+                .Where(b => b.isActive == (int)enumStatus.Active && b.AuthorId == authorId)
                 .ToListAsync();
         }
 
@@ -200,7 +201,7 @@ namespace ECommerceWebsite.Repository
             return await _context.Books
                 .Include(b => b.Author)
                 .Include(b => b.Category)
-                .Where(b => b.isActive && b.CategoryId == categoryId)
+                .Where(b => b.isActive == (int)enumStatus.Active && b.CategoryId == categoryId)
                 .ToListAsync();
         }
     }

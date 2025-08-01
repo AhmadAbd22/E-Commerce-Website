@@ -6,6 +6,8 @@ using ECommerceWebsite.Repository;
 using System;
 using System.Threading.Tasks;
 using ECommerceWebsite.Models.Repository;
+using ECommerceWebsite.Models.Enums;
+using System.Net;
 
 namespace ECommerceWebsite.Controllers
 {
@@ -35,7 +37,6 @@ namespace ECommerceWebsite.Controllers
                 Stock = book.StockQuantity,
                 AuthorId = book.AuthorId,
                 CategoryId = book.CategoryId,
-                ImageUrl = book.ImageUrl,
                 PublicationDate = book.PublicationDate,
                 Author = book.Author,
                 Category = book.Category
@@ -44,7 +45,7 @@ namespace ECommerceWebsite.Controllers
             return View(dtos);
         }
 
-        // GET: /Admin/DeletedBooks
+        // GET
         public async Task<IActionResult> DeletedBooks()
         {
             var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
@@ -56,9 +57,11 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Create()
         {
             var categories = await _categoryRepo.GetAllCategoriesAsync();
+            var authors = await _authorRepo.GetAllAuthorsAsync(); 
             var dto = new BookDto
             {
-                CategoriesList = categories.ToList()
+                CategoriesList = categories.ToList(),
+                AuthorsList = authors.ToList() 
             };
             return View(dto);
         }
@@ -70,37 +73,52 @@ namespace ECommerceWebsite.Controllers
             if (string.IsNullOrWhiteSpace(dto.Title) ||
                 dto.Price <= 0 ||
                 dto.Stock < 0 ||
-                dto.AuthorId == Guid.Empty ||
-                dto.CategoryId == null ||
-                string.IsNullOrWhiteSpace(dto.ImageUrl) ||
+                dto.ImageFile == null || dto.ImageFile.Length == 0 ||
                 dto.PublicationDate == null)
             {
                 ViewData["Message"] = "All fields are required and must be valid.";
 
                 dto.CategoriesList = (await _categoryRepo.GetAllCategoriesAsync()).ToList();
+                dto.AuthorsList = (await _authorRepo.GetAllAuthorsAsync()).ToList();
                 return View(dto);
             }
 
-            if (!ModelState.IsValid)
+            var bookId = Guid.NewGuid();
+            GeneralPurpose.CreateBookDirectory(bookId);
+
+            var fileName = string.IsNullOrWhiteSpace(dto.FileName)
+                ? Path.GetFileName(dto.ImageFile.FileName)
+                : dto.FileName + Path.GetExtension(dto.ImageFile.FileName);
+
+            var filePath = GeneralPurpose.GetBookImagePathForSave(bookId, fileName);
+            var imageSaved = await GeneralPurpose.SaveFile(dto.ImageFile, filePath);
+
+            if (!imageSaved)
             {
+                ModelState.AddModelError("ImageFile", "Failed to save image.");
                 dto.CategoriesList = (await _categoryRepo.GetAllCategoriesAsync()).ToList();
+                dto.AuthorsList = (await _authorRepo.GetAllAuthorsAsync()).ToList();
                 return View(dto);
             }
 
-            //create a new book
+            var imageUrl = GeneralPurpose.GetBookImageUrl(bookId, fileName);
+
+
             var book = new Book
             {
-                Id = Guid.NewGuid(),
+                Id = bookId,
                 Title = dto.Title,
                 Description = dto.Description,
                 Price = dto.Price,
                 StockQuantity = dto.Stock,
                 AuthorId = dto.AuthorId,
                 CategoryId = dto.CategoryId,
-                ImageUrl = dto.ImageUrl,
-                isActive = true,
+                ImageUrl = imageUrl,
+                isActive = (int)enumStatus.Active,
                 CreatedAt = DateTime.UtcNow,
-                PublicationDate = dto.PublicationDate
+                PublicationDate = dto.PublicationDate,
+                Path = filePath,
+                FileName = fileName // dont use dto since dto is null and the filename is set after the dto is filled
             };
 
             await _bookRepo.AddBookAsync(book);
@@ -123,8 +141,8 @@ namespace ECommerceWebsite.Controllers
                 Stock = book.StockQuantity,
                 AuthorId = book.AuthorId,
                 CategoryId = book.CategoryId,
-                ImageUrl = book.ImageUrl,
-                PublicationDate = book.PublicationDate
+                PublicationDate = book.PublicationDate,
+                FileName = book.FileName
             };
 
             return View(dto);
@@ -142,6 +160,37 @@ namespace ECommerceWebsite.Controllers
             var book = await _bookRepo.GetBookByIdAsync(dto.Id);
             if (book == null)
                 return NotFound();
+            if (dto.ImageFile != null && dto.ImageFile.Length > 0)
+            {
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
+                var extension = Path.GetExtension(dto.ImageFile.FileName).ToLowerInvariant();
+                if (!allowedExtensions.Contains(extension))
+                {
+                    ModelState.AddModelError("ImageFile", "Only JPG and PNG images are allowed.");
+                    return View(dto);
+                }
+                if (dto.ImageFile.Length > 2 * 1024 * 1024)
+                {
+                    ModelState.AddModelError("ImageFile", "File size must be less than 2MB.");
+                    return View(dto);
+                }
+
+                var fileName = string.IsNullOrWhiteSpace(dto.FileName)
+                    ? Path.GetFileName(dto.ImageFile.FileName)
+                    : dto.FileName + Path.GetExtension(dto.ImageFile.FileName);
+
+                var filePath = GeneralPurpose.GetBookImagePathForSave(book.Id, fileName);
+                var imageSaved = await GeneralPurpose.SaveFile(dto.ImageFile, filePath);
+
+                if (!imageSaved)
+                {
+                    ModelState.AddModelError("ImageFile", "Failed to save image.");
+                    return View(dto);
+                }
+
+                // Update the image URL
+                book.ImageUrl = GeneralPurpose.GetBookImageUrl(book.Id, fileName);
+            }
 
             book.Title = dto.Title;
             book.Description = dto.Description;
@@ -149,7 +198,6 @@ namespace ECommerceWebsite.Controllers
             book.StockQuantity = dto.Stock;
             book.AuthorId = dto.AuthorId;
             book.CategoryId = dto.CategoryId;
-            book.ImageUrl = dto.ImageUrl;
             book.PublicationDate = dto.PublicationDate;
 
             await _bookRepo.UpdateBookAsync(book);
@@ -188,6 +236,33 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> AddAuthor()
         {
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddAuthor(AuthorDto authDto)
+        {
+            if (string.IsNullOrWhiteSpace(authDto.Name))
+            {
+                ViewData["EmptyFields"] = "Author name cannot be empty!";
+                return View(authDto);
+            }
+
+            var authors = await _authorRepo.GetAllAuthorsAsync();
+            if (authors.Any(a => a.AuthorName.Equals(authDto.Name.Trim())))
+            {
+                ViewData["AuthorExists"] = "Author already exists!";
+                return View(authDto);
+            }
+
+            var author = new Author
+            {
+                Id = Guid.NewGuid(),
+                AuthorName = authDto.Name.Trim()
+            };
+
+            await _authorRepo.AddAuthorAsync(author);
+            ViewData["Message"] = "Author added successfully!";
+            return RedirectToAction("Admin");
         }
 
         [HttpGet]

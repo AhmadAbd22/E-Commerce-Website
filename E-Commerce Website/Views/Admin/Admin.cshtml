@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<BookDto>
 @{
 	ViewData["Title"] = "Admin Dashboard";
-	Layout = "_MinimumLayout"; 
+	// Layout = "_MinimumLayout"; 
 }
 @if (ViewData["Message"] != null)
 {
@@ -9,18 +9,22 @@
 		@ViewData["Message"]
 	</div>
 }
-<div class="content-wrapper">
+
+<body class="has-detached-right">
+
 	<!-- Page header -->
 	<div class="page-header page-header-default">
 		<div class="page-header-content">
 			<div class="page-title">
-				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Admin</span> - Product Grid</h4>
+				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Admin</span> All Books </h4>
 			</div>
 		</div>
 	</div>
 
 	<a href="@Url.Action("Create", "Admin")" class="btn btn-primary legitRipple">+ Add Books</a>
 	<a href="@Url.Action("AddCategory", "Admin")" class="btn btn-primary legitRipple">Add Categories</a>
+	<a href="@Url.Action("AddAuthor", "Admin")" class="btn btn-primary legitRipple">Add Author</a>
+
 
 	<!-- Content area -->
 	<div class="content">
@@ -29,20 +33,16 @@
 
 				<!-- Grid of Books -->
 				<div class="row">
-                    <div class="row">
-                        <p>Test content</p>
-                        @foreach (var book in Model) { @book.Title}
-                    </div>
 					@foreach (var book in Model)
 					{
 						<div class="col-lg-3 col-sm-6">
 							<div class="panel">
 								<div class="panel-body">
 									<div class="thumb thumb-fixed">
-										<a href="@book.ImageUrl" data-popup="lightbox">
-											<img src="@book.ImageUrl" alt="@book.Title" />
-											<span class="zoom-image"><i class="icon-plus2"></i></span>
-										</a>
+										<picture>
+											<source srcset="@book.ImageFile" type="image/webp">
+											<img src="@book.ImageFile" alt="@book.ImageFile" />
+										</picture>
 									</div>
 								</div>
 
@@ -87,4 +87,7 @@
 			&copy; 2025. <a href="#">ECommerce</a> by <a href="#" target="_blank">You</a>
 		</div>
 	</div>
-</div>
+	</>
+
+
+</body>

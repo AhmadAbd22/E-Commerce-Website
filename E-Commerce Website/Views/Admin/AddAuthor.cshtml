@@ -1,0 +1,40 @@
+﻿@using ECommerceWebsite.Models.Dtos
+@model AuthorDto
+@{
+    Layout = "_MinimumLayout"; 
+}
+
+<!-- Centered forms -->
+<div class="row align-center">
+	<div class="col-md-6">
+		<form action="@Url.Action("AddAuthor", "Admin")" method="post">
+			<div class="panel panel-flat">
+				<div class="panel-heading">
+					<div class="row">
+						<div class="col-md-10 col-md-offset-1">
+							<h1 class="panel-title">Add Admin</h1>
+						</div>	
+					</div>
+				</div>
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-10 col-md-offset-1">
+							<div class="form-group">
+								<label><h4></h4></label>
+								<input type="hidden" name="AuthorId" class="form-control">
+								<input type="text" name="Name" class="form-control" placeholder="Author Name">
+							</div>
+						</div>
+					</div>
+							<div class="text-center">
+								<button type="submit" class="btn btn-primary" style="margin-bottom:8px">Add Author</button>
+							</div>
+
+					<div class="text-center">
+						<a href="@Url.Action("Admin", "Admin")" class="btn btn-secondary">Back to Home</a>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

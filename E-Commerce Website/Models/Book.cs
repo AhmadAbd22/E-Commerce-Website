@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ECommerceWebsite.Models
 {
-    public class    Book : BaseModel
+    public class Book : BaseModel
     {
         [Required]
         [Column(TypeName = "nvarchar(100)")]
@@ -43,6 +43,14 @@ namespace ECommerceWebsite.Models
         [Column(TypeName = "nvarchar(255)")]
         [Display(Name = "Image URL")]
         public string ImageUrl { get; set; } = string.Empty;
+
+        [Column(TypeName = "nvarchar(max)")]
+        [Display(Name = "Image Path")]
+        public string Path { get; set; } = string.Empty;
+
+        [Column(TypeName = "nvarchar(max)")]
+        [Display(Name = "Image File Name")]
+        public string FileName { get; set; } = string.Empty;
 
 
         [ForeignKey("CategoryId")]

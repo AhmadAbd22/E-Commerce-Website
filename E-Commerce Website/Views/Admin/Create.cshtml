@@ -1,82 +1,132 @@
 ﻿@model BookDto
 @{
+    ViewData["Title"] = "Add a Book";
 	Layout = "_MinimumLayout";
-	ViewData["Title"] = "Add Books";
 }
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Pickadate CSS -->
+<link href="https://cdn.jsdelivr.net/npm/pickadate@3.6.4/lib/compressed/themes/default.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/pickadate@3.6.4/lib/compressed/themes/default.date.css" rel="stylesheet" />
+<!-- Pickadate JS -->
+<script src="https://cdn.jsdelivr.net/npm/pickadate@3.6.4/lib/compressed/picker.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pickadate@3.6.4/lib/compressed/picker.date.js"></script>
+
+
+<style>
+    .centered-form-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
 
 <!-- Centered forms -->
-<div class="row center">
-	<div class="col-md-6">
-		<form action="@Url.Action("Create", "Admin")" method="post">
-			<div class="panel panel-flat">
-				<div class="panel-heading">
-					<div class="row">
-						<div class="col-md-10 col-md-offset-1">
-							<h5 class="panel-title">Add Product</h5>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div class="panel-body">
-				<div class="row">
-					<div class="col-md-10 col-md-offset-1">
-						<div class="form-group">
-							<label for="Title">Book Title</label>
-							<input type="text" name="Title" class="form-control" placeholder="Book Title">
-						</div>
+<div class="centered-form-container">
+    <div class="col-md-6">
+        <form action="@Url.Action("Create", "Admin")" method="post" enctype="multipart/form-data">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-10 col-md-offset-1">
+                            <h5 class="panel-title">Add Product</h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-10 col-md-offset-1">
+                        <div class="form-group">
+                            <label for="Title" class="no-margin text-semibold"><h6>Book Title</h6></label>
+                            <input type="text" name="Title" class="form-control" placeholder="Book Title">
+                        </div>
 
-						<div class="form-group">
-							<label for="AuthorName">Author</label>
-							<input type="text" name="AuthorName" class="form-control" placeholder="Author Name">
-						</div>
+                        <div class="form-group">
+                            <label for="Author" class="no-margin text-semibold"><h6>Author</h6></label>
+                            <select id="AuthorSelect" name="AuthorId" class="form-control">
+                                @foreach (var author in Model.AuthorsList)
+                                {
+                                    <option value="@author.Id">@author.AuthorName</option>
+                                }
+                            </select>
+                            <input type="hidden" name="AuthorId" id="AuthorIds" />
+                        </div>
 
-						<div class="form-group">
-							<label for="ISBN">ISBN</label>
-							<input type="text" name="ISBN" class="form-control" placeholder="AH13214">
-						</div>
+                        @section Scripts {
+                            <script>
+                                $(function () {
+                                    $('#AuthorSelect').on('change', function () {
+                                        $('#AuthorIds').val($(this).val());
+                                    });
+                                });
+                            </script>
+                        }
 
-						<div class="form-group">
-							<label for="Description">Description</label>
-							<input type="text" name="Description" class="form-control" placeholder="Description">
-						</div>
+                        <div class="form-group">
+                            <label for="Price" class="no-margin text-semibold"><h6>Price</h6></label>
+                            <input type="number" step="0.01" name="Price" class="form-control" placeholder="Price">
+                        </div>
 
-						<div class="form-group">
-							<label for="StockQuantity">Stock</label>
-							<input type="number" name="StockQuantity" class="form-control" placeholder="No. of Books">
-						</div>
 
-						<div class="col-md-3">
-							<div class="content-group-lg">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="icon-calendar5"></i></span>
-									<input type="text" name="PublicationDate" class="form-control pickadate">
-								</div>
-							</div>
-						</div>
+                        <div class="form-group">
+                            <label for="ISBN" class="no-margin text-semibold"><h6>ISBN</h6></label>
+                            <input type="text" name="ISBN" class="form-control" placeholder="AH13214">
+                        </div>
 
-						<div class="form-group"> 
-							<label for="CategoryType">Category</label> 
-							<select data-placeholder="Category Type" class="select" name="CategoryId"> 
-								<option value="">Select Category</option>
-								@foreach(var category in Model.CategoriesList)
-								{
-									<option value="@category.Id">@category.CategoryType</option>
-								}
-							</select> 
-						</div> 
+                        <div class="form-group">
+                            <label for="Description" class="no-margin text-semibold"><h6>Description</h6></label>
+                            <input type="text" name="Description" class="form-control" placeholder="Description">
+                        </div>
 
-						<div class="form-group"> 
-							<label class="display-block">Book Picture</label> 
-							<input type="url" name="ImageUrl" class="file-styled"> 
-						</div>
+                        <div class="form-group">
+                            <label for="Stock"  class="no-margin text-semibold"><h6>Stock</h6></label>
+                            <input type="number" name="Stock" class="form-control" placeholder="No. of Books">
+                        </div>
 
-						<div class="text-right">
-							<button type="submit" class="btn btn-primary">Submit form <i class="icon-arrow-right14 position-right"></i></button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</form>
-	</div>
+                        <div class="content-group-lg">
+                            <div class="input-group">
+                                <label for="PublicationDate" class="no-margin text-semibold"><h6>Publication Date</h6></label>
+                                <span class="input-group-addon"><i class="icon-calendar5"></i></span>
+                                <input type="date" name="PublicationDate" class="form-control pickadate-format" placeholder="Try me&hellip;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="CategoryType" class="no-margin text-semibold"><h6>Category</h6></label>
+                                <select data-placeholder="Category Type" class="select form-control" name="CategoryId">
+                                    @foreach (var category in Model.CategoriesList)
+                                    {
+                                        <option value="@category.Id">@category.CategoryType</option>
+                                    }
+                                </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ImageFile" class="control-label">Upload Book Image</label>
+                            <input type="file" class="form-control" id="ImageFile" name="ImageFile" accept=".png,.jpg,.jpeg" />
+                            <script>
+                                document.getElementById('ImageFile').addEventListener('change', function (e) {
+                                    const file = e.target.files[0];
+                                    if (file) {
+                                        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                                        if (!validTypes.includes(file.type)) {
+                                            alert('Only JPG and PNG images are allowed.');
+                                            e.target.value = '';
+                                        }
+                                    }
+                                });
+                            </script>
+                            <span class="help-block">Allowed formats: PNG, JPG, JPEG</span>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">Add Book<i class="icon-arrow-right14 position-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 <!-- /form centered -->
