@@ -368,28 +368,37 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("AddAuthor");
             }
         }
-        
-        
+
+
+        /// <summary>
+        /// ///////
+        /// </summary>
+        /// <returns></returns>
+        //CATEGORY CRUD
+        ///
+
         [HttpGet]
         public async Task<IActionResult> AddCategory()
         {
-            await PopulateViewDataForAdmin();
-            return View();
+            ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+            return View(new CategoryDto());
         }
 
         [HttpPost]
         public async Task<IActionResult> AddCategory(CategoryDto catDto)
         {
-            if (catDto == null || string.IsNullOrWhiteSpace(catDto.CategoryType))
+            if (string.IsNullOrWhiteSpace(catDto.CategoryType))
             {
-                ViewData["Message"] = "Invalid category data!";
+                ViewData["EmptyFields"] = "Category name cannot be empty!";
+                ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
                 return View(catDto);
             }
 
             var categories = await _categoryRepo.GetAllCategoriesAsync();
             if (categories.Any(c => c.CategoryType.Equals(catDto.CategoryType.Trim(), StringComparison.OrdinalIgnoreCase)))
             {
-                ViewData["Existing"] = "Category Already Exists";
+                ViewData["CategoryExists"] = "A category with this name already exists!";
+                ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
                 return View(catDto);
             }
 
@@ -400,26 +409,93 @@ namespace ECommerceWebsite.Controllers
             };
 
             await _categoryRepo.AddCategoryAsync(category);
-            ViewData["Message"] = "Category added successfully!";
-            return RedirectToAction("Admin", "Admin");
+            TempData["Success"] = "Category added successfully!";
+            return RedirectToAction("AddCategory");
         }
 
-        public async Task RemoveCategory(CategoryDto categoryDto)
+        [HttpGet]
+        public async Task<IActionResult> EditCategory(Guid id)
         {
-            if (categoryDto == null || categoryDto.Id == Guid.Empty)
-            {
-                ViewData["Message"] = "Invalid category data!";
-                return;
-            }
-            var category = await _categoryRepo.GetCategoryByIdAsync(categoryDto.Id);
+            var category = await _categoryRepo.GetCategoryByIdAsync(id);
             if (category == null)
             {
-                ViewData["Message"] = "Category not found!";
-                return;
+                return NotFound();
             }
-            await _categoryRepo.DeleteCategoryAsync(categoryDto.Id);
-            ViewData["Message"] = "Category deleted successfully!";
+
+            var dto = new CategoryDto
+            {
+                Id = category.Id,
+                CategoryType = category.CategoryType
+            };
+
+            ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+            ViewData["IsEditing"] = true;
+            return View("AddCategory", dto);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> EditCategory(CategoryDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.CategoryType))
+            {
+                ViewData["EmptyFields"] = "Category name cannot be empty!";
+                ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+                ViewData["IsEditing"] = true;
+                return View("AddCategory", dto);
+            }
+
+            var category = await _categoryRepo.GetCategoryByIdAsync(dto.Id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            category.CategoryType = dto.CategoryType.Trim();
+            await _categoryRepo.UpdateCategoryAsync(category);
+
+            TempData["Success"] = "Category updated successfully!";
+            return RedirectToAction("AddCategory");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveCategory(Guid categoryId)
+        {
+            // Check if the provided ID is valid
+            if (categoryId == Guid.Empty)
+            {
+                TempData["Error"] = "Invalid category ID.";
+                return RedirectToAction("AddCategory");
+            }
+
+            try
+            {
+                var booksInCategory = await _bookRepo.GetBooksByCategoryAsync(categoryId);
+                if (booksInCategory.Any())
+                {
+                    TempData["Error"] = $"Cannot delete this category because it is still used by {booksInCategory.Count()} book(s). Please reassign them first.";
+                    return RedirectToAction("AddCategory");
+                }
+
+                var category = await _categoryRepo.GetCategoryByIdAsync(categoryId);
+                if (category == null)
+                {
+                    TempData["Error"] = "Category not found.";
+                    return RedirectToAction("AddCategory");
+                }
+
+                await _categoryRepo.DeleteCategoryAsync(categoryId);
+                TempData["Success"] = "Category deleted successfully!";
+                return RedirectToAction("AddCategory");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while deleting the category.";
+                return RedirectToAction("AddCategory");
+            }
+        }
+
+
+        //Populating data for aviwews
 
         private async Task PopulateViewDataForAdmin()
         {
