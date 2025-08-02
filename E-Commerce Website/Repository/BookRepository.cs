@@ -33,9 +33,13 @@ namespace ECommerceWebsite.Repository
             Task<IEnumerable<Book>> GetDeletedBooksAsync();
             Task<IEnumerable<Book>> GetBooksByAuthorAsync(Guid authorId);
             Task<IEnumerable<Book>> GetBooksByCategoryAsync(Guid categoryId);
-        }
+            Task<IEnumerable<Book>> FilterBooksAsync(Guid? authorId, decimal? minPrice, decimal? maxPrice);
+            Task RestoreBookAsync(Guid id);
 
-        public class BookRepository : IBookRepository
+
+    }
+
+    public class BookRepository : IBookRepository
         {
             private readonly ECommerceWebsiteDbContext _context;
 
@@ -204,6 +208,50 @@ namespace ECommerceWebsite.Repository
                 .Where(b => b.isActive == (int)enumStatus.Active && b.CategoryId == categoryId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Book>> FilterBooksAsync(Guid? authorId, decimal? minPrice, decimal? maxPrice)
+        {
+            var query = _context.Books
+                                .Include(b => b.Author)
+                                .Include(b => b.Category)
+                                .Where(b => b.isActive == (int)enumStatus.Active)
+                                .AsQueryable();
+
+            if (authorId.HasValue)
+            {
+                query = query.Where(b => b.AuthorId == authorId.Value);
+            }
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(b => b.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(b => b.Price <= maxPrice.Value);
+            }
+
+            return await query.ToListAsync();
+        }
+
+
+        public async Task RestoreBookAsync(Guid id)
+        {
+            var book = await _context.Books.FindAsync(id);
+            if (book != null)
+            {
+                book.isActive = (int)enumStatus.Active;
+                book.DeletedAt = null; //clear deleteion date 
+                _context.Books.Update(book);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException("Book to restore not found");
+            }
+        }
+
     }
 }
 

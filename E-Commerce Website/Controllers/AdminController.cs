@@ -9,6 +9,7 @@ using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Models.Enums;
 using System.Net;
 
+
 namespace ECommerceWebsite.Controllers
 {
     public class AdminController : Controller
@@ -24,10 +25,14 @@ namespace ECommerceWebsite.Controllers
             _categoryRepo = categoryRepo;
         }
 
+
         // GET: /Admin
         public async Task<IActionResult> Admin()
         {
-            var books = await _bookRepo.GetAllBooksAsync();
+            var books = await _bookRepo.GetActiveBooksAsync();
+            await PopulateViewDataForAdmin();
+            ViewData["IsDeletedView"] = false;
+            
             var dtos = books.Select(book => new BookDto
             {
                 Id = book.Id,
@@ -39,7 +44,8 @@ namespace ECommerceWebsite.Controllers
                 CategoryId = book.CategoryId,
                 PublicationDate = book.PublicationDate,
                 Author = book.Author,
-                Category = book.Category
+                Category = book.Category,
+                 ImageUrl = book.ImageUrl
             }).ToList();
 
             return View(dtos);
@@ -49,6 +55,8 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> DeletedBooks()
         {
             var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
+            await PopulateViewDataForAdmin(); 
+            ViewData["IsDeletedView"] = true;
             return View(deletedBooks);
         }
 
@@ -208,13 +216,15 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Delete(Guid id)
         {
             await _bookRepo.DeleteBookAsync(id);
-            return RedirectToAction("Index");
+            return RedirectToAction("Admin");
         }
 
         // GET
         public async Task<IActionResult> Search(string term)
         {
             var books = await _bookRepo.SearchActiveBooksAsync(term);
+            await PopulateViewDataForAdmin();
+            ViewData["IsDeletedView"] = false;
             return View("Admin", books);
         }
 
@@ -222,14 +232,18 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> FilterByAuthor(Guid authorId)
         {
             var books = await _bookRepo.GetBooksByAuthorAsync(authorId.ToString());
-            return View("Index", books);
+            await PopulateViewDataForAdmin();
+            ViewData["IsDeletedView"] = false;
+            return View("Admin", books);
         }
 
         // GET
         public async Task<IActionResult> FilterByCategory(Guid categoryId)
         {
             var books = await _bookRepo.GetBooksByCategoryAsync(categoryId.ToString());
-            return View("Index", books);
+            await PopulateViewDataForAdmin();
+            ViewData["IsDeletedView"] = false;
+            return View("Admin", books);
         }
         
         [HttpGet]
@@ -313,6 +327,12 @@ namespace ECommerceWebsite.Controllers
             }
             await _categoryRepo.DeleteCategoryAsync(categoryDto.Id);
             ViewData["Message"] = "Category deleted successfully!";
+        }
+
+        private async Task PopulateViewDataForAdmin()
+        {
+            ViewData["Authors"] = await _authorRepo.GetAllAuthorsAsync();
+            ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
         }
     }
 }

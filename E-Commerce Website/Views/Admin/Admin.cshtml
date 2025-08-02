@@ -1,93 +1,153 @@
 ﻿@model IEnumerable<BookDto>
 @{
-	ViewData["Title"] = "Admin Dashboard";
-	// Layout = "_MinimumLayout"; 
-}
-@if (ViewData["Message"] != null)
-{
-	<div class="alert alert-success" role="alert">
-		@ViewData["Message"]
-	</div>
+    bool isDeletedView = (ViewData["IsDeletedView"] as bool?) ?? false;
+    ViewData["Title"] = isDeletedView ? "Deleted Books" : "Admin Dashboard";
+    Layout = "_MinimumLayout"; // This should be your modified layout with the has-detached-right class
 }
 
-<body class="has-detached-right">
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4>
+                <i class="icon-arrow-left52 position-left"></i>
+                <span class="text-semibold">Admin</span> - @(isDeletedView ? "Deleted Books" : "All Books")
+            </h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Index", "Home")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li class="active">Book Management</li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+<!-- Content area -->
+<div class="content">
 
-	<!-- Page header -->
-	<div class="page-header page-header-default">
-		<div class="page-header-content">
-			<div class="page-title">
-				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">Admin</span> All Books </h4>
-			</div>
-		</div>
-	</div>
+    <!-- Detached content -->
+    <div class="container-detached">
+        <div class="content-detached">
 
-	<a href="@Url.Action("Create", "Admin")" class="btn btn-primary legitRipple">+ Add Books</a>
-	<a href="@Url.Action("AddCategory", "Admin")" class="btn btn-primary legitRipple">Add Categories</a>
-	<a href="@Url.Action("AddAuthor", "Admin")" class="btn btn-primary legitRipple">Add Author</a>
+            <!-- Actions and search -->
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-8 col-sm-12">
+                            @if (!isDeletedView)
+                            {
+                                <a href="@Url.Action("Create", "Admin")" class="btn btn-primary"><i class="icon-plus2 position-left"></i> Add Book</a>
+                                <a href="@Url.Action("AddCategory", "Admin")" class="btn btn-default"><i class="icon-price-tags position-left"></i> Categories</a>
+                                <a href="@Url.Action("AddAuthor", "Admin")" class="btn btn-default"><i class="icon-user-plus position-left"></i> Authors</a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Admin", "Admin")" class="btn btn-success"><i class="icon-list position-left"></i> Back to Active Books</a>
+                            }
+                        </div>
 
+                        <div class="col-md-4 col-sm-12">
+                            <form action="@Url.Action("Search", "Admin")" method="get">
+                                <div class="form-group has-feedback has-feedback-left">
+                                    <input type="search" name="term" class="form-control" placeholder="Search books...">
+                                    <div class="form-control-feedback">
+                                        <i class="icon-search4 text-size-small text-muted"></i>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-	<!-- Content area -->
-	<div class="content">
-		<div class="container-detached">
-			<div class="content-detached">
+            <!-- Grid of Books -->
+            <div class="row">
+                @foreach (var book in Model)
+                {
+                    <div class="col-lg-4 col-sm-6">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <div class="thumb thumb-fixed">
+                                    <a href="@book.ImageUrl" data-popup="lightbox">
+                                        <img src="@book.ImageUrl" alt="@book.Title">
+                                        <span class="zoom-image"><i class="icon-plus2"></i></span>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="panel-body panel-body-accent text-center">
+                                <h6 class="text-semibold no-margin"><a href="#" class="text-default">@book.Title</a></h6>
+                                <ul class="list-inline list-inline-separate mb-10">
+                                    <li><a href="#" class="text-muted">@(book.Author?.AuthorName ?? "N/A")</a></li>
+                                </ul>
+                                <h3 class="no-margin text-semibold">Rs. @book.Price</h3>
+                                <div class="text-nowrap">
+                                    <i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-half text-size-base text-warning-300"></i>
+                                </div>
+                                <div class="text-muted">@book.Stock reviews</div>
+                                <div class="mt-15">
+                                    @if (isDeletedView)
+                                    {
+                                        <form asp-action="RestoreBook" asp-route-id="@book.Id" method="post" style="display:inline;"><button type="submit" class="btn btn-sm btn-success">Restore</button></form>
+                                    }
+                                    else
+                                    {
+                                        <a href="@Url.Action("Edit", "Admin", new { id = book.Id })" class="btn btn-sm btn-warning">Edit</a>
+                                        <form asp-action="Delete" asp-route-id="@book.Id" method="post" style="display:inline;"><button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button></form>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    <!-- /detached content -->
+    <!-- Detached sidebar -->
+    <div class="sidebar-detached">
+        <div class="sidebar sidebar-default sidebar-separate">
+            <div class="sidebar-content">
+                <div class="sidebar-category">
+                    <div class="category-title"><span>Filter Products</span></div>
+                    <div class="category-content">
+                        <form action="@Url.Action("Filter", "Admin")" method="get">
+                            <div class="form-group">
+                                <legend class="text-size-mini text-muted no-border no-padding">By Author</legend>
+                                <select name="authorId" class="form-control">
+                                    <option value="">All Authors</option>
+                                    @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                                    {
+                                        foreach (var author in authors)
+                                        {
+                                            <option value="@author.Id">@author.AuthorName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <legend class="text-size-mini text-muted no-border no-padding">By Price</legend>
+                                <div class="row">
+                                    <div class="col-xs-6"><input type="number" name="minPrice" placeholder="Min" class="form-control" step="0.01"></div>
+                                    <div class="col-xs-6"><input type="number" name="maxPrice" placeholder="Max" class="form-control" step="0.01"></div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn bg-blue btn-block">Filter <i class="icon-filter3 position-right"></i></button>
+                        </form>
+                    </div>
+                </div>
+                <div class="sidebar-category">
+                    <div class="category-title"><span>Actions</span></div>
+                    <div class="category-content no-padding">
+                        <ul class="navigation navigation-alt navigation-accordion">
+                            <li><a href="@Url.Action("DeletedBooks", "Admin")"><i class="icon-trash"></i> Show Deleted Books</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /detached sidebar -->
 
-				<!-- Grid of Books -->
-				<div class="row">
-					@foreach (var book in Model)
-					{
-						<div class="col-lg-3 col-sm-6">
-							<div class="panel">
-								<div class="panel-body">
-									<div class="thumb thumb-fixed">
-										<picture>
-											<source srcset="@book.ImageFile" type="image/webp">
-											<img src="@book.ImageFile" alt="@book.ImageFile" />
-										</picture>
-									</div>
-								</div>
-
-								<div class="panel-body panel-body-accent text-center">
-									<h6 class="text-semibold no-margin">
-										<a href="#" class="text-default">@book.Title</a>
-									</h6>
-
-									<ul class="list-inline list-inline-separate mb-10">
-										<li><a href="#" class="text-muted">@book.Category</a></li>
-									</ul>
-
-									<h3 class="no-margin text-semibold">Rs. @book.Price</h3>
-
-									<div class="text-nowrap">
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-									</div>
-
-									<div class="text-muted">0 reviews</div>
-
-									<!-- Admin Actions -->
-									<div class="mt-10">
-										<a href="@Url.Action("EditBook", "Admin")" class="btn btn-sm btn-warning">Edit</a>
-										<a href="/Admin/Delete/@book.Id" class="btn btn-sm btn-danger">Delete</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					}
-				</div>
-				<!-- /grid -->
-
-			</div>
-		</div>
-
-		<!-- Footer -->
-		<div class="footer text-muted">
-			&copy; 2025. <a href="#">ECommerce</a> by <a href="#" target="_blank">You</a>
-		</div>
-	</div>
-	</>
-
-
-</body>
+</div>
+<!-- /content area -->

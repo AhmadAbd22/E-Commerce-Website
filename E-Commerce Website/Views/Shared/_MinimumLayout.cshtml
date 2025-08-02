@@ -4,7 +4,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>Limitless - Responsive Web Application Kit by Eugene Kopyov</title>
+	<title>@ViewData["Title"] - E-Commerce Web Application</title>
+
 	<!-- Global stylesheets -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:400,300,100,500,700,900" rel="stylesheet" type="text/css">
 	<link href="~/assets/css/icons/icomoon/styles.css" rel="stylesheet" type="text/css">
@@ -12,36 +13,55 @@
 	<link href="~/assets/css/core.css" rel="stylesheet" type="text/css">
 	<link href="~/assets/css/components.css" rel="stylesheet" type="text/css">
 	<link href="~/assets/css/colors.css" rel="stylesheet" type="text/css">
+	<link href="~/css/pnotify.min.css" rel="stylesheet" type="text/css">
+
 	<!-- /global stylesheets -->
+
 	<!-- Core JS files -->
 	<script type="text/javascript" src="~/assets/js/plugins/loaders/pace.min.js"></script>
 	<script type="text/javascript" src="~/assets/js/core/libraries/jquery.min.js"></script>
 	<script type="text/javascript" src="~/assets/js/core/libraries/bootstrap.min.js"></script>
 	<script type="text/javascript" src="~/assets/js/plugins/loaders/blockui.min.js"></script>
-	<!-- /core JS files -->
-	<!-- Theme JS files -->
-	<script type="text/javascript" src="~/assets/js/plugins/forms/styling/uniform.min.js"></script>
-
 	<script type="text/javascript" src="~/assets/js/core/app.js"></script>
-	<script type="text/javascript" src="~/assets/js/pages/login.js"></script>
-
 	<script type="text/javascript" src="~/assets/js/plugins/ui/ripple.min.js"></script>
-	<!-- /theme JS files -->
+	<!-- Theme JS files
+
+	<!-- Plugins for forms -->
+	<script type="text/javascript" src="~/assets/js/plugins/forms/styling/uniform.min.js"></script>
+	<script type="text/javascript" src="~/assets/js/plugins/forms/selects/bootstrap_select.min.js"></script>
+
+	<!-- Plugins for date/time pickers -->
+	<script type="text/javascript" src="~/assets/js/plugins/ui/moment/moment.min.js"></script>
+	<script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.js"></script>
+	<script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.date.js"></script>
+	<script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/legacy.js"></script>
+
+	<!-- Plugin for file uploader -->
+	<script type="text/javascript" src="~/assets/js/plugins/uploaders/dropzone.min.js"></script>
+
+	
+
 </head>
 
-<body>
+<!-- This class is needed for the detached sidebar layout on the Admin page -->
+<body class="has-detached-right">
+
 	@await Html.PartialAsync("_Navbar")
 
+	<!-- Page container -->
 	<div class="page-container">
 		<div class="page-content">
 			<div class="content-wrapper">
-				<div class="content">
-					@RenderBody()
-				</div>
+				@RenderBody()
 			</div>
 		</div>
 	</div>
+	<!-- /page container -->
 
+	
+	
+	<!-- Page-specific scripts -->
 	@await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
