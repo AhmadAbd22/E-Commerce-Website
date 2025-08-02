@@ -1,40 +1,159 @@
-﻿@using ECommerceWebsite.Models.Dtos
-@model CategoryDto
+﻿@using ECommerceWebsite.Models
+@model ECommerceWebsite.Models.Dtos.CategoryDto
 @{
-    Layout = "_MinimumLayout"; 
+    Layout = "_MinimumLayout";
+    ViewData["Title"] = "Manage Categories";
+    var categories = ViewData["Categories"] as IEnumerable<Category> ?? new List<Category>();
 }
 
-<!-- Centered forms -->
-<div class="row modal-dialog-centered">
-	<div class="col-md-6">
-		<form action="@Url.Action("AddCategory", "Admin")" method="post">
-			<div class="panel panel-flat">
-				<div class="panel-heading">
-					<div class="row">
-						<div class="col-md-10 col-md-offset-1">
-							<h1 class="panel-title">Add Category</h1>
-						</div>	
-					</div>
-				</div>
-				<div class="panel-body">
-					<div class="row">
-						<div class="col-md-10 col-md-offset-1">
-							<div class="form-group">
-								<label><h4>Category Name</h4></label>
-								<input type="hidden" name="CategoryId" class="form-control">
-								<input type="text" name="CategoryType" class="form-control" placeholder="Category Name">
-							</div>
-						</div>
-					</div>
-							<div class="text-center">
-								<button type="submit" class="btn btn-primary" style="margin-bottom:8px">Add Category</button>
-							</div>
+@* Notification Messages *@
+@if (ViewData["CategoryExists"] != null)
+{
+    <div class="alert alert-danger no-border">@ViewData["CategoryExists"]</div>
+}
+@if (ViewData["EmptyFields"] != null)
+{
+    <div class="alert alert-warning no-border">@ViewData["EmptyFields"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success no-border">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger no-border">@TempData["Error"]</div>
+}
 
-					<div class="text-center">
-						<a href="@Url.Action("Admin", "Admin")" class="btn btn-secondary">Back to Home</a>
-					</div>
-				</div>
-			</div>
-		</form>
-	</div>
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-price-tags2 position-left"></i> <span class="text-semibold">Admin</span> - Manage Categories</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Admin</a></li>
+            <li class="active">Categories</li>
+        </ul>
+    </div>
 </div>
+<!-- /page header -->
+<!-- Content area -->
+<div class="content">
+    <div class="row">
+
+        <!-- Left column: Add/Edit Category Form -->
+        <div class="col-md-4">
+            <form action="@(ViewData["IsEditing"] != null ? Url.Action("EditCategory", "Admin") : Url.Action("AddCategory", "Admin"))" method="post">
+                @if (ViewData["IsEditing"] != null)
+                {
+                    <input type="hidden" name="Id" value="@Model?.Id" />
+                }
+
+                <div class="panel panel-flat">
+                    <div class="panel-heading">
+                        <h5 class="panel-title text-semibold">
+                            @(ViewData["IsEditing"] != null ? "Edit Category" : "Add New Category")
+                        </h5>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-group has-feedback">
+                            <label class="text-semibold">Category Name:</label>
+                            <input type="text" name="CategoryType" value="@Model?.CategoryType" class="form-control" placeholder="e.g., Science Fiction" required>
+                            <div class="form-control-feedback">
+                                <i class="icon-price-tag"></i>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <button type="submit" class="btn btn-primary">
+                                @(ViewData["IsEditing"] != null ? "Update Category" : "Add Category")
+                                <i class="icon-@(ViewData["IsEditing"] != null ? "checkmark" : "plus3") position-right"></i>
+                            </button>
+                            @if (ViewData["IsEditing"] != null)
+                            {
+                                <a href="@Url.Action("AddCategory", "Admin")" class="btn btn-default">Cancel</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right column: Category List -->
+        <div class="col-md-8">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title text-semibold">Existing Categories</h5>
+                </div>
+
+                <div class="panel-body">
+                    <div class="form-group has-feedback has-feedback-left">
+                        <input type="search" id="category-search" class="form-control" placeholder="Search categories...">
+                        <div class="form-control-feedback">
+                            <i class="icon-search4 text-size-small text-muted"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="category-table" class="table table-striped table-hover">
+                        <thead>
+                            <tr class="bg-blue">
+                                <th>Category Name</th>
+                                <th class="text-center" style="width: 100px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!categories.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">No categories found. Add one using the form on the left.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var category in categories)
+                                {
+                                    <tr>
+                                        <td>@category.CategoryType</td>
+                                        <td class="text-center">
+                                            <ul class="icons-list">
+                                                <li><a href="@Url.Action("EditCategory", "Admin", new { id = category.Id })" data-popup="tooltip" title="Edit"><i class="icon-pencil7"></i></a></li>
+                                                <li>
+                                                    <form method="post" action="@Url.Action("RemoveCategory", "Admin")" style="display: inline;">
+                                                        <input type="hidden" name="categoryId" value="@category.Id" />
+                                                        <button type="submit" class="btn btn-link p-0 delete-btn" data-popup="tooltip" title="Delete" onclick="return confirm('Are you sure you want to delete this category? This cannot be undone.')">
+                                                            <i class="icon-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            </ul>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /content area -->
+@section Scripts {
+    <script type="text/javascript">
+        $(function() {
+            // Initialize tooltips for the action icons
+            $('[data-popup="tooltip"]').tooltip();
+
+            // Client-side search for the category table
+            $('#category-search').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $("#category-table tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+    </script>
+}

@@ -45,7 +45,7 @@ namespace ECommerceWebsite.Controllers
                 PublicationDate = book.PublicationDate,
                 Author = book.Author,
                 Category = book.Category,
-                 ImageUrl = book.ImageUrl
+                ImageUrl = book.ImageUrl
             }).ToList();
 
             return View(dtos);
@@ -156,6 +156,8 @@ namespace ECommerceWebsite.Controllers
             return View(dto);
         }
 
+
+
         // POST: 
         [HttpPost]
         public async Task<IActionResult> Edit(BookDto dto)
@@ -249,6 +251,7 @@ namespace ECommerceWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> AddAuthor()
         {
+            await PopulateViewDataForAdmin();
             return View();
         }
 
@@ -258,6 +261,7 @@ namespace ECommerceWebsite.Controllers
             if (string.IsNullOrWhiteSpace(authDto.Name))
             {
                 ViewData["EmptyFields"] = "Author name cannot be empty!";
+                await PopulateViewDataForAdmin();
                 return View(authDto);
             }
 
@@ -265,6 +269,7 @@ namespace ECommerceWebsite.Controllers
             if (authors.Any(a => a.AuthorName.Equals(authDto.Name.Trim())))
             {
                 ViewData["AuthorExists"] = "Author already exists!";
+                await PopulateViewDataForAdmin();
                 return View(authDto);
             }
 
@@ -275,13 +280,100 @@ namespace ECommerceWebsite.Controllers
             };
 
             await _authorRepo.AddAuthorAsync(author);
-            ViewData["Message"] = "Author added successfully!";
-            return RedirectToAction("Admin");
+            TempData["Message"] = "Author added successfully!";
+            return RedirectToAction("AddAuthor");
         }
 
         [HttpGet]
+        public async Task<IActionResult> EditAuthor(Guid id)
+        {
+            var author = await _authorRepo.GetAuthorByIdAsync(id);
+            if (author == null)
+            {
+                return NotFound();
+            }
+
+            var dto = new AuthorDto
+            {
+                AuthorId = author.Id,
+                Name = author.AuthorName
+            };
+
+            await PopulateViewDataForAdmin();
+            ViewData["IsEditing"] = true;
+            return View("AddAuthor",dto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAuthor(AuthorDto dto)
+        {
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                ViewData["EmptyFields"] = "Author name cannot be empty!";
+                await PopulateViewDataForAdmin();
+                ViewData["IsEditing"] = true; 
+                return View("AddAuthor", dto); 
+            }
+
+            try
+            {
+                var author = await _authorRepo.GetAuthorByIdAsync(dto.AuthorId);
+                if (author == null)
+                {
+                    return NotFound();
+                }
+
+                author.AuthorName = dto.Name.Trim();
+                await _authorRepo.UpdateAuthorAsync(author);
+
+                TempData["Success"] = "Author updated successfully!";
+                return RedirectToAction("AddAuthor");
+            }
+            catch (InvalidOperationException ex)
+            {
+                ViewData["EmptyFields"] = ex.Message;
+                await PopulateViewDataForAdmin();
+                ViewData["IsEditing"] = true;
+                return View("AddAuthor", dto);
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveAuthor(Guid authorId)
+        {
+            try
+            {
+                var author = await _authorRepo.GetAuthorByIdAsync(authorId);
+                if (author == null)
+                {
+                    TempData["Error"] = "Author not found!";
+                    return RedirectToAction("AddAuthor");
+                }
+
+                var booksByAuthor = await _bookRepo.GetBooksByAuthorAsync(authorId);
+                if (booksByAuthor.Any())
+                {
+                    TempData["Error"] = "Cannot delete author. Books are associated with this author."; // ✅ Use TempData
+                    return RedirectToAction("AddAuthor");
+                }
+
+                await _authorRepo.DeleteAuthor(author);
+                TempData["Success"] = "Author deleted successfully!"; // ✅ Use TempData
+                return RedirectToAction("AddAuthor");
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while deleting the author.";
+                return RedirectToAction("AddAuthor");
+            }
+        }
+        
+        
+        [HttpGet]
         public async Task<IActionResult> AddCategory()
         {
+            await PopulateViewDataForAdmin();
             return View();
         }
 
