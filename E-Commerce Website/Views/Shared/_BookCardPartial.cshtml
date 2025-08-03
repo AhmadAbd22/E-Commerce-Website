@@ -1,0 +1,45 @@
+﻿@model BookDto
+
+<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+    <div class="panel panel-flat product-card">
+        <div class="panel-body text-center">
+            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+            {
+                <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive" style="max-height: 200px; margin: 0 auto;">
+            }
+            else
+            {
+                <div class="bg-light" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                    <i class="icon-book text-muted" style="font-size: 48px;"></i>
+                </div>
+            }
+        </div>
+        <div class="panel-body">
+            <h6 class="no-margin text-semibold">@Model.Title</h6>
+            @if (Model.Author != null)
+            {
+                <p class="text-muted">by @Model.Author.AuthorName</p>
+            }
+            <p class="text-size-large text-success">Rs. @Model.Price.ToString("F2")</p>
+            <p class="text-muted">Stock: @Model.Stock</p>
+        </div>
+        <div class="panel-body panel-body-accent">
+            <div class="row">
+                <div class="col-xs-6">
+                    <a href="@Url.Action("Details", "Product", new { id = Model.Id })" class="btn btn-default btn-block">
+                        <i class="icon-eye position-left"></i> View
+                    </a>
+                </div>
+                <div class="col-xs-6">
+                    <form method="post" action="@Url.Action("AddToCart", "Cart")">
+                        <input type="hidden" name="bookId" value="@Model.Id" />
+                        <input type="hidden" name="quantity" value="1" />
+                        <button type="submit" class="btn btn-success btn-block" @(Model.Stock <= 0 ? "disabled" : "")>
+                            <i class="icon-cart-add position-left"></i> Cart
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
