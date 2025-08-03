@@ -87,6 +87,8 @@ namespace ECommerceWebsite.Repository
             {
                 return await _context.Books
                     .Where(b => b.isActive == (int)enumStatus.Active)
+                    .Include(b => b.Author)
+                    .Include(b=> b.Category)
                     .OrderByDescending(b => b.CreatedAt)
                     .ToListAsync();
             }
@@ -242,7 +244,7 @@ namespace ECommerceWebsite.Repository
             if (book != null)
             {
                 book.isActive = (int)enumStatus.Active;
-                book.DeletedAt = null; //clear deleteion date 
+                book.DeletedAt = null; 
                 _context.Books.Update(book);
                 await _context.SaveChangesAsync();
             }
