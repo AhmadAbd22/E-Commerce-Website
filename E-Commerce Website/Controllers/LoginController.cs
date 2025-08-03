@@ -3,6 +3,8 @@ using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Models.Helping_Classes;
 using ECommerceWebsite.Models.Enums;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 namespace ECommerceWebsite.Controllers
 {
@@ -52,7 +54,7 @@ namespace ECommerceWebsite.Controllers
                 TempData["Error"] = "Incorrect password.";
                 return View(loginDto);
             }
-            if(user.Role == (int)enumRole.Admin)
+            if (user.Role == (int)enumRole.Admin)
             {
                 var auth = new Authorization(_httpContextAccessor);
                 await auth.SetUserClaims(user);
@@ -66,8 +68,14 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("UserHome", "UserHome");
 
             }
+        }
 
-               
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                TempData["Success"] = "You have been successfully logged out.";
+                return RedirectToAction("Login", "Login");
         }
     }
 }
