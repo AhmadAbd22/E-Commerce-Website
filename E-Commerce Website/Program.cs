@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Repository;
 using ECommerceWebsite.Models.Repository;
+using ECommerceWebsite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +29,8 @@ builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
-
+builder.Services.AddScoped<ICartHistoryRepository, CartHistoryRepository>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 var app = builder.Build();
