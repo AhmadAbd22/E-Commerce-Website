@@ -21,7 +21,7 @@ namespace ECommerceWebsite.Controllers
 
         public IActionResult Login()
         {
-            return View();
+            return View(new LoginDto());
         }
 
         [HttpPost]
@@ -36,7 +36,7 @@ namespace ECommerceWebsite.Controllers
             if (string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
             {
                 ViewData["LoginError"] = "Username and Password are required.";
-                return View(ViewData);
+                return View(loginDto);
             }
 
 
@@ -47,26 +47,32 @@ namespace ECommerceWebsite.Controllers
                 return View(loginDto);
             }
 
+            if (user.IsDeleted)
+            {
+                ViewData["LoginError"] = "Your account has been deactivated. Please contact support.";
+                return View(loginDto);
+            }
+
             // hash enterd password and then compare with the stored password
             string hashedInputPassword = PasswordHelper.HashPassword(loginDto.Password);
             if (user.Password != hashedInputPassword)
             {
-                TempData["Error"] = "Incorrect password.";
+                ViewData["Error"] = "Incorrect password.";
                 return View(loginDto);
             }
+
+            var auth = new Authorization(_httpContextAccessor);
+            await auth.SetUserClaims(user);
+
             if (user.Role == (int)enumRole.Admin)
             {
-                var auth = new Authorization(_httpContextAccessor);
-                await auth.SetUserClaims(user);
+                TempData["Success"] = "Welcome Back, Admin!";
                 return RedirectToAction("Admin", "Admin");
             }
             else
             {
-                var auth = new Authorization(_httpContextAccessor);
-                await auth.SetUserClaims(user);
-
+                TempData["Success"] = $"Welcome Back, {user.FirstName}!";
                 return RedirectToAction("UserHome", "UserHome");
-
             }
         }
 

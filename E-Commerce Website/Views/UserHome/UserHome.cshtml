@@ -1,144 +1,142 @@
-﻿@model IEnumerable<Book>
+﻿@model IEnumerable<BookDto>
 @{
-	Layout = "_Layout";
+    ViewData["Title"] = "Our Bookstore";
+    Layout = "_MinimumLayout";
 }
 
-<!-- Main content -->
-<div class="content-wrapper">
-	<!-- Page header -->
-	<div class="page-header page-header-default">
-		<div class="page-header-content">
-			<div class="page-title">
-				<h4><i class="icon-arrow-left52 position-left"></i> <span class="text-semibold">ECommerce</span> - Product Grid</h4>
-			</div>
-		</div>
+<!-- Page header -->
+<div class="page-header page-header-default">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+            @TempData["Success"]
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+            @TempData["Error"]
+        </div>
+    }
 
-		<div class="breadcrumb-line">
-			<ul class="breadcrumb">
-				<li><a href="index.html"><i class="icon-home2 position-left"></i> Home</a></li>
-				<li><a href="general_widgets_stats.html">General pages</a></li>
-				<li class="active">Stats widgets</li>
-			</ul>
-
-		</div>
-	</div>
-	<!-- /page header -->
-	<div class="searchbar">
-		@* searhbar *@
-		<div class="form-group has-feedback has-feedback-left">
-			<input type="text" id="hot_search_basic_input" class="form-control" placeholder="Search">
-			<div class="form-control-feedback">
-				<i class="icon-search4 text-size-small"></i>
-			</div>
-		</div>
-	</div>
-	<!-- Content area -->
-	<div class="content">
-
-		<!-- Detached content -->
-		<div class="container-detached">
-			<div class="content-detached">
-
-				@* Rounded Button *@
-
-				@* <div class="panel panel-body border-top-primary text-center"> *@
-				@* 	<h6 class="no-margin text-semibold">Rounded button</h6> *@
-				@* 	<p class="text-muted content-group-sm">Works with all button types</p> *@
-				@* 	<button type="button" class="btn btn-danger btn-rounded">Rounded button</button> *@
-				@* </div> *@
-
-
-				<!-- Grid -->
-				<div class="row">
-					@foreach (var book in Model)
-					{
-						<div class="col-lg-3 col-sm-6">
-							<div class="panel">
-								<div class="panel-body">
-									<div class="thumb thumb-fixed">
-										<a href="@book.ImageUrl" data-popup="lightbox">
-											<img src="@book.ImageUrl" alt="@book.Title">
-											<span class="zoom-image"><i class="icon-plus2"></i></span>
-										</a>
-									</div>
-								</div>
-
-								<div class="panel-body panel-body-accent text-center">
-									<h6 class="text-semibold no-margin">
-										<a href="#" class="text-default">@book.Title</a>
-									</h6>
-
-									<ul class="list-inline list-inline-separate mb-10">
-										<li><a href="#" class="text-muted">@book.Author</a></li>
-									</ul>
-
-									<h3 class="no-margin text-semibold">Rs. @book.Price</h3>
-
-									<div class="text-nowrap">
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-										<i class="icon-star-full2 text-size-base text-warning-300"></i>
-									</div>
-
-
-									<form action="", method="post">
-										<input type="hidden" name="bookId" value="@book.Id" />
-										<button type="submit" class="btn btn-primary">Add to Cart</button>
-									</form>
-								</div>
-							</div>
-						</div>
-					}
-
-					
-				</div>
-				<!-- /grid -->
-				<!-- Detached sidebar -->
-				<div class="sidebar-detached">
-					<div class="sidebar sidebar-default sidebar-separate">
-						<div class="sidebar-content">
-						</div>
-					</div>
-				</div>
-				<!-- /detached sidebar -->
-
-
-				<!-- Pagination -->
-				<div class="text-center content-group-lg pt-20">
-					<ul class="pagination">
-						<li class="disabled"><a href="#"><i class="icon-arrow-small-left"></i></a></li>
-						<li class="active"><a href="#">1</a></li>
-						<li><a href="#">2</a></li>
-						<li><a href="#">3</a></li>
-						<li><a href="#">4</a></li>
-						<li><a href="#">5</a></li>
-						<li><a href="#"><i class="icon-arrow-small-right"></i></a></li>
-					</ul>
-				</div>
-				<!-- /pagination -->
-
-			</div>
-		</div>
-		<!-- /detached content -->
-		
-		<!-- Footer -->
-		<div class="footer text-muted">
-			&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
-		</div>
-		<!-- /footer -->
-
-	</div>
-	<!-- /content area -->
-
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-store position-left"></i> <span class="text-semibold">Bookstore</span> - All Books</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("UserHome", "UserHome")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li class="active">Store</li>
+        </ul>
+    </div>
 </div>
-<!-- /main content -->
+<!-- /page header -->
+<!-- Content area -->
+<div class="content">
+    <div class="container-detached">
+        <div class="content-detached">
 
+            <!-- Search bar -->
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <form action="@Url.Action("Search", "Product")" method="get">
+                        <div class="form-group has-feedback has-feedback-left">
+                            <input type="search" name="term" class="form-control" placeholder="Search books...">
+                            <div class="form-control-feedback">
+                                <i class="icon-search4 text-size-small text-muted"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
+            <!-- Grid of Books -->
+            <div class="row">
+                @if (!Model.Any())
+                {
+                    <div class="col-xs-12">
+                        <div class="alert alert-info text-center">No books found matching your criteria.</div>
+                    </div>
+                }
+                else
+                {
+                    @foreach (var book in Model)
+                    {
+                        @await Html.PartialAsync("_BookCardPartial", book)
+                    }
+                }
+            </div>
 
+        </div>
+    </div>
 
+    <!-- Detached sidebar for filtering -->
+    <div class="sidebar-detached">
+        <div class="sidebar sidebar-default sidebar-separate">
+            <div class="sidebar-content">
+                <div class="sidebar-category">
+                    <div class="category-title"><span>Filter Products</span></div>
+                    <div class="category-content">
+                        <form action="@Url.Action("Filter", "Product")" method="get">
 
+                            <div class="form-group">
+                                <legend class="text-size-mini text-muted no-border no-padding">By Category</legend>
+                                <select name="categoryId" class="form-control">
+                                    <option value="">All Categories</option>
+                                    @if (ViewData["Categories"] is IEnumerable<Category> categories)
+                                    {
+                                        foreach (var category in categories)
+                                        {
+                                            <option value="@category.Id">@category.CategoryType</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
 
+                            <div class="form-group">
+                                <legend class="text-size-mini text-muted no-border no-padding">By Author</legend>
+                                <select name="authorId" class="form-control">
+                                    <option value="">All Authors</option>
+                                    @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                                    {
+                                        foreach (var author in authors)
+                                        {
+                                            <option value="@author.Id">@author.AuthorName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
 
+                            <div class="form-group">
+                                <legend class="text-size-mini text-muted no-border no-padding">By Price</legend>
+                                <div class="row">
+                                    <div class="col-xs-6"><input type="number" name="minPrice" placeholder="Min" class="form-control" step="0.01"></div>
+                                    <div class="col-xs-6"><input type="number" name="maxPrice" placeholder="Max" class="form-control" step="0.01"></div>
+                                </div>
+                            </div>
 
+                            <button type="submit" class="btn bg-blue btn-block">Filter <i class="icon-filter3 position-right"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /content area -->
+@section Styles {
+    <style>
+        .product-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+            .product-card .panel-body-accent {
+                margin-top: auto;
+            }
+    </style>
+}

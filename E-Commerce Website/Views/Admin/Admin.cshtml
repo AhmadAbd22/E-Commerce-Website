@@ -23,6 +23,24 @@
     </div>
 </div>
 <!-- /page header -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        <i class="icon-checkmark position-left"></i>
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        <i class="icon-blocked position-left"></i>
+        @TempData["Error"]
+    </div>
+}
+
+
 <!-- Content area -->
 <div class="content">
 
@@ -62,43 +80,40 @@
             </div>
 
             <!-- Grid of Books -->
-            <div class="row">
-                @foreach (var book in Model)
+            <div class="row book-grid">
+                @if (!Model.Any())
                 {
-                    <div class="col-lg-4 col-sm-6">
-                        <div class="panel">
-                            <div class="panel-body">
-                                <div class="thumb thumb-fixed">
-                                    <a href="@book.ImageUrl" data-popup="lightbox">
-                                        <img src="@book.ImageUrl" alt="@book.Title">
-                                        <span class="zoom-image"><i class="icon-plus2"></i></span>
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="panel-body panel-body-accent text-center">
-                                <h6 class="text-semibold no-margin"><a href="#" class="text-default">@book.Title</a></h6>
-                                <ul class="list-inline list-inline-separate mb-10">
-                                    <li><a href="#" class="text-muted">@(book.Author?.AuthorName ?? "N/A")</a></li>
-                                </ul>
-                                <h3 class="no-margin text-semibold">Rs. @book.Price</h3>
-                                <div class="text-nowrap">
-                                    <i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-full2 text-size-base text-warning-300"></i><i class="icon-star-half text-size-base text-warning-300"></i>
-                                </div>
-                                <div class="text-muted">@book.Stock reviews</div>
-                                <div class="mt-15">
+                    <div class="col-xs-12">
+                        <div class="panel panel-flat">
+                            <div class="panel-body text-center">
+                                <i class="icon-book icon-3x text-muted mb-20"></i>
+                                <h4 class="text-muted">No books found</h4>
+                                <p class="text-muted">
                                     @if (isDeletedView)
                                     {
-                                        <form asp-action="RestoreBook" asp-route-id="@book.Id" method="post" style="display:inline;"><button type="submit" class="btn btn-sm btn-success">Restore</button></form>
+                                        <text>No deleted books to display.</text>
                                     }
                                     else
                                     {
-                                        <a href="@Url.Action("Edit", "Admin", new { id = book.Id })" class="btn btn-sm btn-warning">Edit</a>
-                                        <form asp-action="Delete" asp-route-id="@book.Id" method="post" style="display:inline;"><button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this book?');">Delete</button></form>
+                                        <text>Start by adding some books to your inventory.</text>
                                     }
-                                </div>
+                                </p>
+                                @if (!isDeletedView)
+                                {
+                                    <a href="@Url.Action("Create", "Admin")" class="btn btn-primary">
+                                        <i class="icon-plus2 position-left"></i> Add Your First Book
+                                    </a>
+                                }
                             </div>
                         </div>
                     </div>
+                }
+                else
+                {
+                    @foreach (var book in Model)
+                    {
+                        @await Html.PartialAsync("_AdminBookCardPartial", book)
+                    }
                 }
             </div>
         </div>
