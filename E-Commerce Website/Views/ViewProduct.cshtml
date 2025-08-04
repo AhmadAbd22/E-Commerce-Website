@@ -1,0 +1,115 @@
+﻿@model BookDto
+@{
+    ViewData["Title"] = Model.Title;
+    Layout = "_MinimumLayout";
+}
+
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-book position-left"></i> <span class="text-semibold">@Model.Title</span></h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("UserHome", "UserHome")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li><a href="@Url.Action("UserHome", "UserHome")">Store</a></li>
+            <li class="active">@Model.Title</li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+
+<!-- Content area -->
+<div class="content">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Product Image -->
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive center-block">
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <!-- Product Details -->
+            <div class="panel panel-flat">
+                <div class="panel-body">
+                    <h3 class="text-semibold">@Model.Title</h3>
+                    <p class="text-muted">by @(Model.Author?.AuthorName ?? "Unknown Author")</p>
+                    
+                    <h2 class="text-primary text-semibold">Rs. @Model.Price</h2>
+                    
+                    @if (Model.Stock > 0)
+                    {
+                        <div class="text-success mb-15">
+                            <i class="icon-checkmark3 position-left"></i>
+                            In Stock (@Model.Stock available)
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-danger mb-15">
+                            <i class="icon-cross2 position-left"></i>
+                            Out of Stock
+                        </div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mb-20">
+                            <h6 class="text-semibold">Description:</h6>
+                            <p>@Model.Description</p>
+                        </div>
+                    }
+
+                    @if (Model.PublicationDate.HasValue)
+                    {
+                        <p><strong>Publication Date:</strong> @Model.PublicationDate.Value.ToString("MMMM dd, yyyy")</p>
+                    }
+
+                    @if (Model.Category != null)
+                    {
+                        <p><strong>Category:</strong> @Model.Category.CategoryType</p>
+                    }
+
+                    <!-- Add to Cart Section -->
+                    @if (Model.Stock > 0)
+                    {
+                        <form method="post" action="@Url.Action("AddToCart", "Cart")" class="mt-20">
+                            <input type="hidden" name="bookId" value="@Model.Id" />
+                            <div class="form-group">
+                                <label>Quantity:</label>
+                                <div class="input-group" style="width: 150px;">
+                                    <input type="number" name="quantity" class="form-control" value="1" min="1" max="@Model.Stock">
+                                    <span class="input-group-btn">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="icon-cart-add position-left"></i> Add to Cart
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <button type="button" class="btn btn-default" disabled>
+                            <i class="icon-blocked position-left"></i> Out of Stock
+                        </button>
+                    }
+                    <div class="mt-20">
+                        <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-default">
+                            <i class="icon-arrow-left8 position-left"></i> Continue Shopping
+                        </a>
+                        <a href="@Url.Action("ViewCart", "Cart")" class="btn btn-info">
+                            <i class="icon-cart position-left"></i> View Cart
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /content area -->
