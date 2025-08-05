@@ -79,9 +79,10 @@ namespace ECommerceWebsite.Controllers
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-                await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-                TempData["Success"] = "You have been successfully logged out.";
-                return RedirectToAction("Login", "Login");
+            ViewData["Login"] = false; 
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData["Success"] = "You have been successfully logged out.";
+            return RedirectToAction("Login", "Login");
         }
     }
 }
