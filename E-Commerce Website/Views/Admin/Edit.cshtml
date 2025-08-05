@@ -1,0 +1,149 @@
+﻿@model BookDto
+@{
+    ViewData["Title"] = "Edit Book";
+    Layout = "_MinimumLayout";
+}
+
+<style>
+    /* Custom style to vertically center the form on the page */
+    .content-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 120px); 
+    }
+
+    .panel-heading-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+</style>
+
+<!-- Centered form -->
+<div class="col-md-7 col-lg-6">
+    <form action="@Url.Action("Edit", "Admin")" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <div class="panel panel-flat">
+
+            <div class="position-left">
+                <a href="@Url.Action("Admin", "Admin")" class="btn btn-secondary btn-sm bg-green">Home</a>
+            </div>
+            <div class="panel-heading text-center">
+                <h5 class="panel-title text-semibold">Edit Book</h5>
+            </div>
+
+            <div class="panel-body">
+                <div class="form-group">
+                    <label class="text-semibold">Book Title:</label>
+                    <input type="text" name="Title" value="@Model.Title" class="form-control" placeholder="e.g., The Great Gatsby" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="text-semibold">Author:</label>
+                    <select name="AuthorId" class="bootstrap-select" data-width="100%" data-live-search="true" title="Select an author..." required>
+                        @if (ViewData["Authors"] != null)
+                        {
+                            @foreach (var author in (IEnumerable<ECommerceWebsite.Models.Author>)ViewData["Authors"]!)
+                            {
+                                <option value="@author.Id" selected="@(author.Id == Model.AuthorId)">@author.AuthorName</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="text-semibold">Category:</label>
+                    <select name="CategoryId" class="bootstrap-select" data-width="100%" data-live-search="true" title="Select a category..." required>
+                        @if (ViewData["Categories"] != null)
+                        {
+                            @foreach (var category in (IEnumerable<ECommerceWebsite.Models.Category>)ViewData["Categories"]!)
+                            {
+                                <option value="@category.Id" selected="@(category.Id == Model.CategoryId)">@category.CategoryType</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="text-semibold">Description:</label>
+                    <textarea name="Description" rows="3" class="form-control" placeholder="A brief description of the book...">@Model.Description</textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="text-semibold">Price (Rs.):</label>
+                            <input type="number" step="0.01" name="Price" value="@Model.Price" class="form-control" placeholder="e.g., 1499.99" required>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="text-semibold">Stock:</label>
+                            <input type="number" name="Stock" value="@Model.Stock" class="form-control" placeholder="e.g., 50" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label class="text-semibold">Publication Date:</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="icon-calendar5"></i></span>
+                                <input type="text" name="PublicationDate" value="@(Model.PublicationDate?.ToString("yyyy-MM-dd"))" class="form-control pickadate-format" placeholder="Select a date..." required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="text-semibold">Book Image:</label>
+                    <input type="file" name="ImageFile" class="file-input" data-show-preview="false" accept=".png,.jpg,.jpeg">
+                    <span class="help-block">Allowed formats: PNG, JPG, JPEG (Leave empty to keep current image)</span>
+                    <input type="hidden" name="FileName" value="@Model.FileName" />
+                </div>
+
+                <div class="text-right">
+                    <a href="@Url.Action("Admin", "Admin")" class="btn btn-default">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Update Book <i class="icon-checkmark position-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+<!-- /centered form -->
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            // Initialize Bootstrap Select
+            $('.bootstrap-select').selectpicker();
+
+            // Initialize Pickadate
+            $('.pickadate-format').pickadate({
+                format: 'yyyy-mm-dd',
+                selectMonths: true,
+                selectYears: 100
+            });
+
+            $('.file-input').uniform({
+                fileButtonClass: 'action btn btn-default'
+            });
+
+             // Simple client-side validation for file type.
+             $('input[name="ImageFile"]').on('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const validTypes = ['image/jpeg', 'image/png'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Only JPG and PNG images are allowed.');
+                        $(this).val(''); 
+                        $(this).parent().find('span.filename').text('No file selected');
+                    }
+                }
+            });
+        });
+    </script>
+}

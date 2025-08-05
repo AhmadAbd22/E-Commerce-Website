@@ -1,0 +1,281 @@
+﻿@model OrderHistoryDto
+@{
+    ViewData["Title"] = "Order History";
+    Layout = "_MinimumLayout";
+}
+
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-history position-left"></i> <span class="text-semibold">Order History</span></h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("UserHome", "UserHome")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li class="active">Order History</li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+<!-- Success/Error Messages -->
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible">
+        <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+        @TempData["Error"]
+    </div>
+}
+
+<!-- Content area -->
+<div class="content">
+    @if (!Model.Orders.Any())
+    {
+        <!-- Empty State -->
+        <div class="panel panel-flat">
+            <div class="panel-body text-center">
+                <i class="icon-bag icon-3x text-muted mb-20"></i>
+                <h4 class="text-muted">No orders found</h4>
+                <p class="text-muted">You haven't placed any orders yet. Start shopping to see your order history here!</p>
+                <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-primary">
+                    <i class="icon-cart-add position-left"></i> Start Shopping
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Order Statistics -->
+        <div class="row">
+            <div class="col-sm-6 col-md-3">
+                <div class="panel panel-body bg-blue-400 has-bg-image">
+                    <div class="media no-margin">
+                        <div class="media-body">
+                            <h3 class="no-margin">@Model.TotalOrders</h3>
+                            <span class="text-uppercase text-size-mini">Total Orders</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-bag icon-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <div class="panel panel-body bg-success-400 has-bg-image">
+                    <div class="media no-margin">
+                        <div class="media-body">
+                            <h3 class="no-margin">Rs. @Model.TotalSpent.ToString("F2")</h3>
+                            <span class="text-uppercase text-size-mini">Total Spent</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-cash3 icon-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <div class="panel panel-body bg-warning-400 has-bg-image">
+                    <div class="media no-margin">
+                        <div class="media-body">
+                            <h3 class="no-margin">@Model.Orders.Count(o => o.OrderStatus.ToLower() == "pending")</h3>
+                            <span class="text-uppercase text-size-mini">Pending Orders</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-hour-glass2 icon-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-md-3">
+                <div class="panel panel-body bg-info-400 has-bg-image">
+                    <div class="media no-margin">
+                        <div class="media-body">
+                            <h3 class="no-margin">@Model.Orders.Count(o => o.OrderStatus.ToLower() == "delivered")</h3>
+                            <span class="text-uppercase text-size-mini">Delivered Orders</span>
+                        </div>
+                        <div class="media-right media-middle">
+                            <i class="icon-check icon-3x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        @foreach (var order in Model.Orders)
+        {
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6 class="panel-title">
+                                <i class="icon-bag position-left"></i>
+                                Order #@order.OrderId.ToString().Substring(0, 8)
+                                <span class="label label-@order.StatusColor">
+                                    <i class="@order.StatusIcon position-left"></i>
+                                    @order.OrderStatus
+                                </span>
+                            </h6>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <span class="text-muted">@order.OrderDate.ToString("MMM dd, yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-body">
+                    <!-- Order Info Row -->
+                    <div class="row mb-15">
+                        <div class="col-md-3">
+                            <strong>Total Amount:</strong><br>
+                            <span class="text-success text-size-large">Rs. @order.TotalAmount.ToString("F2")</span>
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Items:</strong><br>
+                            @order.TotalItems item@(order.TotalItems != 1 ? "s" : "")
+                        </div>
+                        <div class="col-md-3">
+                            <strong>Shipping To:</strong><br>
+                            @order.City
+                        </div>
+                        <div class="col-md-3">
+                            @if (order.EstimatedDeliveryDate.HasValue)
+                            {
+                                <strong>Estimated Delivery:</strong>
+
+                                <br>
+                                @order.EstimatedDeliveryDate.Value.ToString("MMM dd, yyyy")
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Order Items -->
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr class="bg-light">
+                                    <th>Book</th>
+                                    <th width="100">Quantity</th>
+                                    <th width="120">Unit Price</th>
+                                    <th width="120">Subtotal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in order.OrderItems)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="media">
+                                                <div class="media-left">
+                                                    <img src="@item.ImageUrl" alt="@item.BookTitle" class="img-rounded" style="width: 50px; height: 60px;">
+                                                </div>
+                                                <div class="media-body">
+                                                    <h6 class="media-heading">
+                                                        <a href="@Url.Action("ViewProduct", "Product", new { id = item.BookId })">@item.BookTitle</a>
+                                                    </h6>
+                                                    <span class="text-muted text-size-small">by @item.AuthorName</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge badge-flat bg-blue">@item.Quantity</span>
+                                        </td>
+                                        <td>Rs. @item.UnitPrice.ToString("F2")</td>
+                                        <td><strong>Rs. @item.Subtotal.ToString("F2")</strong></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Order Actions -->
+                    <div class="text-right">
+                        <a href="@Url.Action("OrderConfirmation", "Cart", new { orderId = order.OrderId })" class="btn btn-default">
+                            <i class="icon-eye position-left"></i> View Details
+                        </a>
+                        @if (order.OrderStatus.ToLower() == "pending")
+                        {
+                            <button type="button" class="btn btn-danger" onclick="cancelOrder('@order.OrderId')">
+                                <i class="icon-cross2 position-left"></i> Cancel Order
+                            </button>
+                        }
+                        @if (order.OrderStatus.ToLower() == "delivered")
+                        {
+                            <button type="button" class="btn btn-success" disabled>
+                                <i class="icon-checkmark3 position-left"></i> Order Complete
+                            </button>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Back to Shopping Button -->
+        <div class="text-center">
+            <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-primary btn-lg">
+                <i class="icon-cart-add position-left"></i> Continue Shopping
+            </a>
+        </div>
+    }
+</div>
+<!-- /content area -->
+@section Scripts {
+    <script>
+        function cancelOrder(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                // Implement cancel order functionality
+                $.post('@Url.Action("CancelOrder", "Cart")', { orderId: orderId })
+                    .done(function(response) {
+                        location.reload();
+                    })
+                    .fail(function() {
+                        alert('Error cancelling order. Please try again.');
+                    });
+            }
+        }
+
+        // Auto-hide alerts after 5 seconds
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
+        });
+    </script>
+}
+
+@section Styles {
+    <style>
+        .has-bg-image {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+');
+        }
+
+        .media img {
+            object-fit: cover;
+        }
+
+        .badge-flat {
+            border-radius: 0;
+        }
+
+        .panel-heading .row {
+            margin: 0;
+        }
+
+        .label {
+            font-size: 11px;
+            padding: 3px 7px;
+        }
+    </style>
+}
+
