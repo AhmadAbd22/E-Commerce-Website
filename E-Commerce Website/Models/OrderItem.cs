@@ -17,7 +17,7 @@ namespace ECommerceWebsite.Models
         public User? User { get; set; }
 
         [ForeignKey("OrderDetailsId")]
-        public Guid? OrderDetails { get; set; }
+        public Guid? OrderDetailsId { get; set; }
         public OrderDetails? Orderetails { get; set; }  
 
         [ForeignKey("BookId")]
