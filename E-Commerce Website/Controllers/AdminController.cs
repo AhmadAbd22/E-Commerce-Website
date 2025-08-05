@@ -32,6 +32,7 @@ namespace ECommerceWebsite.Controllers
             var books = await _bookRepo.GetActiveBooksAsync();
             await PopulateViewDataForAdmin();
             ViewData["IsDeletedView"] = false;
+            ViewData["Login"] = true;
             
             var dtos = books.Select(book => new BookDto
             {
@@ -58,6 +59,22 @@ namespace ECommerceWebsite.Controllers
             await PopulateViewDataForAdmin(); 
             ViewData["IsDeletedView"] = true;
             return View(deletedBooks);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RestoreBook(Guid id)
+        {
+            try
+            {
+                await _bookRepo.RestoreBookAsync(id);
+                TempData["Success"] = "Book restored successfully!";
+                return RedirectToAction("DeletedBooks");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Error restoring book.";
+                return RedirectToAction("DeletedBooks");
+            }
         }
 
         // GET
@@ -139,6 +156,8 @@ namespace ECommerceWebsite.Controllers
             var book = await _bookRepo.GetBookByIdAsync(id);
             if (book == null)
                 return NotFound();
+
+            await PopulateViewDataForAdmin();
 
             var dto = new BookDto
             {
@@ -354,12 +373,12 @@ namespace ECommerceWebsite.Controllers
                 var booksByAuthor = await _bookRepo.GetBooksByAuthorAsync(authorId);
                 if (booksByAuthor.Any())
                 {
-                    TempData["Error"] = "Cannot delete author. Books are associated with this author."; // ✅ Use TempData
+                    TempData["Error"] = "Cannot delete author. Books are associated with this author.";
                     return RedirectToAction("AddAuthor");
                 }
 
                 await _authorRepo.DeleteAuthor(author);
-                TempData["Success"] = "Author deleted successfully!"; // ✅ Use TempData
+                TempData["Success"] = "Author deleted successfully!"; 
                 return RedirectToAction("AddAuthor");
             }
             catch (Exception ex)
@@ -370,12 +389,7 @@ namespace ECommerceWebsite.Controllers
         }
 
 
-        /// <summary>
-        /// ///////
-        /// </summary>
-        /// <returns></returns>
-        //CATEGORY CRUD
-        ///
+      //Category CRUD
 
         [HttpGet]
         public async Task<IActionResult> AddCategory()
@@ -460,7 +474,6 @@ namespace ECommerceWebsite.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveCategory(Guid categoryId)
         {
-            // Check if the provided ID is valid
             if (categoryId == Guid.Empty)
             {
                 TempData["Error"] = "Invalid category ID.";

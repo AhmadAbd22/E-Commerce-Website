@@ -119,7 +119,7 @@ namespace ECommerceWebsite.Controllers
                     PublicationDate = book.PublicationDate
                 };
 
-                return View("ProductDetail", bookDto);
+                return View("ViewProduct", bookDto);
             }
             catch (Exception ex)
             {
