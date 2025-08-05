@@ -66,14 +66,12 @@
                         </div>
 
                         <div class="col-md-4 col-sm-12">
-                            <form action="@Url.Action("Search", "Admin")" method="get">
-                                <div class="form-group has-feedback has-feedback-left">
-                                    <input type="search" name="term" class="form-control" placeholder="Search books...">
-                                    <div class="form-control-feedback">
-                                        <i class="icon-search4 text-size-small text-muted"></i>
-                                    </div>
+                            <div class="form-group has-feedback has-feedback-left">
+                                <input type="search" id="book-search" class="form-control" placeholder="Type to search books...">
+                                <div class="form-control-feedback">
+                                    <i class="icon-search4 text-size-small text-muted"></i>
                                 </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,6 +113,13 @@
                         @await Html.PartialAsync("_AdminBookCardPartial", book)
                     }
                 }
+
+                <div class="col-xs-12" id="no-results-message" style="display: none;">
+                    <div class="alert alert-warning text-center">
+                        <i class="icon-notification2 position-left"></i>
+                        No books found matching your search term.
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -166,3 +171,35 @@
 
 </div>
 <!-- /content area -->
+@section Scripts {
+    <script type="text/javascript">
+        $(function() {
+            // NEW: Active Search Implementation
+            $('#book-search').on('keyup', function() {
+                var searchTerm = $(this).val().toLowerCase();
+                var visibleCount = 0;
+
+                // Loop through each book card container in the grid
+                $('.book-grid > div').each(function() {
+                    var bookCard = $(this);
+                    var bookText = bookCard.text().toLowerCase();
+
+                    // Check if the card's text contains the search term
+                    if (bookText.indexOf(searchTerm) > -1) {
+                        bookCard.show();
+                        visibleCount++;
+                    } else {
+                        bookCard.hide();
+                    }
+                });
+
+                // Show or hide the 'no results' message
+                if (visibleCount === 0) {
+                    $('#no-results-message').show();
+                } else {
+                    $('#no-results-message').hide();
+                }
+            });
+        });
+    </script>
+}

@@ -22,7 +22,7 @@
         <!-- Book Details -->
         <div class="panel-body" style="min-height: 120px;">
             <h6 class="text-semibold no-margin text-center">
-                <a href="@Url.Action("ViewProduct", "Product", new { id = Model.Id })" class="text-default">@Model.Title</a>
+                <a href="@Url.Action("Details", "UserHome", new { id = Model.Id })" class="text-default">@Model.Title</a>
             </h6>
             <div class="text-center mt-5">
                 @if (Model.Author != null)
@@ -84,7 +84,7 @@
                 <!-- Active Book Actions -->
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">
-                        <a href="@Url.Action("ViewProduct", "Product", new { id = Model.Id })" class="btn btn-info btn-sm">
+                        <a href="@Url.Action("Details", "UserHome", new { id = Model.Id })" class="btn btn-info btn-sm">
                             <i class="icon-eye position-left"></i> View
                         </a>
                     </div>

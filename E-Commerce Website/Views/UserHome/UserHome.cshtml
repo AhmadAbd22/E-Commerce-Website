@@ -42,15 +42,51 @@
             <!-- Search bar -->
             <div class="panel panel-flat">
                 <div class="panel-body">
-                    <form action="@Url.Action("Search", "Product")" method="get">
-                        <div class="form-group has-feedback has-feedback-left">
-                            <input type="search" name="term" class="form-control" placeholder="Search books...">
-                            <div class="form-control-feedback">
-                                <i class="icon-search4 text-size-small text-muted"></i>
-                            </div>
+                    <div class="form-group has-feedback has-feedback-left">
+                        <input type="search" id="book-search" class="form-control" placeholder="Search books by title, author, or description...">
+                        <div class="form-control-feedback">
+                            <i class="icon-search4 text-size-small text-muted"></i>
                         </div>
-                    </form>
+                    </div>
+                    <div class="row mt-10">
+                        <div class="col-sm-4">
+                            <select id="author-filter" class="form-control">
+                                <option value="">All Authors</option>
+                                @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                                {
+                                    foreach (var author in authors)
+                                    {
+                                        <option value="@author.AuthorName">@author.AuthorName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <select id="category-filter" class="form-control">
+                                <option value="">All Categories</option>
+                                @if (ViewData["Categories"] is IEnumerable<Category> categories)
+                                {
+                                    foreach (var category in categories)
+                                    {
+                                        <option value="@category.CategoryType">@category.CategoryType</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="button" id="clear-filters" class="btn btn-default btn-block">
+                                <i class="icon-reset position-left"></i> Clear Filters
+                            </button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- No Results Message -->
+            <div id="no-results" class="alert alert-info text-center" style="display: none;">
+                <i class="icon-info22 icon-2x"></i>
+                <h5>No books found</h5>
+                <p>Try adjusting your search criteria or clear the filters to see all books.</p>
             </div>
 
             <!-- Grid of Books -->
@@ -80,7 +116,7 @@
                 <div class="sidebar-category">
                     <div class="category-title"><span>Filter Products</span></div>
                     <div class="category-content">
-                        <form action="@Url.Action("Filter", "Product")" method="get">
+                        <form action="@Url.Action("UserHome", "UserHome")" method="post">
 
                             <div class="form-group">
                                 <legend class="text-size-mini text-muted no-border no-padding">By Category</legend>

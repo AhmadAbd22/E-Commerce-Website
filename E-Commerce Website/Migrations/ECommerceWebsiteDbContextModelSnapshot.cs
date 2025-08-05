@@ -354,10 +354,7 @@ namespace ECommerceWebsite.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
-                    b.Property<Guid?>("OrderDetails")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("OrderetailsId")
+                    b.Property<Guid?>("OrderDetailsId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Quantity")
@@ -382,7 +379,7 @@ namespace ECommerceWebsite.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.HasIndex("OrderetailsId");
+                    b.HasIndex("OrderDetailsId");
 
                     b.HasIndex("UserId");
 
@@ -558,7 +555,7 @@ namespace ECommerceWebsite.Migrations
 
                     b.HasOne("ECommerceWebsite.Models.OrderDetails", "Orderetails")
                         .WithMany("OrderItems")
-                        .HasForeignKey("OrderetailsId");
+                        .HasForeignKey("OrderDetailsId");
 
                     b.HasOne("ECommerceWebsite.Models.User", "User")
                         .WithMany()
