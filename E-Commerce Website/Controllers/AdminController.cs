@@ -58,7 +58,23 @@ namespace ECommerceWebsite.Controllers
             var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
             await PopulateViewDataForAdmin(); 
             ViewData["IsDeletedView"] = true;
-            return View(deletedBooks);
+
+            var dtos = deletedBooks.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Price = book.Price,
+                Stock = book.StockQuantity,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId,
+                PublicationDate = book.PublicationDate,
+                Author = book.Author,
+                Category = book.Category,
+                ImageUrl = book.ImageUrl
+            }).ToList();
+
+            return View(dtos);
         }
 
         [HttpPost]

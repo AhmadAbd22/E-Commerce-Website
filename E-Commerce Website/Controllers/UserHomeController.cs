@@ -48,7 +48,7 @@ namespace ECommerceWebsite.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UserHome(string search, Guid? authorId, Guid? categoryId)
+        public async Task<IActionResult> UserHome(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice)
         {
             IEnumerable<Book> books;
             try
@@ -57,22 +57,25 @@ namespace ECommerceWebsite.Controllers
                 {
                     books = await _bookRepo.SearchActiveBooksAsync(search);
                 }
-                else if (authorId.HasValue)
+                else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
                 {
-                    books = await _bookRepo.GetBooksByAuthorAsync(authorId.Value);
-                }
-                else if (categoryId.HasValue)
-                {
-                    books = await _bookRepo.GetBooksByCategoryAsync(categoryId.Value);
+                    books = await _bookRepo.FilterBooksAsync(authorId.Value, minPrice, maxPrice);
+                    if (categoryId.HasValue)
+                    {
+                        books = books.Where(b => b.CategoryId == categoryId.Value);
+                    }
                 }
                 else
                 {
                     books = await _bookRepo.GetActiveBooksAsync();
                 }
+
                 var authors = await _authorRepo.GetAllAuthorsAsync();
                 var categories = await _categoryRepo.GetAllCategoriesAsync();
+
                 ViewData["Authors"] = authors;
                 ViewData["Categories"] = categories;
+
                 var dtos = books.Select(book => new BookDto
                 {
                     Id = book.Id,
@@ -82,9 +85,10 @@ namespace ECommerceWebsite.Controllers
                     Author = book.Author,
                     ImageUrl = book.ImageUrl,
                 }).ToList();
+
                 return View(dtos);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return View("Error", new { message = "An error occurred while searching for books." });
             }
@@ -127,6 +131,9 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("UserHome");
             }
         }
+
+
+
 
 
     }

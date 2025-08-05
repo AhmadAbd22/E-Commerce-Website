@@ -30,7 +30,6 @@
 			}
 			else
 			{
-				<!-- Non-authenticated users or SignUp page see Login -->
 				<li>
 					<a href="@Url.Action("Login", "Login")" class="btn btn-link navbar-btn">
 						<i class="icon-enter position-left"></i>
@@ -39,7 +38,6 @@
 				</li>
 			}
 
-			<!-- ✅ CONDITIONAL: Only show cart for authenticated users -->
 			@if (isAuthenticated && !isSignUpPage)
 			{
 				<li class="cart-nav-item">

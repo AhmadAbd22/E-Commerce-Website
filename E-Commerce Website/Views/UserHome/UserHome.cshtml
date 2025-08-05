@@ -176,3 +176,76 @@
             }
     </style>
 }
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Clear Filters button functionality
+            $('#clear-filters').on('click', function() {
+                // Clear search input
+                $('#book-search').val('');
+
+                // Reset filter dropdowns
+                $('#author-filter').val('');
+                $('#category-filter').val('');
+
+                // Show all book cards (only target book card containers)
+                $('.col-lg-3, .col-md-4, .col-sm-6, .col-xs-12').not('.col-sm-4').show();
+
+                // Hide no results message
+                $('#no-results').hide();
+
+                // Optional: Clear sidebar form filters as well
+                $('select[name="categoryId"]').val('');
+                $('select[name="authorId"]').val('');
+                $('input[name="minPrice"]').val('');
+                $('input[name="maxPrice"]').val('');
+            });
+
+            // Search functionality for real-time filtering
+            $('#book-search, #author-filter, #category-filter').on('input change', function() {
+                filterBooks();
+            });
+
+            function filterBooks() {
+                var searchTerm = $('#book-search').val().toLowerCase();
+                var selectedAuthor = $('#author-filter').val().toLowerCase();
+                var selectedCategory = $('#category-filter').val().toLowerCase();
+                var visibleCount = 0;
+
+                // Target only book card containers (exclude the Clear Filters button container)
+                $('.row > div').not('.col-sm-4').each(function() {
+                    var bookCard = $(this);
+                    
+                    // Skip if this is not a book card container
+                    if (!bookCard.hasClass('col-lg-3') && !bookCard.hasClass('col-md-4') && !bookCard.hasClass('col-sm-6')) {
+                        return;
+                    }
+                    
+                    var bookText = bookCard.text().toLowerCase();
+                    var bookAuthor = bookCard.find('p.text-muted').first().text().toLowerCase().replace('by ', '') || '';
+                    
+                    var matchesSearch = searchTerm === '' || bookText.indexOf(searchTerm) > -1;
+                    var matchesAuthor = selectedAuthor === '' || bookAuthor.indexOf(selectedAuthor) > -1;
+
+                    var matchesCategory = selectedCategory === '' || bookText.indexOf(selectedCategory) > -1;
+
+                    if (matchesSearch && matchesAuthor && matchesCategory) {
+                        bookCard.show();
+                        visibleCount++;
+                    } else {
+                        bookCard.hide();
+                    }
+                });
+
+                if (visibleCount === 0) {
+                    $('#no-results').show();
+                } else {
+                    $('#no-results').hide();
+                }
+            }
+        });
+    </script>
+}
+
+}

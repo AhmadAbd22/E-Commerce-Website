@@ -49,7 +49,7 @@ namespace ECommerceWebsite.Controllers
 
             if (user.IsDeleted)
             {
-                ViewData["LoginError"] = "Your account has been deactivated. Please contact support.";
+                TempData["LoginError"] = "Your account has been deactivated. Please contact support.";
                 return View(loginDto);
             }
 
@@ -57,7 +57,7 @@ namespace ECommerceWebsite.Controllers
             string hashedInputPassword = PasswordHelper.HashPassword(loginDto.Password);
             if (user.Password != hashedInputPassword)
             {
-                ViewData["Error"] = "Incorrect password.";
+                TempData["Error"] = "Incorrect password.";
                 return View(loginDto);
             }
 
