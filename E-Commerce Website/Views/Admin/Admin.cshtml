@@ -2,9 +2,8 @@
 @{
     bool isDeletedView = (ViewData["IsDeletedView"] as bool?) ?? false;
     ViewData["Title"] = isDeletedView ? "Deleted Books" : "Admin Dashboard";
-    Layout = "_MinimumLayout"; // This should be your modified layout with the has-detached-right class
+    Layout = "_MinimumLayout";
 }
-
 <!-- Page header -->
 <div class="page-header page-header-default">
     <div class="page-header-content">
@@ -148,11 +147,14 @@
                             <div class="form-group">
                                 <legend class="text-size-mini text-muted no-border no-padding">By Price</legend>
                                 <div class="row">
-                                    <div class="col-xs-6"><input type="number" name="minPrice" placeholder="Min" class="form-control" step="0.01"></div>
-                                    <div class="col-xs-6"><input type="number" name="maxPrice" placeholder="Max" class="form-control" step="0.01"></div>
+                                    <div class="col-xs-6"><input type="number" name="minPrice" placeholder="Min" class="form-control" step="50"></div>
+                                    <div class="col-xs-6"><input type="number" name="maxPrice" placeholder="Max" class="form-control" step="50"></div>
                                 </div>
                             </div>
                             <button type="submit" class="btn bg-blue btn-block">Filter <i class="icon-filter3 position-right"></i></button>
+                            <button type="button" id="clear-filters" class="btn btn-default btn-block mt-10">
+                                <i class="icon-reset position-left"></i> Clear Filters
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -171,10 +173,12 @@
 
 </div>
 <!-- /content area -->
+
+
 @section Scripts {
     <script type="text/javascript">
         $(function() {
-            // NEW: Active Search Implementation
+            // Active Search Implementation
             $('#book-search').on('keyup', function() {
                 var searchTerm = $(this).val().toLowerCase();
                 var visibleCount = 0;
@@ -200,6 +204,25 @@
                     $('#no-results-message').hide();
                 }
             });
+
+            // Clear Filters functionality
+            $('#clear-filters').on('click', function() {
+                // Clear all form inputs
+                $('#author-filter').val('');
+                $('#min-price').val('');
+                $('#max-price').val('');
+                
+                // Clear search input
+                $('#book-search').val('');
+                
+                // Show all books
+                $('.book-grid > div').show();
+                $('#no-results-message').hide();
+                
+                // Redirect to clear filters on server side
+                window.location.href = '@Url.Action("Admin", "Admin")';
+            });
         });
     </script>
 }
+

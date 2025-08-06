@@ -262,25 +262,74 @@ namespace ECommerceWebsite.Controllers
             var books = await _bookRepo.SearchActiveBooksAsync(term);
             await PopulateViewDataForAdmin();
             ViewData["IsDeletedView"] = false;
-            return View("Admin", books);
+
+            var dtos = books.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Price = book.Price,
+                Stock = book.StockQuantity,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId,
+                PublicationDate = book.PublicationDate,
+                Author = book.Author,
+                Category = book.Category,
+                ImageUrl = book.ImageUrl
+            }).ToList();
+
+            return View("Admin", dtos);
         }
 
         // GET
         public async Task<IActionResult> FilterByAuthor(Guid authorId)
         {
-            var books = await _bookRepo.GetBooksByAuthorAsync(authorId.ToString());
+            var books = await _bookRepo.GetBooksByAuthorAsync(authorId);
+
             await PopulateViewDataForAdmin();
             ViewData["IsDeletedView"] = false;
-            return View("Admin", books);
+
+            var dtos = books.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Price = book.Price,
+                Stock = book.StockQuantity,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId,
+                PublicationDate = book.PublicationDate,
+                Author = book.Author,
+                Category = book.Category,
+                ImageUrl = book.ImageUrl
+            }).ToList();
+
+            return View("Admin", dtos);
         }
 
         // GET
         public async Task<IActionResult> FilterByCategory(Guid categoryId)
         {
-            var books = await _bookRepo.GetBooksByCategoryAsync(categoryId.ToString());
+            var books = await _bookRepo.GetBooksByCategoryAsync(categoryId);
             await PopulateViewDataForAdmin();
             ViewData["IsDeletedView"] = false;
-            return View("Admin", books);
+
+            var dtos = books.Select(book => new BookDto
+            {
+                Id = book.Id,
+                Title = book.Title,
+                Description = book.Description,
+                Price = book.Price,
+                Stock = book.StockQuantity,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId,
+                PublicationDate = book.PublicationDate,
+                Author = book.Author,
+                Category = book.Category,
+                ImageUrl = book.ImageUrl
+            }).ToList();
+
+            return View("Admin", dtos);
         }
         
         [HttpGet]
@@ -530,6 +579,11 @@ namespace ECommerceWebsite.Controllers
         {
             ViewData["Authors"] = await _authorRepo.GetAllAuthorsAsync();
             ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+        }
+
+        public async Task<IActionResult> ClearFilters()
+        {
+            return RedirectToAction("Admin");
         }
     }
 }
