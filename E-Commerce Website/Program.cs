@@ -19,7 +19,15 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LoginPath = "/Login/Login"; 
         options.LogoutPath = "/Login/Logout";
         options.ExpireTimeSpan = TimeSpan.FromHours(2);
+        options.AccessDeniedPath = "/Login/Login";
     });
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
+});
+
 
 builder.Services.AddHttpContextAccessor();
 
