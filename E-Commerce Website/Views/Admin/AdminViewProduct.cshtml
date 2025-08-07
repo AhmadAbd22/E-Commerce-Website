@@ -1,0 +1,220 @@
+﻿@model BookDto
+@{
+    ViewData["Title"] = Model.Title + " - Admin View";
+    Layout = "_AdminLayout";
+}
+
+<!-- Page header -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-book position-left"></i> <span class="text-semibold">@Model.Title</span> - <small>Admin View</small></h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Dashboard</a></li>
+            <li><a href="@Url.Action("Admin", "Admin")">Book Management</a></li>
+            <li class="active">@Model.Title</li>
+        </ul>
+    </div>
+</div>
+<!-- /page header -->
+<!-- Content area -->
+<div class="content">
+    <div class="row">
+        <div class="col-md-6">
+            <!-- Product Image -->
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Book Image</h6>
+                </div>
+                <div class="panel-body">
+                    <div class="product-image-container">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive center-block product-detail-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <!-- Product Details -->
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Book Information</h6>
+                </div>
+                <div class="panel-body">
+                    <h3 class="text-semibold">@Model.Title</h3>
+                    <p class="text-muted">by @(Model.Author?.AuthorName ?? "Unknown Author")</p>
+
+                    <h2 class="text-primary text-semibold">Rs. @Model.Price</h2>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <strong>Stock Status:</strong>
+                            @if (Model.Stock > 0)
+                            {
+                                <div class="text-success">
+                                    <i class="icon-checkmark3 position-left"></i>
+                                    In Stock (@Model.Stock available)
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-danger">
+                                    <i class="icon-cross2 position-left"></i>
+                                    Out of Stock
+                                </div>
+                            }
+                        </div>
+                        <div class="col-sm-6">
+                            @if (Model.Category != null)
+                            {
+                                <p><strong>Category:</strong> @Model.Category.CategoryType</p>
+                            }
+                        </div>
+                    </div>
+
+                    @if (Model.PublicationDate.HasValue)
+                    {
+                        <p><strong>Publication Date:</strong> @Model.PublicationDate.Value.ToString("MMMM dd, yyyy")</p>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <div class="mt-20">
+                            <h6 class="text-semibold">Description:</h6>
+                            <div class="well well-sm">
+                                <p>@Model.Description</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Admin Action Buttons -->
+                    <div class="mt-30">
+                        <h6 class="text-semibold">Admin Actions:</h6>
+                        <div class="btn-group btn-group-justified">
+                            <div class="btn-group">
+                                <a href="@Url.Action("Edit", "Admin", new { id = Model.Id })" class="btn btn-warning">
+                                    <i class="icon-pencil position-left"></i> Edit Book
+                                </a>
+                            </div>
+                            <div class="btn-group">
+                                <form method="post" action="@Url.Action("Delete", "Admin")" style="display: inline-block; width: 100%;">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete &quot;@Model.Title&quot;?')">
+                                        <i class="icon-trash position-left"></i> Delete Book
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="mt-15">
+                            <a href="@Url.Action("Admin", "Admin")" class="btn btn-default btn-block">
+                                <i class="icon-arrow-left8 position-left"></i> Back to Book List
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Admin Information Panel -->
+    <div class="row mt-20">
+        <div class="col-md-12">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h6 class="panel-title">Additional Information</h6>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="text-semibold">Book ID:</td>
+                                    <td><code>@Model.Id</code></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-semibold">Author ID:</td>
+                                    <td><code>@Model.AuthorId</code></td>
+                                </tr>
+                                @if (Model.CategoryId.HasValue)
+                                {
+                                    <tr>
+                                        <td class="text-semibold">Category ID:</td>
+                                        <td><code>@Model.CategoryId</code></td>
+                                    </tr>
+                                }
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="alert alert-info">
+                                <h6><i class="icon-info22 position-left"></i> Quick Actions</h6>
+                                <p>From this view you can:</p>
+                                <ul class="list-unstyled">
+                                    <li><i class="icon-checkmark3 text-success"></i> Edit book information</li>
+                                    <li><i class="icon-checkmark3 text-success"></i> Delete the book</li>
+                                    <li><i class="icon-checkmark3 text-success"></i> View all book details</li>
+                                    <li><i class="icon-checkmark3 text-success"></i> Return to book management</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /content area -->
+@section Styles {
+    <style>
+        .product-image-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+        }
+
+        .product-detail-image {
+            max-width: 100%;
+            max-height: 400px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .table-borderless > tbody > tr > td,
+        .table-borderless > tbody > tr > th,
+        .table-borderless > tfoot > tr > td,
+        .table-borderless > tfoot > tr > th,
+        .table-borderless > thead > tr > td,
+        .table-borderless > thead > tr > th {
+            border: none;
+            padding: 8px 0;
+        }
+
+        .well {
+            background-color: #f5f5f5;
+            border: 1px solid #e3e3e3;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .well-sm {
+            padding: 10px;
+        }
+    </style>
+}
+
+

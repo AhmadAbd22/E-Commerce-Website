@@ -1,7 +1,7 @@
 ﻿@model ECommerceWebsite.Models.Dtos.LoginDto
 @{
-	Layout = "_MinimumLayout"; 
-		
+	bool isLoginView = (ViewData["isLoginView"] as bool?) ?? false;
+	Layout = "_MinimumLayout";
 }
 
 <body class="login-container">

@@ -1,7 +1,7 @@
 ﻿@using ECommerceWebsite.Models
 @model ECommerceWebsite.Models.Dtos.AuthorDto
 @{
-    Layout = "_MinimumLayout";
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Manage Authors";
     var authors = ViewData["Authors"] as IEnumerable<Author> ?? new List<Author>();
 }

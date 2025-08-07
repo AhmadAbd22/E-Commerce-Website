@@ -6,6 +6,7 @@
 	var usernameError = ViewData["UsernameError"] as string;
 	var passwordError = ViewData["PasswordError"] as string;
 	var existUser = ViewData["ExistUser"] as string;
+    bool isLoginView = (ViewData["isLoginView"] as bool?) ?? false;
 }
 
 @if (!string.IsNullOrEmpty(usernameError))

@@ -1,7 +1,7 @@
 ﻿@using ECommerceWebsite.Models
 @model ECommerceWebsite.Models.Dtos.CategoryDto
 @{
-    Layout = "_MinimumLayout";
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Manage Categories";
     var categories = ViewData["Categories"] as IEnumerable<Category> ?? new List<Category>();
 }

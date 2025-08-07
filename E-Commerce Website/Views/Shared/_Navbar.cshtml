@@ -2,9 +2,12 @@
 	var categories = ViewData["Categories"] as IEnumerable<Category>;
 	var cartItemCount = ViewBag.CartItemCount ?? 0;
 	bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+	bool isLoginView = (ViewData["isLoginView"] as bool?) ?? false;
 	string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
 	string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
 	bool isSignUpPage = currentController == "SignUp" && currentAction == "SignUp";
+	bool isLoginPage = currentController == "Login" && currentAction == "Login";
+	bool isAdminView = currentController == "Admin";
 }
 
 <div class="navbar navbar-inverse bg-indigo">
@@ -18,58 +21,45 @@
 	</div>
 
 	<div class="navbar-collapse collapse" id="navbar-mobile">
+		<!-- Left side - empty for now -->
 		<ul class="nav navbar-nav">
-			@if (isAuthenticated && !isSignUpPage)
-			{
-				<li>
-					<a href="@Url.Action("Logout", "Login")" class="btn btn-link navbar-btn">
-						<i class="icon-switch2 position-left"></i>
-						<span class="hidden-xs">Logout</span>
-					</a>
-				</li>
-			}
-			else
-			{
-				<li>
-					<a href="@Url.Action("Login", "Login")" class="btn btn-link navbar-btn">
-						<i class="icon-enter position-left"></i>
-						<span class="hidden-xs">Login</span>
-					</a>
-				</li>
-			}
+		</ul>
 
-			@if (isAuthenticated && !isSignUpPage)
-			{
-				<li class="cart-nav-item">
-					<a href="@Url.Action("ViewCart", "Cart")" class="navbar-btn cart-button" data-popup="tooltip" title="View Shopping Cart">
-						<i class="icon-cart2"></i>
-						<span class="visible-xs-inline-block">Cart</span>
-						@if (cartItemCount > 0)
-						{
-							<span class="badge bg-danger cart-badge" id="cart-badge">@cartItemCount</span>
-						}
-					</a>
-				</li>
-			}
-
+		<!-- Right side navigation -->
 		<div class="navbar-right">
-			@if (isAuthenticated && !isSignUpPage)
-			{
-				<p class="navbar-text">Welcome back!</p>
-			}
-			else if (isSignUpPage)
-			{
-				<p class="navbar-text">Join us today!</p>
-			}
-			else
-			{
-				<p class="navbar-text">Welcome! Please login</p>
-			}
+			<ul class="nav navbar-nav navbar-inline">
+				<!-- Welcome message and logout/login buttons in one line -->
+				<li class="navbar-text-item">
+					@if (isAuthenticated && !isSignUpPage && !isLoginPage)
+					{
+						<span class="navbar-text">Welcome back!</span>
+						@if (isAdminView)
+						{
+							<!-- Admin view - logout button inline with welcome message -->
+							<a href="@Url.Action("Logout", "Login")" class="btn btn-link navbar-btn inline-logout">
+								<i class="icon-switch2 position-left"></i>
+								<span class="hidden-xs">Logout</span>
+							</a>
+						}
+					}
+					else if (isSignUpPage)
+					{
+						<span class="navbar-text">Join us today!</span>
+					}
+					else if (isLoginPage)
+					{
+						<span class="navbar-text">Welcome! Please sign in</span>
+					}
+					else
+					{
+						<span class="navbar-text">Welcome! Please login</span>
+					}
+				</li>
 
-			<ul class="nav navbar-nav">
-				@if (isAuthenticated && !isSignUpPage)
+				<!-- Only show account dropdown when authenticated AND not on login/signup pages AND not admin view -->
+				@if (isAuthenticated && !isSignUpPage && !isLoginPage && !isAdminView)
 				{
-					<!-- User Account Dropdown -->
+					<!-- User Account Dropdown - show full dropdown only on customer facing views -->
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<i class="icon-user"></i>
@@ -79,9 +69,6 @@
 						<div class="dropdown-menu dropdown-content">
 							<div class="dropdown-content-heading">
 								My Account
-								<ul class="icons-list">
-									<li><a href="#"><i class="icon-cog6"></i></a></li>
-								</ul>
 							</div>
 
 							<ul class="media-list dropdown-content-body width-300">
@@ -116,20 +103,6 @@
 										<span class="text-muted">View your past orders</span>
 									</div>
 								</li>
-
-								<li class="media">
-									<div class="media-left">
-										<a href="#" class="btn bg-purple-300 btn-rounded btn-icon btn-xs">
-											<i class="icon-user"></i>
-										</a>
-									</div>
-									<div class="media-body">
-										<a href="#" class="media-heading">
-											<span class="text-semibold">Profile Settings</span>
-										</a>
-										<span class="text-muted">Manage your account</span>
-									</div>
-								</li>
 							</ul>
 
 							<div class="dropdown-content-footer">
@@ -140,51 +113,86 @@
 						</div>
 					</li>
 				}
-				else
+
+				<!-- Login/Signup buttons for non-authenticated users -->
+				@if (!isAuthenticated)
 				{
-					<li>
-						<a href="@Url.Action("SignUp", "SignUp")" class="btn btn-success navbar-btn">
-							<i class="icon-plus3 position-left"></i>
-							<span class="hidden-xs">Sign Up</span>
-						</a>
-					</li>
+					@if (isSignUpPage)
+					{
+						<!-- Show Login button when on SignUp page -->
+						<li>
+							<a href="@Url.Action("Login", "Login")" class="btn btn-link navbar-btn">
+								<i class="icon-enter position-left"></i>
+								<span class="hidden-xs">Login</span>
+							</a>
+						</li>
+					}
+					else if (isLoginPage)
+					{
+						<!-- Show Sign Up button when on Login page -->
+						<li>
+							<a href="@Url.Action("SignUp", "SignUp")" class="btn btn-link navbar-btn">
+								<i class="icon-plus3 position-left"></i>
+								<span class="hidden-xs">Sign Up</span>
+							</a>
+						</li>
+					}
+					else
+					{
+						<!-- Show Login button on other pages when not authenticated -->
+						<li>
+							<a href="@Url.Action("Login", "Login")" class="btn btn-link navbar-btn">
+								<i class="icon-enter position-left"></i>
+								<span class="hidden-xs">Login</span>
+							</a>
+						</li>
+					}
 				}
 			</ul>
 		</div>
 	</div>
 </div>
 
+
 @section Styles {
-	<style>
-		.cart-nav-item {
-			position: relative;
-		}
+<style>
+	/* Prevent horizontal scrolling */
+	.navbar {
+		overflow-x: hidden;
+	}
 
-		.cart-badge {
-			position: absolute;
-			top: 6px;
-			right: 2px;
-			padding: 2px 6px;
-			border-radius: 50%;
-			font-size: 10px;
-			font-weight: bold;
-			min-width: 16px;
-			text-align: center;
-			animation: pulse 2s infinite;
-			box-shadow: 0 0 0 2px #fff;
-		}
+	.navbar-right {
+		margin-right: 0;
+	}
 
+	.cart-nav-item {
+		position: relative;
+	}
 
-		.cart-button {
-			position: relative;
-			display: inline-block;
-			margin: 8px 4px;
-			padding: 8px 12px;
-			border-radius: 4px;
-			transition: all 0.3s ease;
-			text-decoration: none;
-			color: #fff;
-		}
+	.cart-badge {
+		position: absolute;
+		top: 6px;
+		right: 2px;
+		padding: 2px 6px;
+		border-radius: 50%;
+		font-size: 10px;
+		font-weight: bold;
+		min-width: 16px;
+		text-align: center;
+		animation: pulse 2s infinite;
+		box-shadow: 0 0 0 2px #fff;
+	}
+
+	.cart-button {
+		position: relative;
+		display: inline-block;
+		margin: 8px 4px;
+		padding: 8px 12px;
+		border-radius: 4px;
+		transition: all 0.3s ease;
+		text-decoration: none;
+		color: #fff;
+	}
 
 		.cart-button:hover {
 			background-color: rgba(255, 255, 255, 0.1);
@@ -192,5 +200,66 @@
 			text-decoration: none;
 			transform: translateY(-1px);
 		}
-	</style>
+
+	/* Inline navbar elements */
+	.navbar-inline {
+		display: flex;
+		align-items: center;
+		flex-wrap: nowrap;
+		max-width: 100%;
+	}
+
+	.navbar-text-item {
+		display: flex;
+		align-items: center;
+		padding: 0 10px;
+		white-space: nowrap;
+		flex-shrink: 1;
+		min-width: 0;
+	}
+
+		.navbar-text-item .navbar-text {
+			margin: 0;
+			padding: 15px 0;
+			margin-right: 8px;
+			white-space: nowrap;
+		}
+
+	.inline-logout {
+		margin: 0;
+		padding: 6px 12px;
+		color: #fff;
+		text-decoration: none;
+		white-space: nowrap;
+		flex-shrink: 0;
+	}
+
+		.inline-logout:hover {
+			background-color: rgba(255, 255, 255, 0.1);
+			color: #fff;
+			text-decoration: none;
+		}
+
+	/* Mobile responsive */
+	#media (max-width: 768px) {
+		.navbar-text-item
+
+	{
+		flex-direction: column;
+		padding: 5px;
+	}
+
+	.navbar-text-item .navbar-text {
+		margin-right: 0;
+		margin-bottom: 5px;
+		padding: 10px 0;
+	}
+
+	.inline-logout {
+		padding: 4px 8px;
+		font-size: 12px;
+	}
+
+	}
+</style>
 }

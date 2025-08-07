@@ -1,0 +1,106 @@
+﻿@{
+    var cartItemCount = ViewBag.CartItemCount ?? 0;
+    bool isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+    string currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    string currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+    bool isAdminView = currentController == "Admin";
+    bool isDeletedView = (ViewData["IsDeletedView"] as bool?) ?? false;
+
+    // Get user role to determine admin status
+    bool isAdmin = User.IsInRole("Admin") || isAdminView;
+}
+
+<!-- Main sidebar -->
+<div class="sidebar sidebar-main sidebar-default">
+    <div class="sidebar-content">
+        <!-- Main navigation -->
+        <div class="sidebar-category sidebar-category-visible">
+            <div class="category-content no-padding">
+                <ul class="navigation navigation-main navigation-accordion">
+
+                    @if (isAuthenticated)
+                    {
+                        @if (isAdmin)
+                        {
+                            <!-- Admin Navigation -->
+                            <li class="navigation-header"><span>Admin Panel</span> <i class="icon-menu" title="Admin"></i></li>
+                            <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">
+                                <a href="@Url.Action("Admin", "Admin")"><i class="icon-home4"></i> <span>Dashboard</span></a>
+                            </li>
+
+                            <li class="navigation-header"><span>Content Management</span> <i class="icon-menu" title="Management"></i></li>
+                            <li class="@(currentAction == "Create" ? "active" : "")">
+                                <a href="@Url.Action("Create", "Admin")"><i class="icon-plus3"></i> <span>Add New Book</span></a>
+                            </li>
+                            <li class="@(currentAction == "AddAuthor" ? "active" : "")">
+                                <a href="@Url.Action("AddAuthor", "Admin")"><i class="icon-users"></i> <span>Manage Authors</span></a>
+                            </li>
+                            <li class="@(currentAction == "AddCategory" ? "active" : "")">
+                                <a href="@Url.Action("AddCategory", "Admin")"><i class="icon-price-tags2"></i> <span>Manage Categories</span></a>
+                            </li>
+
+                            <li class="navigation-header"><span>Actions</span> <i class="icon-menu" title="Actions"></i></li>
+                            <li class="@(isDeletedView ? "active" : "")">
+                                <a href="@Url.Action("DeletedBooks", "Admin")"><i class="icon-trash"></i> <span>Recycle Bin</span></a>
+                            </li>
+
+                            @if (isDeletedView)
+                            {
+                                <li>
+                                    <a href="@Url.Action("Admin", "Admin")"><i class="icon-list"></i> <span>Back to Active Books</span></a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <!-- User Navigation -->
+                            <li class="navigation-header"><span>Store</span> <i class="icon-menu" title="Store"></i></li>
+                            <li class="@(currentController == "UserHome" && currentAction == "UserHome" ? "active" : "")">
+                                <a href="@Url.Action("UserHome", "UserHome")"><i class="icon-store"></i> <span>Browse Books</span></a>
+                            </li>
+                            <li class="@(currentController == "Cart" && currentAction == "ViewCart" ? "active" : "")">
+                                <a href="@Url.Action("ViewCart", "Cart")">
+                                    <i class="icon-cart2"></i>
+                                    <span>Shopping Cart</span>
+                                    @if (cartItemCount > 0)
+                                    {
+                                        <span class="badge bg-success pull-right">@cartItemCount</span>
+                                    }
+                                </a>
+                            </li>
+                            <li class="@(currentController == "Cart" && currentAction == "OrderHistory" ? "active" : "")">
+                                <a href="@Url.Action("OrderHistory", "Cart")"><i class="icon-history"></i> <span>Order History</span></a>
+                            </li>
+                        }
+                    }
+                    else
+                    {
+                        <!-- Non-authenticated Navigation -->
+                        <li class="navigation-header"><span>Welcome</span> <i class="icon-menu" title="Welcome"></i></li>
+                        <li><a href="@Url.Action("Login", "Login")"><i class="icon-enter"></i> <span>Login</span></a></li>
+                        <li><a href="@Url.Action("SignUp", "SignUp")"><i class="icon-plus3"></i> <span>Sign Up</span></a></li>
+                        <li><a href="@Url.Action("UserHome", "UserHome")"><i class="icon-store"></i> <span>Browse Books</span></a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+        <!-- /main navigation -->
+    </div>
+</div>
+<!-- /main sidebar -->
+@section Styles {
+    <style>
+        .sidebar .navigation li.active > a {
+            background-color: #2196F3;
+            color: #fff;
+        }
+
+            .sidebar .navigation li.active > a i {
+                color: #fff;
+            }
+
+        .sidebar .navigation .badge {
+            animation: pulse 2s infinite;
+        }
+    </style>
+}
