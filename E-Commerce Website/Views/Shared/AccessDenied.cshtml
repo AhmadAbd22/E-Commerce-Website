@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+    Layout = "_MinimumLayout";
+}
+
+<div class="content">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-flat">
+                <div class="panel-body text-center">
+                    <i class="icon-blocked icon-3x text-danger mb-20"></i>
+                    <h3 class="text-danger">Access Denied</h3>
+                    <p class="text-muted">You don't have permission to access this resource.</p>
+                    <div class="mt-20">
+                        <a href="@Url.Action("Login", "Login")" class="btn btn-primary">
+                            <i class="icon-enter position-left"></i> Login
+                        </a>
+                        <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-default">
+                            <i class="icon-home position-left"></i> Home
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
