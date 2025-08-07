@@ -21,6 +21,7 @@ namespace ECommerceWebsite.Controllers
 
         public IActionResult Login()
         {
+            ViewData["isLoginView"] = true; 
             return View(new LoginDto());
         }
 

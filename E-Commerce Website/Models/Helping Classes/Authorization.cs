@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.DTOs;
+using ECommerceWebsite.Models.Enums;
 
 namespace ECommerceWebsite.Models.Helping_Classes
 {
@@ -41,12 +42,15 @@ namespace ECommerceWebsite.Models.Helping_Classes
         {
             try
             {
+                string roleString = user.Role == (int)enumRole.Admin ? "Admin" : "User";
                 List<Claim> claims = new List<Claim>()
                 {
                     new Claim(ClaimTypes.Sid, user.Id.ToString()),
                     new Claim("EncId", user.Id.ToString()),
                     new Claim("UserName", user.FirstName + " " + user.LastName),
                     new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Role, roleString),
+                    new Claim("UserId", user.Id.ToString())
                 };
 
 

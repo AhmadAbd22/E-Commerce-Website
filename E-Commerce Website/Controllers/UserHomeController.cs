@@ -2,22 +2,28 @@
 using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Repository;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceWebsite.Controllers
 {
+    [Authorize(Roles = "User")]
     public class UserHomeController : Controller
     {
         private readonly IBookRepository _bookRepo;
         private readonly ICategoryRepository _categoryRepo;
         private readonly IAuthorRepository _authorRepo;
+        private readonly ICartRepository _cartRepo;
 
-        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, IAuthorRepository authorRepo)
+        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, IAuthorRepository authorRepo, ICartRepository cartRepo)
         {
             _bookRepo = bookRepo;
             _categoryRepo = categoryRepo;
             _authorRepo = authorRepo;
+            _cartRepo = cartRepo;
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> UserHome()
         {
             try
@@ -25,6 +31,8 @@ namespace ECommerceWebsite.Controllers
                 var books = await _bookRepo.GetActiveBooksAsync();
                 var authors = await _authorRepo.GetAllAuthorsAsync();
                 var categories = await _categoryRepo.GetAllCategoriesAsync();
+
+                await SetCartItemCount();
 
                 ViewData["Authors"] = authors;
                 ViewData["Categories"] = categories;
@@ -73,6 +81,8 @@ namespace ECommerceWebsite.Controllers
                 var authors = await _authorRepo.GetAllAuthorsAsync();
                 var categories = await _categoryRepo.GetAllCategoriesAsync();
 
+                await SetCartItemCount();
+
                 ViewData["Authors"] = authors;
                 ViewData["Categories"] = categories;
 
@@ -94,6 +104,7 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
+        [AllowAnonymous]
         public async Task<IActionResult> Details(Guid id)
         {
             try
@@ -134,7 +145,59 @@ namespace ECommerceWebsite.Controllers
 
 
 
+        //helper method
 
+        private Guid GetCurrentUserId()
+        {
+            try
+            {
+                if (!User.Identity?.IsAuthenticated ?? true)
+                {
+                    return Guid.Empty;
+                }
 
+                var userIdClaim = User.FindFirst(ClaimTypes.Sid)
+                               ?? User.FindFirst("EncId")
+                               ?? User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+                {
+                    return Guid.Empty;
+                }
+
+                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return userId;
+                }
+
+                return Guid.Empty;
+            }
+            catch (Exception)
+            {
+                return Guid.Empty;
+            }
+        }
+
+        // Helper method
+        private async Task SetCartItemCount()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = GetCurrentUserId();
+                if (userId != Guid.Empty)
+                {
+                    var cartItemCount = await _cartRepo.GetCartItemCountAsync(userId);
+                    ViewBag.CartItemCount = cartItemCount;
+                }
+                else
+                {
+                    ViewBag.CartItemCount = 0;
+                }
+            }
+            else
+            {
+                ViewBag.CartItemCount = 0;
+            }
+        }
     }
 }

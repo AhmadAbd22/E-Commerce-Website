@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Models.Enums;
 using System.Net;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 
 namespace ECommerceWebsite.Controllers
@@ -17,12 +19,14 @@ namespace ECommerceWebsite.Controllers
         private readonly IBookRepository _bookRepo;
         private readonly IAuthorRepository _authorRepo;
         private readonly ICategoryRepository _categoryRepo;
+        private readonly ICartRepository _cartRepo;
 
-        public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo, ICategoryRepository categoryRepo)
+        public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo, ICategoryRepository categoryRepo, ICartRepository cartRepo)
         {
             _bookRepo = bookRepo;
             _authorRepo = authorRepo;
             _categoryRepo = categoryRepo;
+            _cartRepo = cartRepo;
         }
 
 
@@ -30,7 +34,9 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Admin()
         {
             var books = await _bookRepo.GetActiveBooksAsync();
+
             await PopulateViewDataForAdmin();
+            await SetCartItemCount();
             ViewData["IsDeletedView"] = false;
             ViewData["Login"] = true;
             
@@ -52,11 +58,57 @@ namespace ECommerceWebsite.Controllers
             return View(dtos);
         }
 
+        // Add this method to your AdminController class
+
+        [HttpGet]
+        public async Task<IActionResult> Details(Guid id)
+        {
+            try
+            {
+                var book = await _bookRepo.GetBookByIdAsync(id);
+                if (book == null)
+                {
+                    TempData["Error"] = "Book not found!";
+                    return RedirectToAction("Admin");
+                }
+
+                await PopulateViewDataForAdmin();
+                await SetCartItemCount();
+
+                var bookDto = new BookDto
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Price = book.Price,
+                    Stock = book.StockQuantity,
+                    Author = book.Author,
+                    Category = book.Category,
+                    ImageUrl = book.ImageUrl,
+                    Description = book.Description,
+                    PublicationDate = book.PublicationDate,
+                    AuthorId = book.AuthorId,
+                    CategoryId = book.CategoryId
+                };
+
+                return View("AdminViewProduct", bookDto);
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "An error occurred while loading the book details.";
+                return RedirectToAction("Admin");
+            }
+        }
+
+
+
+
         // GET
         public async Task<IActionResult> DeletedBooks()
         {
             var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
-            await PopulateViewDataForAdmin(); 
+
+            await PopulateViewDataForAdmin();
+            await SetCartItemCount();
             ViewData["IsDeletedView"] = true;
 
             var dtos = deletedBooks.Select(book => new BookDto
@@ -98,7 +150,9 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Create()
         {
             var categories = await _categoryRepo.GetAllCategoriesAsync();
-            var authors = await _authorRepo.GetAllAuthorsAsync(); 
+            var authors = await _authorRepo.GetAllAuthorsAsync();
+            await SetCartItemCount();
+
             var dto = new BookDto
             {
                 CategoriesList = categories.ToList(),
@@ -336,6 +390,7 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> AddAuthor()
         {
             await PopulateViewDataForAdmin();
+            await SetCartItemCount();
             return View();
         }
 
@@ -460,6 +515,7 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> AddCategory()
         {
             ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+            await SetCartItemCount();
             return View(new CategoryDto());
         }
 
@@ -584,6 +640,59 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> ClearFilters()
         {
             return RedirectToAction("Admin");
+        }
+
+
+        private async Task SetCartItemCount()
+        {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var userId = GetCurrentUserId();
+                if (userId != Guid.Empty && _cartRepo != null)
+                {
+                    var cartItemCount = await _cartRepo.GetCartItemCountAsync(userId);
+                    ViewBag.CartItemCount = cartItemCount;
+                }
+                else
+                {
+                    ViewBag.CartItemCount = 0;
+                }
+            }
+            else
+            {
+                ViewBag.CartItemCount = 0;
+            }
+        }
+
+        private Guid GetCurrentUserId()
+        {
+            try
+            {
+                if (!User.Identity?.IsAuthenticated ?? true)
+                {
+                    return Guid.Empty;
+                }
+
+                var userIdClaim = User.FindFirst(ClaimTypes.Sid)
+                               ?? User.FindFirst("EncId")
+                               ?? User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+                {
+                    return Guid.Empty;
+                }
+
+                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return userId;
+                }
+
+                return Guid.Empty;
+            }
+            catch (Exception)
+            {
+                return Guid.Empty;
+            }
         }
     }
 }
