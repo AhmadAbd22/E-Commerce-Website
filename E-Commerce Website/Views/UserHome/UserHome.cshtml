@@ -31,14 +31,20 @@
             <li><a href="@Url.Action("UserHome", "UserHome")"><i class="icon-home2 position-left"></i> Home</a></li>
             <li class="active">Store</li>
         </ul>
+        <!-- Filter Toggle Button for Mobile -->
+        <div class="breadcrumb-elements">
+            <button type="button" class="btn btn-link filter-toggle visible-xs" id="filter-toggle">
+                <i class="icon-menu-open position-left"></i> Filters
+            </button>
+        </div>
     </div>
 </div>
 <!-- /page header -->
 <!-- Content area -->
 <div class="content">
-    <div class="container-detached">
-        <div class="content-detached">
-
+    <div class="row">
+        <!-- Main content area -->
+        <div class="col-lg-9 col-md-8" id="main-content">
             <!-- Search bar -->
             <div class="panel panel-flat">
                 <div class="panel-body">
@@ -90,7 +96,7 @@
             </div>
 
             <!-- Grid of Books -->
-            <div class="row">
+            <div class="row book-grid">
                 @if (!Model.Any())
                 {
                     <div class="col-xs-12">
@@ -105,21 +111,25 @@
                     }
                 }
             </div>
-
         </div>
-    </div>
 
-    <!-- Detached sidebar for filtering -->
-    <div class="sidebar-detached">
-        <div class="sidebar sidebar-default sidebar-separate">
-            <div class="sidebar-content">
-                <div class="sidebar-category">
-                    <div class="category-title"><span>Filter Products</span></div>
-                    <div class="category-content">
+        <!-- Right Filter Sidebar -->
+        <div class="col-lg-3 col-md-4" id="filter-sidebar">
+            <div class="sidebar-fixed">
+                <div class="panel panel-flat">
+                    <div class="panel-heading">
+                        <h6 class="panel-title">
+                            <i class="icon-filter3 position-left"></i>
+                            Filter Products
+                            <button type="button" class="btn btn-link btn-xs pull-right filter-close visible-xs" id="filter-close">
+                                <i class="icon-cross2"></i>
+                            </button>
+                        </h6>
+                    </div>
+                    <div class="panel-body">
                         <form action="@Url.Action("UserHome", "UserHome")" method="post">
-
                             <div class="form-group">
-                                <legend class="text-size-mini text-muted no-border no-padding">By Category</legend>
+                                <label class="text-semibold">By Category</label>
                                 <select name="categoryId" class="form-control">
                                     <option value="">All Categories</option>
                                     @if (ViewData["Categories"] is IEnumerable<Category> categories)
@@ -133,7 +143,7 @@
                             </div>
 
                             <div class="form-group">
-                                <legend class="text-size-mini text-muted no-border no-padding">By Author</legend>
+                                <label class="text-semibold">By Author</label>
                                 <select name="authorId" class="form-control">
                                     <option value="">All Authors</option>
                                     @if (ViewData["Authors"] is IEnumerable<Author> authors)
@@ -147,14 +157,25 @@
                             </div>
 
                             <div class="form-group">
-                                <legend class="text-size-mini text-muted no-border no-padding">By Price</legend>
+                                <label class="text-semibold">By Price Range</label>
                                 <div class="row">
-                                    <div class="col-xs-6"><input type="number" name="minPrice" placeholder="Min" class="form-control" step="0.01"></div>
-                                    <div class="col-xs-6"><input type="number" name="maxPrice" placeholder="Max" class="form-control" step="0.01"></div>
+                                    <div class="col-xs-6">
+                                        <input type="number" name="minPrice" placeholder="Min" class="form-control" step="0.01">
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <input type="number" name="maxPrice" placeholder="Max" class="form-control" step="0.01">
+                                    </div>
                                 </div>
                             </div>
 
-                            <button type="submit" class="btn bg-blue btn-block">Filter <i class="icon-filter3 position-right"></i></button>
+                            <div class="form-group">
+                                <button type="submit" class="btn bg-blue btn-block">
+                                    <i class="icon-filter3 position-left"></i> Apply Filters
+                                </button>
+                                <button type="button" id="clear-sidebar-filters" class="btn btn-default btn-block mt-10">
+                                    <i class="icon-reset position-left"></i> Clear All
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -165,6 +186,44 @@
 <!-- /content area -->
 @section Styles {
     <style>
+        /* Filter Sidebar Styles */
+        #filter-sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-fixed {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+
+        .filter-toggle, .filter-close {
+            color: #fff;
+            border: none;
+            background: transparent;
+            padding: 8px 15px;
+        }
+
+            .filter-toggle:hover, .filter-close:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+
+        .filter-close {
+            color: #666;
+            padding: 2px 8px;
+        }
+
+            .filter-close:hover {
+                background-color: #f5f5f5;
+                color: #333;
+            }
+
+        .breadcrumb-elements {
+            float: right;
+            margin-top: -5px;
+        }
+
         .product-card {
             display: flex;
             flex-direction: column;
@@ -180,6 +239,31 @@
 @section Scripts {
     <script type="text/javascript">
         $(document).ready(function() {
+            // Filter sidebar toggle functionality for mobile
+            $('#filter-toggle').on('click', function() {
+                $('#filter-sidebar').addClass('active');
+                $('body').append('<div class="sidebar-backdrop"></div>');
+                $('.sidebar-backdrop').addClass('active');
+                $('#main-content').addClass('sidebar-open');
+            });
+
+            // Close filter sidebar
+            $('#filter-close, .sidebar-backdrop').on('click', function() {
+                $('#filter-sidebar').removeClass('active');
+                $('.sidebar-backdrop').removeClass('active');
+                $('#main-content').removeClass('sidebar-open');
+                setTimeout(function() {
+                    $('.sidebar-backdrop').remove();
+                }, 300);
+            });
+
+            // Close sidebar on escape key
+            $(document).on('keyup', function(e) {
+                if (e.keyCode === 27) { // Escape key
+                    $('#filter-close').click();
+                }
+            });
+
             // Clear Filters button functionality
             $('#clear-filters').on('click', function() {
                 // Clear search input
@@ -190,16 +274,22 @@
                 $('#category-filter').val('');
 
                 // Show all book cards (only target book card containers)
-                $('.col-lg-3, .col-md-4, .col-sm-6, .col-xs-12').not('.col-sm-4').show();
+                $('.book-grid > div').show();
 
                 // Hide no results message
                 $('#no-results').hide();
+            });
 
-                // Optional: Clear sidebar form filters as well
+            // Clear sidebar filters
+            $('#clear-sidebar-filters').on('click', function() {
+                // Clear sidebar form filters
                 $('select[name="categoryId"]').val('');
                 $('select[name="authorId"]').val('');
                 $('input[name="minPrice"]').val('');
                 $('input[name="maxPrice"]').val('');
+
+                // Also trigger the main clear functionality
+                $('#clear-filters').click();
             });
 
             // Search functionality for real-time filtering
@@ -213,21 +303,14 @@
                 var selectedCategory = $('#category-filter').val().toLowerCase();
                 var visibleCount = 0;
 
-                // Target only book card containers (exclude the Clear Filters button container)
-                $('.row > div').not('.col-sm-4').each(function() {
+                // Target only book card containers
+                $('.book-grid > div').each(function() {
                     var bookCard = $(this);
-                    
-                    // Skip if this is not a book card container
-                    if (!bookCard.hasClass('col-lg-3') && !bookCard.hasClass('col-md-4') && !bookCard.hasClass('col-sm-6')) {
-                        return;
-                    }
-                    
                     var bookText = bookCard.text().toLowerCase();
                     var bookAuthor = bookCard.find('p.text-muted').first().text().toLowerCase().replace('by ', '') || '';
-                    
+
                     var matchesSearch = searchTerm === '' || bookText.indexOf(searchTerm) > -1;
                     var matchesAuthor = selectedAuthor === '' || bookAuthor.indexOf(selectedAuthor) > -1;
-
                     var matchesCategory = selectedCategory === '' || bookText.indexOf(selectedCategory) > -1;
 
                     if (matchesSearch && matchesAuthor && matchesCategory) {
@@ -248,4 +331,3 @@
     </script>
 }
 
-}
