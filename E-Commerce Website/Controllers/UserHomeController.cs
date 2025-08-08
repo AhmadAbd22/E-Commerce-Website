@@ -67,8 +67,8 @@ namespace ECommerceWebsite.Controllers
                 }
                 else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
                 {
-                    books = await _bookRepo.FilterBooksAsync(authorId.Value, minPrice, maxPrice);
-                    if (categoryId.HasValue)
+                    books = await _bookRepo.FilterBooksAsync(authorId ?? Guid.Empty, minPrice, maxPrice);
+                        if (categoryId.HasValue)
                     {
                         books = books.Where(b => b.CategoryId == categoryId.Value);
                     }

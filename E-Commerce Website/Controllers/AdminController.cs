@@ -58,6 +58,29 @@ namespace ECommerceWebsite.Controllers
             return View(dtos);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice )
+        {
+            IEnumerable<Book> books;
+            try
+            {
+                if (!string.IsNullOrEmpty(search))
+                {
+                    books = await _bookRepo.SearchActiveBooksAsync(search);
+                }
+                else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
+                {
+                    books = await _bookRepo.FilterBooksAsync(authorId ?? Guid.Empty, minPrice, maxPrice);
+                    if (categoryId.HasValue)
+                    {
+                        books = books.Where(b => b.CategoryId == categoryId.Value);
+                    }
+                }
+                else
+                {
+                    books = await _bookRepo.GetActiveBooksAsync();
+                }
+
         // Add this method to your AdminController class
 
         [HttpGet]
