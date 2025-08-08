@@ -1,4 +1,4 @@
-﻿namespace ECommerceWebsite.Models.Enums
+﻿    namespace ECommerceWebsite.Models.Enums
 {
     public enum enumRole
     {
