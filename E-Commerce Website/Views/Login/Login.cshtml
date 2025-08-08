@@ -45,8 +45,17 @@
 						</div>
 					}
 
+					@if (TempData["LoginError"] != null)
+					{
+						<div class="alert alert-danger alert-dismissible">
+							<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
+							<i class="icon-blocked position-left"></i>
+							@TempData["LoginError"]
+						</div>
+					}
+
 					<!-- Simple login form -->
-					<form action="@Url.Action("Login", "Login")" method="post">
+					<form id="loginForm" action="@Url.Action("Login", "Login")" method="post">
 						<div class="row">
 							<div class="col-lg-4 col-lg-offset-4 col-md-6 col-md-offset-3 mt-4">
 								<div class="panel panel-body login-form">
@@ -56,21 +65,27 @@
 									</div>
 
 									<div class="form-group has-feedback has-feedback-left">
-										<input type="text" name="Username" value="@(Model?.Username ?? "")" class="form-control" placeholder="Username">
+										<input type="text" name="Username" class="form-control" placeholder="Username" value="@(Model?.Username ?? "")" required>
 										<div class="form-control-feedback">
 											<i class="icon-user text-muted"></i>
 										</div>
 									</div>
 
-									<div class="form-group has-feedback has-feedback-left">
-										<input type="password" name="Password" class="form-control" placeholder="Password">
-										<div class="form-control-feedback">
-											<i class="icon-lock2 text-muted"></i>
+									<div class="form-group has-feedback">
+										<input type="password" id="loginPassword" name="Password" class="form-control" placeholder="Password" required>
+										<div class="form-control-feedback form-control-feedback-right">
+											<i class="icon-eye-blocked password-toggle text-muted" id="toggleLoginPassword" style="cursor: pointer;" title="Show password"></i>
 										</div>
 									</div>
 
 									<div class="form-group">
 										<button type="submit" class="btn bg-pink-400 btn-block">Sign in <i class="icon-circle-right2 position-right"></i></button>
+									</div>
+
+									<div class="text-center">
+										<a href="@Url.Action("SignUp", "SignUp")" class="btn btn-link">
+											Don't have an account? Sign up here
+										</a>
 									</div>
 								</div>
 							</div>
@@ -96,3 +111,119 @@
 	<!-- /page container -->
 
 </body>
+
+@section Scripts {
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Password toggle functionality for login
+			function togglePasswordVisibility(toggleIcon, passwordField) {
+				if (passwordField.type === 'password') {
+					passwordField.type = 'text';
+					toggleIcon.removeClass('icon-eye-blocked').addClass('icon-eye');
+					toggleIcon.attr('title', 'Hide password');
+				} else {
+					passwordField.type = 'password';
+					toggleIcon.removeClass('icon-eye').addClass('icon-eye-blocked');
+					toggleIcon.attr('title', 'Show password');
+				}
+			}
+
+			// Toggle password visibility for login password field
+			$('#toggleLoginPassword').on('click', function() {
+				var passwordField = document.getElementById('loginPassword');
+				togglePasswordVisibility($(this), passwordField);
+			});
+
+			// Form validation
+			$('#loginForm').on('submit', function(e) {
+				var username = $('#loginPassword').closest('form').find('input[name="Username"]').val().trim();
+				var password = $('#loginPassword').val().trim();
+
+				// Check if fields are not empty
+				if (username.length === 0) {
+					e.preventDefault();
+					showErrorMessage('Username is required.');
+					$('input[name="Username"]').focus();
+					return false;
+				}
+
+				if (password.length === 0) {
+					e.preventDefault();
+					showErrorMessage('Password is required.');
+					$('#loginPassword').focus();
+					return false;
+				}
+
+				return true;
+			});
+
+			// Function to show error messages
+			function showErrorMessage(message) {
+				// Remove existing error alerts
+				$('.alert-danger.custom-error').remove();
+
+				// Create new error alert
+				var errorAlert = $('<div class="alert alert-danger alert-dismissible custom-error">' +
+					'<button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>' +
+					'<i class="icon-blocked position-left"></i>' +
+					message +
+					'</div>');
+
+				// Insert before the form
+				$('#loginForm').before(errorAlert);
+
+				// Auto-hide after 5 seconds
+				setTimeout(function() {
+					errorAlert.fadeOut();
+				}, 5000);
+			}
+
+			// Clear validation errors when user starts typing
+			$('input[name="Username"], #loginPassword').on('input', function() {
+				$('.alert-danger.custom-error').fadeOut();
+			});
+		});
+	</script>
+}
+
+@section Styles {
+	<style>
+		.password-toggle {
+			z-index: 10;
+			pointer-events: auto;
+			position: absolute;
+			right: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+
+			.password-toggle:hover {
+				color: #666 !important;
+			}
+
+		.form-control-feedback {
+			pointer-events: none;
+		}
+
+			.form-control-feedback .password-toggle {
+				pointer-events: auto;
+			}
+
+		.form-control-feedback-right {
+			right: 0;
+			text-align: right;
+		}
+
+		.has-feedback .form-control {
+			padding-right: 42.5px;
+		}
+
+		.custom-error {
+			margin-bottom: 15px;
+		}
+
+		.has-feedback .password-toggle {
+			right: 12px;
+		}
+	</style>
+}
