@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Models.Helping_Classes;
 using ECommerceWebsite.Models.Enums;
+using ECommerceWebsite.Repository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 
@@ -10,12 +10,12 @@ namespace ECommerceWebsite.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly ECommerceWebsiteDbContext _context;
+        private readonly IUserRepository _userRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public LoginController(ECommerceWebsiteDbContext context, IHttpContextAccessor httpContextAccessor)
+        public LoginController(IUserRepository userRepo, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
+            _userRepo = userRepo;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -40,8 +40,8 @@ namespace ECommerceWebsite.Controllers
                 return View(loginDto);
             }
 
-
-            var user = _context.Users.FirstOrDefault(u => u.Username == loginDto.Username);
+            // Use repository instead of direct DbContext access
+            var user = await _userRepo.GetUserByUsernameAsync(loginDto.Username);
             if (user == null)
             {
                 ViewData["LoginError"] = "Invalid username or User Doesn't Exist";
@@ -54,7 +54,7 @@ namespace ECommerceWebsite.Controllers
                 return View(loginDto);
             }
 
-            // hash enterd password and then compare with the stored password
+            // hash entered password and then compare with the stored password
             string hashedInputPassword = PasswordHelper.HashPassword(loginDto.Password);
             if (user.Password != hashedInputPassword)
             {
@@ -62,6 +62,7 @@ namespace ECommerceWebsite.Controllers
                 return View(loginDto);
             }
 
+            // Use Authorization helper for setting claims
             var auth = new Authorization(_httpContextAccessor);
             await auth.SetUserClaims(user);
 

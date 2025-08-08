@@ -35,8 +35,6 @@ namespace ECommerceWebsite.Repository
             Task<IEnumerable<Book>> GetBooksByCategoryAsync(Guid categoryId);
             Task<IEnumerable<Book>> FilterBooksAsync(Guid? authorId, decimal? minPrice, decimal? maxPrice);
             Task RestoreBookAsync(Guid id);
-
-
     }
 
     public class BookRepository : IBookRepository

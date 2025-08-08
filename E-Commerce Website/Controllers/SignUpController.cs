@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ECommerceWebsite.Models;
-using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Models.Helping_Classes;
+using ECommerceWebsite.Repository;
+using ECommerceWebsite.Models.Enums;
 
 namespace ECommerceWebsite.Controllers
 {
     public class SignUpController : Controller
     {
-        private readonly ECommerceWebsiteDbContext _context;
+        private readonly IUserRepository _userRepo;
 
-        public SignUpController(ECommerceWebsiteDbContext context)
+        public SignUpController(IUserRepository userRepo)
         {
-            _context = context;
+            _userRepo = userRepo;
         }
+
         public IActionResult SignUp()
         {
             return View();
@@ -27,19 +28,20 @@ namespace ECommerceWebsite.Controllers
             {
                 return View(signupDto);
             }
+
             //Checking Conditions
             if (string.IsNullOrEmpty(signupDto.Username) || string.IsNullOrEmpty(signupDto.Password) || 
                 string.IsNullOrEmpty(signupDto.FirstName) || string.IsNullOrEmpty(signupDto.LastName) ||
-                string.IsNullOrEmpty(signupDto.Email) )
+                string.IsNullOrEmpty(signupDto.Email))
             {
                 ViewData["UsernameError"] = "All fields are required.";
                 return View(signupDto);
             }
 
-            var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == signupDto.Email);
+            var existingUser = await _userRepo.GetUserByEmailAsync(signupDto.Email);
             if(existingUser != null)
             {
-                ViewData["ExistUser"] = "User already exists with this email. Use another emal";
+                ViewData["ExistUser"] = "User already exists with this email. Use another email";
                 return View(signupDto);
             }
             
@@ -49,17 +51,30 @@ namespace ECommerceWebsite.Controllers
                 return View(signupDto);
             }
 
-            //CReat new User 
+            //Create new User with proper initialization
             var user = new User
             {
+                Id = Guid.NewGuid(),
                 Username = signupDto.Username,
                 FirstName = signupDto.FirstName,
                 LastName = signupDto.LastName,
                 Password = PasswordHelper.HashPassword(signupDto.Password),
-                Email = signupDto.Email
+                Email = signupDto.Email,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Role = (int)enumRole.User,
+                IsDeleted = false,
+                isActive = (int)enumStatus.Active,
+                // Set default values for required fields that aren't in SignUpDto
+                Address = "",
+                City = "",
+                Province = "",
+                PostalCode = "",
+                PhoneNumber = "00000000000", // Default 11-digit phone number
+                DateOfBirth = DateTime.UtcNow.AddYears(-18) // Default to 18 years ago
             };
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+
+            await _userRepo.AddUserAsync(user);
 
             TempData["Message"] = "Sign-up successful!";
             return RedirectToAction("Login", "Login");

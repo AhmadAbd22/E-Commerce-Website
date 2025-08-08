@@ -11,7 +11,10 @@ namespace ECommerceWebsite.Repository
         Task AddUserAsync(User user);                               //CREATE
         Task UpdateUserAsync(User user);                            //UPDATE        
         Task DeleteUserAsync(Guid id);                              //DELETE
+        Task<User?> GetUserByEmailAsync(string email);              //READ
+        Task<User?> GetUserByUsernameAsync(string username);        //READ by username
     }
+
     public class UserRepository : IUserRepository
     {
         private readonly ECommerceWebsiteDbContext _context;
@@ -20,7 +23,8 @@ namespace ECommerceWebsite.Repository
         {
             _context = context;
         }
-        public async Task AddUserAsync (User user)
+
+        public async Task AddUserAsync(User user)
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
@@ -47,6 +51,16 @@ namespace ECommerceWebsite.Repository
             return user;
         }
 
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<User?> GetUserByUsernameAsync(string username)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
+        }
+
         public async Task UpdateUserAsync(User user)
         {
             var existingUser = await GetUserByIdAsync(user.Id);
@@ -65,6 +79,10 @@ namespace ECommerceWebsite.Repository
             existingUser.City = user.City;
             existingUser.Province = user.Province;
             existingUser.PostalCode = user.PostalCode;
+            existingUser.UpdatedAt = DateTime.UtcNow;
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
         }
     }
 }
