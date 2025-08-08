@@ -5,6 +5,7 @@ using ECommerceWebsite.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using ECommerceWebsite.Models.Helping_Classes;
 
 namespace ECommerceWebsite.Controllers
 {
@@ -15,17 +16,21 @@ namespace ECommerceWebsite.Controllers
         private readonly IBookRepository _bookRepo;
         private readonly IOrderServiceRepository _orderService;
         private readonly IOrderRepository _orderRepo;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public CartController(
             ICartRepository cartRepo,
             IBookRepository bookRepo,
             IOrderServiceRepository orderService,
-            IOrderRepository orderRepo) 
+            IOrderRepository orderRepo,
+            IHttpContextAccessor httpContextAccessor) 
         {
             _cartRepo = cartRepo;
             _bookRepo = bookRepo;
             _orderService = orderService;
-            _orderRepo = orderRepo; 
+            _orderRepo = orderRepo;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         private Guid GetCurrentUserId()
@@ -64,14 +69,6 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
-        private (Guid UserId, string Username, string Role) GetCurrentUserInfo()
-        {
-            var userId = GetCurrentUserId();
-            var username = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
-            var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "User";
-
-            return (userId, username, role);
-        }
 
         private bool IsCurrentUserCustomer()
         {
@@ -426,19 +423,20 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var authHelper = new Authorization(_httpContextAccessor);
+                var userClaims = authHelper.GetUserClaims();
+
+                if (userClaims == null || !Guid.TryParse(userClaims.Id, out Guid userId))
+                {
+                    throw new UnauthorizedAccessException("User is not authenticated or user ID is invalid.");
+                }
 
                 var orders = await _orderRepo.GetOrderByUserIdAsync(userId);
 
-                if (!orders.Any())
+                if (orders == null || !orders.Any())
                 {
-                    var emptyDto = new OrderHistoryDto
-                    {
-                        Orders = new List<OrderHistoryItemDto>(),
-                        TotalOrders = 0,
-                        TotalSpent = 0
-                    };
-                    return View(emptyDto);
+                    var emptyDto = new OrderHistoryDto { Orders = new List<OrderHistoryItemDto>() };
+                    return View(emptyDto); 
                 }
 
                 var orderHistoryItems = orders.Select(order => new OrderHistoryItemDto
@@ -448,9 +446,7 @@ namespace ECommerceWebsite.Controllers
                     OrderStatus = order.OrderStatus,
                     TotalAmount = order.TotalAmount,
                     TotalItems = order.OrderItems?.Sum(oi => oi.Quantity) ?? 0,
-                    ShippingAddress = order.ShippingAddress,
                     City = order.City,
-                    PhoneNumber = order.PhoneNumber,
                     EstimatedDeliveryDate = GetEstimatedDeliveryDate(order.OrderDate, order.OrderStatus),
                     StatusColor = GetStatusColor(order.OrderStatus),
                     StatusIcon = GetStatusIcon(order.OrderStatus),
@@ -462,16 +458,15 @@ namespace ECommerceWebsite.Controllers
                         Quantity = oi.Quantity,
                         UnitPrice = oi.UnitPrice,
                         Subtotal = oi.Quantity * oi.UnitPrice,
-                        ImageUrl = oi.Book?.ImageUrl ?? "",
-                        PriceAtPurchase = oi.UnitPrice
+                        ImageUrl = oi.Book?.ImageUrl ?? ""
                     }).ToList() ?? new List<OrderItemDto>()
                 }).OrderByDescending(o => o.OrderDate).ToList();
 
                 var orderHistoryDto = new OrderHistoryDto
                 {
                     Orders = orderHistoryItems,
-                    TotalOrders = orders.Count,
-                    TotalSpent = orders.Sum(o => o.TotalAmount)
+                    TotalOrders = orderHistoryItems.Count,
+                    TotalSpent = orderHistoryItems.Sum(o => o.TotalAmount)
                 };
 
                 return View(orderHistoryDto);
@@ -483,6 +478,7 @@ namespace ECommerceWebsite.Controllers
             }
             catch (Exception ex)
             {
+                // This will now only catch unexpected errors
                 System.Diagnostics.Debug.WriteLine($"Order history error: {ex.Message}");
                 TempData["Error"] = "An error occurred while loading your order history.";
                 return RedirectToAction("UserHome", "UserHome");
