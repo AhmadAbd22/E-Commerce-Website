@@ -40,7 +40,6 @@ namespace ECommerceWebsite.Controllers
                 return View(loginDto);
             }
 
-            // Use repository instead of direct DbContext access
             var user = await _userRepo.GetUserByUsernameAsync(loginDto.Username);
             if (user == null)
             {

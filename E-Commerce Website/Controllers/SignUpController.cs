@@ -28,11 +28,10 @@ namespace ECommerceWebsite.Controllers
             {
                 return View(signupDto);
             }
-
             //Checking Conditions
             if (string.IsNullOrEmpty(signupDto.Username) || string.IsNullOrEmpty(signupDto.Password) || 
                 string.IsNullOrEmpty(signupDto.FirstName) || string.IsNullOrEmpty(signupDto.LastName) ||
-                string.IsNullOrEmpty(signupDto.Email))
+                string.IsNullOrEmpty(signupDto.Email) )
             {
                 ViewData["UsernameError"] = "All fields are required.";
                 return View(signupDto);
@@ -51,7 +50,7 @@ namespace ECommerceWebsite.Controllers
                 return View(signupDto);
             }
 
-            //Create new User with proper initialization
+            //Create new User 
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -62,16 +61,17 @@ namespace ECommerceWebsite.Controllers
                 Email = signupDto.Email,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                Role = (int)enumRole.User,
-                IsDeleted = false,
-                isActive = (int)enumStatus.Active,
-                // Set default values for required fields that aren't in SignUpDto
-                Address = "",
-                City = "",
-                Province = "",
-                PostalCode = "",
-                PhoneNumber = "00000000000", // Default 11-digit phone number
-                DateOfBirth = DateTime.UtcNow.AddYears(-18) // Default to 18 years ago
+                Role = (int)enumRole.Customer,
+
+                //TODO: Uncomment these after chanegs in Singup.cshtml
+                //IsDeleted = false,
+                //isActive = (int)enumStatus.Active,
+                //Address = signupDto.Address,
+                //City = signupDto.City,
+                //Province = signupDto.Province,
+                //PostalCode = signupDto.PostalCode,
+                //PhoneNumber = signupDto.PhoneNumber, 
+                //DateOfBirth = signupDto.DOB,
             };
 
             await _userRepo.AddUserAsync(user);

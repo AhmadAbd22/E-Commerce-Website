@@ -17,6 +17,21 @@ namespace ECommerceWebsite.Models.Dtos
 
         [DataType(DataType.EmailAddress)]
         public string ConfirmEmail { get; set; }
+
+        //[DataType(DataType.PhoneNumber)]
+        //[StringLength(11, MinimumLength = 11, ErrorMessage = "Phone number must be exactly 11 digits.")]
+        //[RegularExpression(@"^\d{11}$", ErrorMessage = "Phone number must contain only digits.")]
+        //public string PhoneNumber { get; set; }
+        //public string? Address { get; set; }
+        //public string? City { get; set; }
+        //public string? Province { get; set; }
+
+        //[DataType(DataType.PostalCode)]
+        //public string? PostalCode { get; set; }
+
+        //[DataType(DataType.Date)]
+        //public DateTime DOB { get; set; }
+
     }
 
 }
