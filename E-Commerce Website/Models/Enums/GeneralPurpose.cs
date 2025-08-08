@@ -85,29 +85,30 @@ namespace ECommerceWebsite.Models.Enums
                     return false;
                 }
             }
-            public static async Task<bool> DeleteFile(string userId, string filePath)
+        public static async Task<bool> DeleteFile(string userId, string filePath)
+        {
+            try
             {
-                try
+                var fileDir = GetFilePathForSave(userId.ToString());
+                if (!string.IsNullOrEmpty(filePath))
                 {
-                    var fileDir = GetFilePathForSave(userId.ToString());
-                    if (!string.IsNullOrEmpty(filePath))
-                    {
-                        string[] getName = filePath.Split("/");
+                    string[] getName = filePath.Split("/");
 
-                        // Check if a book image already exists for the user
-                        string existingBookImagePath = Path.Combine(fileDir, getName.Last());
-                        if (System.IO.File.Exists(existingBookImagePath))
-                        {
-                            System.IO.File.Delete(existingBookImagePath);
-                        }
+                    // Check if a book image already exists for the user
+                    string existingBookImagePath = Path.Combine(fileDir, getName.Last());
+                    if (System.IO.File.Exists(existingBookImagePath))
+                    {
+                        // Use Task.Run to perform file deletion asynchronously
+                        await Task.Run(() => System.IO.File.Delete(existingBookImagePath));
                     }
-                    return true;
                 }
-                catch
-                {
-                    return false;
-                }
+                return true;
             }
+            catch
+            {
+                return false;
+            }
+        }
             #endregion
 
         }
