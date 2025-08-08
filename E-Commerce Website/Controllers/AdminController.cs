@@ -34,9 +34,14 @@ namespace ECommerceWebsite.Controllers
         public async Task<IActionResult> Admin()
         {
             var books = await _bookRepo.GetActiveBooksAsync();
+            var authors = await _authorRepo.GetAllAuthorsAsync();
+            var categories = await _categoryRepo.GetAllCategoriesAsync();
 
             await PopulateViewDataForAdmin();
             await SetCartItemCount();
+
+            ViewData["Authors"] = authors;
+            ViewData["Categories"] = categories;
             ViewData["IsDeletedView"] = false;
             ViewData["Login"] = true;
             
@@ -81,7 +86,29 @@ namespace ECommerceWebsite.Controllers
                     books = await _bookRepo.GetActiveBooksAsync();
                 }
 
-        // Add this method to your AdminController class
+                var authors = await _authorRepo.GetAllAuthorsAsync();
+                var categories = await _categoryRepo.GetAllCategoriesAsync();
+
+                ViewData["Authors"] = authors;
+                ViewData["Categories"] = categories;
+
+                var dtos = books.Select(book => new BookDto
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Price = book.Price,
+                    Stock = book.StockQuantity,
+                    Author = book.Author,
+                    ImageUrl = book.ImageUrl,
+                }).ToList();
+
+                return View(dtos);
+            }
+            catch (Exception)
+            {
+                return View("Error", new { message = "An error occurred while searching for books." });
+            }
+        }
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
