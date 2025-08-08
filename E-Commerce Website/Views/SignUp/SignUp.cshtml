@@ -1,4 +1,6 @@
-﻿@{
+﻿@using ECommerceWebsite.Models.Dtos
+@model SignUpDto
+@{
 	Layout = "_MinimumLayout"; 
 	ViewBag.Message = "Sign-up successful!";
 }
@@ -42,110 +44,83 @@
 					<!-- Registration form -->
 					<form action="@Url.Action("SignUp","SignUp")" method="post">
 						<div class="row">
-							<div class="col-lg-6 col-lg-offset-3">
-								<div class="panel registration-form">
-									<div class="panel-body">
-										<div class="text-center">
-											<div class="icon-object border-success text-success"><i class="icon-plus3"></i></div>
-											<h5 class="content-group-lg">Create account <small class="display-block">All fields are required</small></h5>
-										</div>
-
-										<div class="form-group has-feedback">
-											<input type="hidden" name="id" />
-											<input type="text" name="Username" class="form-control" placeholder="Choose username">
-											<div class="form-control-feedback">
-												<i class="icon-user-plus text-muted"></i>
+								<div class="col-lg-6 col-lg-offset-3">
+									<div class="panel registration-form">
+										<div class="panel-body">
+											<div class="text-center">
+												<div class="icon-object border-success text-success"><i class="icon-plus3"></i></div>
+												<h5 class="content-group-lg">Create account <small class="display-block">All fields are required</small></h5>
 											</div>
-										</div>
 
-										<div class="row">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" name="FirstName" class="form-control" placeholder="First name">
-													<div class="form-control-feedback">
-														<i class="icon-user-check text-muted"></i>
+											<div id="passwordMismatchError" class="alert alert-danger" style="display: none">
+												<i class="icon-blocked position-left"></i>
+												Password Do Not Match!
+											</div>
+
+											<div class="form-group has-feedback">
+												<input type="hidden" name="id" />
+												<input type="text" name="Username" class="form-control" placeholder="Choose username" required>
+												<div class="form-control-feedback">
+													<i class="icon-user-plus text-muted"></i>
+												</div>
+											</div>
+
+											<div class="row">
+												<div class="col-md-6">
+													<div class="form-group has-feedback">
+														<input type="text" name="FirstName" class="form-control" placeholder="First name" required>
+														<div class="form-control-feedback">
+															<i class="icon-user-check text-muted"></i>
+														</div>
+													</div>
+												</div>
+
+												<div class="col-md-6">
+													<div class="form-group has-feedback">
+														<input type="text" name="LastName" class="form-control" placeholder="Second name" required>
+														<div class="form-control-feedback">
+															<i class="icon-user-check text-muted"></i>
+														</div>
 													</div>
 												</div>
 											</div>
 
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="text" name="LastName" class="form-control" placeholder="Second name">
-													<div class="form-control-feedback">
-														<i class="icon-user-check text-muted"></i>
+											<div class="row">
+												<div class="col-md-6">
+													<div class="form-group has-feedback">
+														<input type="password" name="Password" id="password" class="form-control" placeholder="Create password" required>
+														<div class="form-control-feedback">
+															<i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
+														</div>
 													</div>
 												</div>
-											</div>
-										</div>
 
-										<div class="row">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="password" name="Password" class="form-control" placeholder="Create password">
-													<div class="form-control-feedback">
-														<i class="icon-user-lock text-muted"></i>
-													</div>
-												</div>
-											</div>
-
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="password" name="ConfirmPassword" class="form-control" placeholder="Repeat password">
-													<div class="form-control-feedback">
-														<i class="icon-user-lock text-muted"></i>
-													</div>
-												</div>
-											</div>
-										</div>
-
-										<div class="row">
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="email" name="Email" class="form-control" placeholder="Your email">
-													<div class="form-control-feedback">
-														<i class="icon-mention text-muted"></i>
+												<div class="col-md-6">
+													<div class="form-group has-feedback">
+														<input type="password" name="ConfirmPassword" id="confirmPassword" class="form-control" placeholder="Repeat password" required>
+														<div class="form-control-feedback">
+															<i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
+														</div>
 													</div>
 												</div>
 											</div>
 
-											<div class="col-md-6">
-												<div class="form-group has-feedback">
-													<input type="email" name="ConfirmEmail" class="form-control" placeholder="Repeat email">
-													<div class="form-control-feedback">
-														<i class="icon-mention text-muted"></i>
+											<div class="row">
+												<div class="col-md-12">
+													<div class="form-group has-feedback">
+														<input type="email" name="Email" class="form-control" placeholder="Your email" required>
+														<div class="form-control-feedback">
+															<i class="icon-mention text-muted"></i>
+														</div>
 													</div>
 												</div>
-											</div>
-										</div>
 
-										<div class="form-group">
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" class="styled" checked="checked">
-													Send me <a href="#">test account settings</a>
-												</label>
+											<div class="text-right">
+												<a href="@Url.Action("Login", "Login")" class="btn btn-link">
+													<i class="icon-arrow-left13 position-left"></i> Back to login form
+												</a>
+												<button type="submit" class="btn bg-teal-400 btn-labeled btn-labeled-right ml-10"><b><i class="icon-plus3"></i></b> Create account</button>
 											</div>
-
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" class="styled" checked="checked">
-													Subscribe to monthly newsletter
-												</label>
-											</div>
-
-											<div class="checkbox">
-												<label>
-													<input type="checkbox" class="styled">
-													Accept <a href="#">terms of service</a>
-												</label>
-											</div>
-										</div>
-
-										<div class="text-right">
-											<a href="@Url.Action("Login", "Login")" class="btn btn-link">
-												<i class="icon-arrow-left13 position-left"></i> Back to login form
-											</a>
-											<button type="submit" class="btn bg-teal-400 btn-labeled btn-labeled-right ml-10"><b><i class="icon-plus3"></i></b> Create account</button>
 										</div>
 									</div>
 								</div>
@@ -174,3 +149,118 @@
 	<!-- /page container -->
 
 </body>
+
+
+
+@section Scripts {
+	<script type="text/javascript">
+		$(document).ready(function() {
+			// Password toggle functionality
+			function togglePasswordVisibility(toggleIcon, passwordField) {
+				if (passwordField.type === 'password') {
+					passwordField.type = 'text';
+					toggleIcon.removeClass('icon-eye-blocked').addClass('icon-eye');
+					toggleIcon.attr('title', 'Hide password');
+				} else {
+					passwordField.type = 'password';
+					toggleIcon.removeClass('icon-eye').addClass('icon-eye-blocked');
+					toggleIcon.attr('title', 'Show password');
+				}
+			}
+
+			// Toggle password visibility for main password field
+			$('#togglePassword').on('click', function() {
+				var passwordField = document.getElementById('password');
+				togglePasswordVisibility($(this), passwordField);
+			});
+
+			// Toggle password visibility for confirm password field
+			$('#toggleConfirmPassword').on('click', function() {
+				var confirmPasswordField = document.getElementById('confirmPassword');
+				togglePasswordVisibility($(this), confirmPasswordField);
+			});
+
+			// Real-time password match validation
+			function validatePasswordMatch() {
+				var password = $('#password').val();
+				var confirmPassword = $('#confirmPassword').val();
+				var errorDiv = $('#passwordMismatchError');
+
+				if (confirmPassword.length > 0 && password !== confirmPassword) {
+					errorDiv.show();
+					$('#confirmPassword').addClass('border-danger');
+					return false;
+				} else {
+					errorDiv.hide();
+					$('#confirmPassword').removeClass('border-danger');
+					return true;
+				}
+			}
+
+			// Check password match on input
+			$('#password, #confirmPassword').on('input', function() {
+				validatePasswordMatch();
+			});
+
+			// Form submission validation
+			$('#signupForm').on('submit', function(e) {
+				var password = $('#password').val();
+				var confirmPassword = $('#confirmPassword').val();
+
+				// Check if passwords match
+				if (password !== confirmPassword) {
+					e.preventDefault(); // Prevent form submission
+					$('#passwordMismatchError').show();
+					$('#confirmPassword').addClass('border-danger').focus();
+
+					// Scroll to the error message
+					$('html, body').animate({
+						scrollTop: $('#passwordMismatchError').offset().top - 100
+					}, 500);
+
+					return false;
+				}
+
+				// Check if password is not empty
+				if (password.length === 0) {
+					e.preventDefault();
+					$('#password').focus();
+					return false;
+				}
+
+				return true;
+			});
+
+			// Remove error styling when user starts typing
+			$('#confirmPassword').on('focus input', function() {
+				$(this).removeClass('border-danger');
+			});
+		});
+	</script>
+}
+
+@section Styles {
+	<style>
+		.border-danger {
+			border-color: #d32f2f !important;
+			box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
+		}
+
+		.password-toggle {
+			z-index: 10;
+			pointer-events: auto;
+		}
+
+			.password-toggle:hover {
+				color: #666 !important;
+			}
+
+		.form-control-feedback {
+			pointer-events: none;
+		}
+
+			.form-control-feedback .password-toggle {
+				pointer-events: auto;
+			}
+	</style>
+}

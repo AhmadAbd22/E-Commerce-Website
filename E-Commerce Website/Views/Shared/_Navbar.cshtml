@@ -12,7 +12,9 @@
 
 <div class="navbar navbar-inverse bg-indigo">
 	<div class="navbar-header">
-		<a class="navbar-brand" href="@Url.Action("UserHome", "UserHome")"><img src="~/assets/images/logo_light.png" alt=""></a>
+		<a class="navbar-brand" href="@(isAdminView ? Url.Action("Admin", "Admin") : Url.Action("UserHome", "UserHome"))">
+			<img src="~/assets/images/logo_light.png" alt="">
+		</a>
 
 		<ul class="nav navbar-nav visible-xs-block">
 			<li><a data-toggle="collapse" data-target="#navbar-mobile"><i class="icon-tree5"></i></a></li>
@@ -28,18 +30,17 @@
 		<!-- Right side navigation -->
 		<div class="navbar-right">
 			<ul class="nav navbar-nav navbar-inline">
-				<!-- Welcome message and logout/login buttons in one line -->
+				<!-- Welcome message -->
 				<li class="navbar-text-item">
 					@if (isAuthenticated && !isSignUpPage && !isLoginPage)
 					{
-						<span class="navbar-text">Welcome back!</span>
 						@if (isAdminView)
 						{
-							<!-- Admin view - logout button inline with welcome message -->
-							<a href="@Url.Action("Logout", "Login")" class="btn btn-link navbar-btn inline-logout">
-								<i class="icon-switch2 position-left"></i>
-								<span class="hidden-xs">Logout</span>
-							</a>
+							<span class="navbar-text">Welcome, Admin!</span>
+						}
+						else
+						{
+							<span class="navbar-text">Welcome back!</span>
 						}
 					}
 					else if (isSignUpPage)
@@ -56,10 +57,9 @@
 					}
 				</li>
 
-				<!-- Only show account dropdown when authenticated AND not on login/signup pages AND not admin view -->
-				@if (isAuthenticated && !isSignUpPage && !isLoginPage && !isAdminView)
+				<!-- User Account Dropdown with Logout Only - show for both authenticated users and admins -->
+				@if (isAuthenticated && !isSignUpPage && !isLoginPage)
 				{
-					<!-- User Account Dropdown - show full dropdown only on customer facing views -->
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
 							<i class="icon-user"></i>
@@ -68,48 +68,31 @@
 
 						<div class="dropdown-menu dropdown-content">
 							<div class="dropdown-content-heading">
-								My Account
+								@if (isAdminView)
+								{
+									<text>Admin Account</text>
+								}
+								else
+								{
+									<text>My Account</text>
+								}
 							</div>
 
-							<ul class="media-list dropdown-content-body width-300">
+							<ul class="media-list dropdown-content-body width-250">
 								<li class="media">
 									<div class="media-left">
-										<a href="@Url.Action("ViewCart", "Cart")" class="btn bg-success-400 btn-rounded btn-icon btn-xs">
-											<i class="icon-cart2"></i>
+										<a href="@Url.Action("Logout", "Login")" class="btn bg-danger btn-rounded btn-icon btn-xs">
+											<i class="icon-switch2"></i>
 										</a>
 									</div>
 									<div class="media-body">
-										<a href="@Url.Action("ViewCart", "Cart")" class="media-heading">
-											<span class="text-semibold">Shopping Cart</span>
-											@if (cartItemCount > 0)
-											{
-												<span class="badge bg-success pull-right">@cartItemCount</span>
-											}
+										<a href="@Url.Action("Logout", "Login")" class="media-heading">
+											<span class="text-semibold">Logout</span>
 										</a>
-										<span class="text-muted">View and manage your cart items</span>
-									</div>
-								</li>
-
-								<li class="media">
-									<div class="media-left">
-										<a href="@Url.Action("OrderHistory", "Cart")" class="btn bg-blue btn-rounded btn-icon btn-xs">
-											<i class="icon-history"></i>
-										</a>
-									</div>
-									<div class="media-body">
-										<a href="@Url.Action("OrderHistory", "Cart")" class="media-heading">
-											<span class="text-semibold">Order History</span>
-										</a>
-										<span class="text-muted">View your past orders</span>
+										<span class="text-muted">Sign out of your account</span>
 									</div>
 								</li>
 							</ul>
-
-							<div class="dropdown-content-footer">
-								<a href="@Url.Action("Logout", "Login")" data-popup="tooltip" title="Logout">
-									<i class="icon-switch2 display-block"></i>
-								</a>
-							</div>
 						</div>
 					</li>
 				}
@@ -153,113 +136,110 @@
 	</div>
 </div>
 
-
 @section Styles {
-<style>
-	/* Prevent horizontal scrolling */
-	.navbar {
-		overflow-x: hidden;
-	}
-
-	.navbar-right {
-		margin-right: 0;
-	}
-
-	.cart-nav-item {
-		position: relative;
-	}
-
-	.cart-badge {
-		position: absolute;
-		top: 6px;
-		right: 2px;
-		padding: 2px 6px;
-		border-radius: 50%;
-		font-size: 10px;
-		font-weight: bold;
-		min-width: 16px;
-		text-align: center;
-		animation: pulse 2s infinite;
-		box-shadow: 0 0 0 2px #fff;
-	}
-
-	.cart-button {
-		position: relative;
-		display: inline-block;
-		margin: 8px 4px;
-		padding: 8px 12px;
-		border-radius: 4px;
-		transition: all 0.3s ease;
-		text-decoration: none;
-		color: #fff;
-	}
-
-		.cart-button:hover {
-			background-color: rgba(255, 255, 255, 0.1);
-			color: #fff;
-			text-decoration: none;
-			transform: translateY(-1px);
+	<style>
+		/* Prevent horizontal scrolling */
+		.navbar {
+			overflow-x: hidden;
 		}
 
-	/* Inline navbar elements */
-	.navbar-inline {
-		display: flex;
-		align-items: center;
-		flex-wrap: nowrap;
-		max-width: 100%;
-	}
+		.navbar-right {
+			margin-right: 0;
+		}
 
-	.navbar-text-item {
-		display: flex;
-		align-items: center;
-		padding: 0 10px;
-		white-space: nowrap;
-		flex-shrink: 1;
-		min-width: 0;
-	}
+		.cart-nav-item {
+			position: relative;
+		}
 
-		.navbar-text-item .navbar-text {
-			margin: 0;
-			padding: 15px 0;
-			margin-right: 8px;
+		.cart-badge {
+			position: absolute;
+			top: 6px;
+			right: 2px;
+			padding: 2px 6px;
+			border-radius: 50%;
+			font-size: 10px;
+			font-weight: bold;
+			min-width: 16px;
+			text-align: center;
+			animation: pulse 2s infinite;
+			box-shadow: 0 0 0 2px #fff;
+		}
+
+		.cart-button {
+			position: relative;
+			display: inline-block;
+			margin: 8px 4px;
+			padding: 8px 12px;
+			border-radius: 4px;
+			transition: all 0.3s ease;
+			text-decoration: none;
+			color: #fff;
+		}
+
+			.cart-button:hover {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				text-decoration: none;
+				transform: translateY(-1px);
+			}
+
+		/* Inline navbar elements */
+		.navbar-inline {
+			display: flex;
+			align-items: center;
+			flex-wrap: nowrap;
+			max-width: 100%;
+		}
+
+		.navbar-text-item {
+			display: flex;
+			align-items: center;
+			padding: 0 10px;
 			white-space: nowrap;
+			flex-shrink: 1;
+			min-width: 0;
 		}
 
-	.inline-logout {
-		margin: 0;
-		padding: 6px 12px;
-		color: #fff;
-		text-decoration: none;
-		white-space: nowrap;
-		flex-shrink: 0;
-	}
+			.navbar-text-item .navbar-text {
+				margin: 0;
+				padding: 15px 0;
+				margin-right: 8px;
+				white-space: nowrap;
+			}
 
-		.inline-logout:hover {
-			background-color: rgba(255, 255, 255, 0.1);
+		.inline-logout {
+			margin: 0;
+			padding: 6px 12px;
 			color: #fff;
+			text-decoration: none;
+			white-space: nowrap;
+			flex-shrink: 0;
+		}
+
+			.inline-logout:hover {
+				background-color: rgba(255, 255, 255, 0.1);
+				color: #fff;
+				text-decoration: none;
+			}
+
+		/* Dropdown styling for logout */
+		.dropdown-content {
+			min-width: 250px;
+		}
+
+		.dropdown-content-body .media:hover {
+			background-color: #f5f5f5;
+			border-radius: 4px;
+		}
+
+		.dropdown-content-body .media a {
 			text-decoration: none;
 		}
 
-	/* Mobile responsive */
-	#media (max-width: 768px) {
-		.navbar-text-item
+			.dropdown-content-body .media a:hover {
+				text-decoration: none;
+			}
 
-	{
-		flex-direction: column;
-		padding: 5px;
-	}
-
-	.navbar-text-item .navbar-text {
-		margin-right: 0;
-		margin-bottom: 5px;
-		padding: 10px 0;
-	}
-
-	.inline-logout {
-		padding: 4px 8px;
-		font-size: 12px;
-	}
-
-	}
-</style>
+	</style>
 }
+
