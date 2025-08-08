@@ -33,15 +33,10 @@ namespace ECommerceWebsite.Repository
 
         public async Task<List<OrderDetails>> GetOrderByUserIdAsync(Guid userId)
         {
-           var order = await _context.OrderDetails
+           return await _context.OrderDetails
                 .Where(o => o.UserId == userId)
                 .Include(o => o.OrderItems)
                 .ToListAsync();
-            if (order == null || !order.Any())
-            {
-                throw new KeyNotFoundException("No orders found for the specified user.");
-            }
-            return order;
         }
 
         public async Task PlaceOrder(OrderDetails order)
