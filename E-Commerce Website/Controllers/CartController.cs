@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ECommerceWebsite.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User")]
     public class CartController : Controller
     {
         private readonly ICartRepository _cartRepo;
