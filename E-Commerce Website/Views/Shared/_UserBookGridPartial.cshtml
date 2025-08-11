@@ -1,0 +1,39 @@
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@model PagedResult<BookDto>
+
+<!-- Grid of Books -->
+<div class="row">
+    @if (!Model.Items.Any())
+    {
+        <div class="col-xs-12">
+            <div class="alert alert-info text-center">No books found matching your criteria.</div>
+        </div>
+    }
+    else
+    {
+        @foreach (var book in Model.Items)
+        {
+            @await Html.PartialAsync("_BookCardPartial", book)
+        }
+    }
+</div>
+
+<!-- Pagination -->
+<div class="text-center">
+    <ul class="pagination pagination-rounded">
+        @if (Model.CurrentPage > 1)
+        {
+            <li><a href="@Url.Action("_UserBooksGridPartial", "UserHome", new { page = Model.CurrentPage - 1 })">&larr; &nbsp; Prev</a></li>
+        }
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="@(i == Model.CurrentPage ? "active" : "")"><a href="@Url.Action("_UserBooksGridPartial", "UserHome", new { page = i })">@i</a></li>
+        }
+
+        @if (Model.CurrentPage < Model.TotalPages)
+        {
+            <li><a href="@Url.Action("_UserBooksGridPartial", "UserHome", new { page = Model.CurrentPage + 1 })">Next &nbsp; &rarr;</a></li>
+        }
+    </ul>
+</div>
