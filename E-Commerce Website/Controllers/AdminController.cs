@@ -10,6 +10,7 @@ using ECommerceWebsite.Models.Enums;
 using System.Net;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using ECommerceWebsite.Models.Helping_Classes;
 
 
 namespace ECommerceWebsite.Controllers
@@ -31,84 +32,68 @@ namespace ECommerceWebsite.Controllers
 
 
         // GET: /Admin
-        public async Task<IActionResult> Admin()
+        public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice, int pageNumber = 1)
         {
-            var books = await _bookRepo.GetActiveBooksAsync();
-            var authors = await _authorRepo.GetAllAuthorsAsync();
-            var categories = await _categoryRepo.GetAllCategoriesAsync();
+            const int pageSize = 9;
+            PagedResult<Book> pagedBooks;
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search, pageNumber, pageSize);
+            }
+            else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
+            {
+                pagedBooks = await _bookRepo.FilterBooksPagedAsync(authorId, categoryId, minPrice, maxPrice, pageNumber, pageSize);
+            }
+            else
+            {
+                pagedBooks = await _bookRepo.GetActiveBooksPagedAsync(pageNumber, pageSize);
+            }
+
+            var pagedDto = new PagedResult<BookDto>
+            {
+                CurrentPage = pagedBooks.CurrentPage,
+                PageSize = pagedBooks.PageSize,
+                TotalCount = pagedBooks.TotalCount,
+                Items = pagedBooks.Items.Select(book => new BookDto
+                {
+                    Id = book.Id,
+                    Title = book.Title,
+                    Description = book.Description,
+                    Price = book.Price,
+                    Stock = book.StockQuantity,
+                    AuthorId = book.AuthorId,
+                    CategoryId = book.CategoryId,
+                    PublicationDate = book.PublicationDate,
+                    Author = book.Author,
+                    Category = book.Category,
+                    ImageUrl = book.ImageUrl
+                }).ToList()
+            };
 
             await PopulateViewDataForAdmin();
             await SetCartItemCount();
 
-            ViewData["Authors"] = authors;
-            ViewData["Categories"] = categories;
-            ViewData["IsDeletedView"] = false;
-            ViewData["Login"] = true;
-            
-            var dtos = books.Select(book => new BookDto
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Description = book.Description,
-                Price = book.Price,
-                Stock = book.StockQuantity,
-                AuthorId = book.AuthorId,
-                CategoryId = book.CategoryId,
-                PublicationDate = book.PublicationDate,
-                Author = book.Author,
-                Category = book.Category,
-                ImageUrl = book.ImageUrl
-            }).ToList();
+            ViewData["Search"] = search;
+            ViewData["AuthorId"] = authorId;
+            ViewData["CategoryId"] = categoryId;
+            ViewData["MinPrice"] = minPrice;
+            ViewData["MaxPrice"] = maxPrice;
 
-            return View(dtos);
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_AdminBookGridPartial", pagedDto);
+            }
+
+            return View(pagedDto);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice )
+        public IActionResult Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice)
         {
-            IEnumerable<Book> books;
-            try
-            {
-                if (!string.IsNullOrEmpty(search))
-                {
-                    books = await _bookRepo.SearchActiveBooksAsync(search);
-                }
-                else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
-                {
-                    books = await _bookRepo.FilterBooksAsync(authorId ?? Guid.Empty, minPrice, maxPrice);
-                    if (categoryId.HasValue)
-                    {
-                        books = books.Where(b => b.CategoryId == categoryId.Value);
-                    }
-                }
-                else
-                {
-                    books = await _bookRepo.GetActiveBooksAsync();
-                }
-
-                var authors = await _authorRepo.GetAllAuthorsAsync();
-                var categories = await _categoryRepo.GetAllCategoriesAsync();
-
-                ViewData["Authors"] = authors;
-                ViewData["Categories"] = categories;
-
-                var dtos = books.Select(book => new BookDto
-                {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Price = book.Price,
-                    Stock = book.StockQuantity,
-                    Author = book.Author,
-                    ImageUrl = book.ImageUrl,
-                }).ToList();
-
-                return View(dtos);
-            }
-            catch (Exception)
-            {
-                return View("Error", new { message = "An error occurred while searching for books." });
-            }
+            return RedirectToAction("Admin", new { search, authorId, categoryId, minPrice, maxPrice });
         }
+   
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
@@ -148,8 +133,6 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("Admin");
             }
         }
-
-
 
 
         // GET
