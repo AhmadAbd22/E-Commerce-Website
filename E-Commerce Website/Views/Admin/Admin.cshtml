@@ -1,8 +1,14 @@
-﻿@model IEnumerable<BookDto>
+﻿@model ECommerceWebsite.Models.Helping_Classes.PagedResult<BookDto>
 @{
-    bool isDeletedView = (ViewData["IsDeletedView"] as bool?) ?? false;
-    ViewData["Title"] = isDeletedView ? "Deleted Books" : "Admin Dashboard";
+    ViewData["Title"] = "Admin Dashboard";
     Layout = "_AdminLayout";
+
+    // Get filter values from ViewData to repopulate the form
+    string currentSearch = ViewData["Search"] as string ?? "";
+    Guid? currentAuthorId = ViewData["AuthorId"] as Guid?;
+    Guid? currentCategoryId = ViewData["CategoryId"] as Guid?;
+    decimal? currentMinPrice = ViewData["MinPrice"] as decimal?;
+    decimal? currentMaxPrice = ViewData["MaxPrice"] as decimal?;
 }
 
 <!-- Page header -->
@@ -11,21 +17,15 @@
         <div class="page-title">
             <h4>
                 <i class="icon-arrow-left52 position-left"></i>
-                <span class="text-semibold">Admin</span> - @(isDeletedView ? "Deleted Books" : "All Books")
+                <span class="text-semibold">Admin</span> - Book Management
             </h4>
         </div>
     </div>
     <div class="breadcrumb-line">
         <ul class="breadcrumb">
             <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Home</a></li>
-            <li class="active">Book Management</li>
+            <li class="active">All Books</li>
         </ul>
-        <!-- Filter Toggle Button -->
-        <div class="breadcrumb-elements">
-            <button type="button" class="btn btn-link filter-toggle" id="filter-toggle">
-                <i class="icon-menu-open position-left"></i> Filters
-            </button>
-        </div>
     </div>
 </div>
 <!-- /page header -->
@@ -33,7 +33,6 @@
 {
     <div class="alert alert-success alert-dismissible">
         <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-        <i class="icon-checkmark position-left"></i>
         @TempData["Success"]
     </div>
 }
@@ -41,249 +40,131 @@
 {
     <div class="alert alert-danger alert-dismissible">
         <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-        <i class="icon-blocked position-left"></i>
         @TempData["Error"]
     </div>
 }
 
 <!-- Content area -->
 <div class="content">
-    <div class="row">
-        <!-- Main content area -->
-        <div class="col-lg-9 col-md-8" id="main-content">
-            <!-- Search -->
-            <div class="panel panel-flat">
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-8 col-md-offset-2">
-                            <div class="form-group has-feedback has-feedback-left">
-                                <input type="search" id="book-search" class="form-control" placeholder="Type to search books...">
-                                <div class="form-control-feedback">
-                                    <i class="icon-search4 text-size-small text-muted"></i>
-                                </div>
+    <!-- Search and filter form -->
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <!-- NOTE: The form method is now GET for better UX (bookmarkable URLs) -->
+            <form asp-action="Admin" method="get" id="filter-form">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="text-semibold">Search by Title/Author</label>
+                            <input type="search" name="search" id="search-input" class="form-control" placeholder="Type to search..." value="@currentSearch">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="text-semibold">By Author</label>
+                            <select name="authorId" id="author-filter" class="form-control" asp-items="@(new SelectList((IEnumerable<Author>)ViewData["Authors"], "Id", "AuthorName", currentAuthorId))">
+                                <option value="">All Authors</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="text-semibold">By Category</label>
+                            <select name="categoryId" id="category-filter" class="form-control" asp-items="@(new SelectList((IEnumerable<Category>)ViewData["Categories"], "Id", "CategoryType", currentCategoryId))">
+                                <option value="">All Categories</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="text-semibold">Price Range</label>
+                            <div class="input-group">
+                                <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control" value="@currentMinPrice">
+                                <span class="input-group-addon">-</span>
+                                <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control" value="@currentMaxPrice">
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <!-- Grid of Books -->
-            <div class="row book-grid">
-                @if (!Model.Any())
-                {
-                    <div class="col-xs-12">
-                        <div class="panel panel-flat">
-                            <div class="panel-body text-center">
-                                <i class="icon-book icon-3x text-muted mb-20"></i>
-                                <h4 class="text-muted">No books found</h4>
-                                <p class="text-muted">
-                                    @if (isDeletedView)
-                                    {
-                                        <text>No deleted books to display.</text>
-                                    }
-                                    else
-                                    {
-                                        <text>Start by adding some books to your inventory.</text>
-                                    }
-                                </p>
-                                @if (!isDeletedView)
-                                {
-                                    <p class="text-muted">Use the sidebar to add your first book.</p>
-                                }
-                            </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="display-block">&nbsp;</label>
+                            <button type="submit" class="btn bg-blue btn-block">
+                                <i class="icon-filter3 position-left"></i> Apply
+                            </button>
                         </div>
                     </div>
-                }
-                else
-                {
-                    @foreach (var book in Model)
-                    {
-                        @await Html.PartialAsync("_AdminBookCardPartial", book)
-                    }
-                }
-
-                <div class="col-xs-12" id="no-results-message" style="display: none;">
-                    <div class="alert alert-warning text-center">
-                        <i class="icon-notification2 position-left"></i>
-                        No books found matching your search term.
-                    </div>
                 </div>
-            </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Right Filter Sidebar -->
-        <div class="col-lg-3 col-md-4" id="filter-sidebar">
-            <div class="sidebar-fixed">
-                <div class="panel panel-flat">
-                    <div class="panel-heading">
-                        <h6 class="panel-title">
-                            <i class="icon-filter3 position-left"></i>
-                            Filter Products
-                        </h6>
-                    </div>
-                    <div class="panel-body">
-                        <form action="@Url.Action("FilterByAuthor", "Admin")" method="get">
-                            <div class="form-group">
-                                <label class="text-semibold">By Author</label>
-                                <select name="authorId" class="form-control">
-                                    <option value="">All Authors</option>
-                                    @if (ViewData["Authors"] is IEnumerable<Author> authors)
-                                    {
-                                        foreach (var author in authors)
-                                        {
-                                            <option value="@author.Id">@author.AuthorName</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="text-semibold">By Category</label>
-                                <select name="categoryId" class="form-control">
-                                    <option value="">All Categories</option>
-                                    @if (ViewData["Categories"] is IEnumerable<Category> categories)
-                                    {
-                                        foreach (var category in categories)
-                                        {
-                                            <option value="@category.CategoryType">@category.CategoryType</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="text-semibold">By Price Range</label>
-                                <div class="row">
-                                    <div class="col-xs-6">
-                                        <input type="number" name="minPrice" placeholder="Min" class="form-control" step="50">
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <input type="number" name="maxPrice" placeholder="Max" class="form-control" step="50">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <button type="submit" class="btn bg-blue btn-block">
-                                    <i class="icon-filter3 position-left"></i> Apply Filters
-                                </button>
-                                <button type="button" id="clear-filters" class="btn btn-default btn-block mt-10">
-                                    <i class="icon-reset position-left"></i> Clear Filters
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- AJAX Updatable Area -->
+    <div id="admin-book-container">
+        @await Html.PartialAsync("_AdminBookGridPartial", Model)
     </div>
 </div>
 <!-- /content area -->
-@section Styles {
-    <style>
-        /* Filter Sidebar Styles */
-        #filter-sidebar {
-            transition: all 0.3s ease;
-        }
-
-        .sidebar-fixed {
-            position: sticky;
-            top: 20px;
-            z-index: 100;
-        }
-
-        .filter-toggle, .filter-close {
-            color: #fff;
-            border: none;
-            background: transparent;
-            padding: 8px 15px;
-        }
-
-            .filter-toggle:hover, .filter-close:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-                color: #fff;
-            }
-
-        .filter-close {
-            color: #666;
-            padding: 2px 8px;
-        }
-
-            .filter-close:hover {
-                background-color: #f5f5f5;
-                color: #333;
-            }
-    </style>
-}
-
 @section Scripts {
     <script type="text/javascript">
         $(function() {
-            // Filter sidebar toggle functionality
-            $('#filter-toggle').on('click', function() {
-                $('#filter-sidebar').addClass('active');
-                $('body').append('<div class="sidebar-backdrop"></div>');
-                $('.sidebar-backdrop').addClass('active');
-                $('#main-content').addClass('sidebar-open');
-            });
+            var debounceTimeout;
 
-            // Close filter sidebar
-            $('#filter-close, .sidebar-backdrop').on('click', function() {
-                $('#filter-sidebar').removeClass('active');
-                $('.sidebar-backdrop').removeClass('active');
-                $('#main-content').removeClass('sidebar-open');
-                setTimeout(function() {
-                    $('.sidebar-backdrop').remove();
-                }, 300);
-            });
+            function fetchAdminPage(pageNumber) {
+                // Get all filter values from the form
+                var search = $('#search-input').val();
+                var authorId = $('#author-filter').val();
+                var categoryId = $('#category-filter').val();
+                var minPrice = $('#min-price-filter').val();
+                var maxPrice = $('#max-price-filter').val();
 
-            // Close sidebar on escape key
-            $(document).on('keyup', function(e) {
-                if (e.keyCode === 27) { // Escape key
-                    $('#filter-close').click();
-                }
-            });
+                // Construct the URL with all parameters
+                var url = '@Url.Action("Admin", "Admin")' +
+                    '?pageNumber=' + pageNumber +
+                    '&search=' + encodeURIComponent(search) +
+                    '&authorId=' + encodeURIComponent(authorId) +
+                    '&categoryId=' + encodeURIComponent(categoryId) +
+                    '&minPrice=' + encodeURIComponent(minPrice) +
+                    '&maxPrice=' + encodeURIComponent(maxPrice);
 
-            // Active Search Implementation
-            $('#book-search').on('keyup', function() {
-                var searchTerm = $(this).val().toLowerCase();
-                var visibleCount = 0;
+                // Show a loading indicator
+                $('#admin-book-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading...</h4></div>');
 
-                // Loop through each book card container in the grid
-                $('.book-grid > div').each(function() {
-                    var bookCard = $(this);
-                    var bookText = bookCard.text().toLowerCase();
-
-                    // Check if the card's text contains the search term
-                    if (bookText.indexOf(searchTerm) > -1) {
-                        bookCard.show();
-                        visibleCount++;
-                    } else {
-                        bookCard.hide();
-                    }
+                // Perform the AJAX GET request
+                $.get(url, function(data) {
+                    // Replace the content with the response from the server
+                    $('#admin-book-container').html(data);
+                }).fail(function() {
+                    $('#admin-book-container').html('<div class="alert alert-danger">An error occurred while loading data. Please try again.</div>');
                 });
+            }
 
-                // Show or hide the 'no results' message
-                if (visibleCount === 0) {
-                    $('#no-results-message').show();
-                } else {
-                    $('#no-results-message').hide();
+            // --- EVENT HANDLERS ---
+
+            // 1. Handle Pagination Clicks
+            $('#admin-book-container').on('click', '.pagination a', function(e) {
+                e.preventDefault(); // Stop the link from navigating directly
+                var page = $(this).data('page');
+                if (page) {
+                    fetchAdminPage(page);
                 }
             });
 
-            // Clear Filters functionality
-            $('#clear-filters').on('click', function() {
-                // Clear all form inputs
-                $('select[name="authorId"]').val('');
-                $('input[name="minPrice"]').val('');
-                $('input[name="maxPrice"]').val('');
+            // 2. Handle Active Search and Filtering (with Debouncing)
+            // This now applies to all filter inputs
+            $('#search-input, #min-price-filter, #max-price-filter').on('keyup', function() {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(function() {
+                    fetchAdminPage(1);
+                }, 300); // Wait 500ms after the user stops typing
+            });
 
-                // Clear search input
-                $('#book-search').val('');
+            // Handle dropdown selects immediately on change
+            $('#author-filter, #category-filter').on('change', function() {
+                 fetchAdminPage(1);
+            });
 
-                // Show all books
-                $('.book-grid > div').show();
-                $('#no-results-message').hide();
-
-                // Redirect to clear filters on server side
-                window.location.href = '@Url.Action("Admin", "Admin")';
+            $('#filter-form').on('submit', function(e) {
+                e.preventDefault();
+                fetchAdminPage(1); 
             });
         });
     </script>
