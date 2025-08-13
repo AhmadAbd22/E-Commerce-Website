@@ -1,6 +1,7 @@
-﻿@model ECommerceWebsite.Models.Helping_Classes.PagedResult<Book>
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@model PagedResult<BookDto>
 
-<!-- Grid of Books -->
+<!-- Renders the grid of book cards -->
 <div class="row">
     @if (!Model.Items.Any())
     {
@@ -19,42 +20,6 @@
             @await Html.PartialAsync("_BookCardPartial", book)
         }
     }
+
+    @await Html.PartialAsync("_PaginationPartial")
 </div>
-
-<!-- Pagination with Corrected Logic -->
-@if (Model.TotalPages > 0)
-{
-    <div class="panel panel-body" style="margin-top: 20px;">
-        <div class="row">
-            <div class="col-sm-6 text-left-sm text-center-xs">
-                <span class="text-muted">Showing @Model.StartItem to @Model.EndItem of @Model.TotalCount books</span>
-            </div>
-            <div class="col-sm-6 text-right-sm text-center-xs">
-                @if (Model.TotalPages > 1)
-                {
-                    <ul class="pagination pagination-rounded">
-                        <!-- 'Previous' Link -->
-                        @if (Model.HasPreviousPage)
-                        {
-                            <li><a href="#" data-page="@(Model.CurrentPage - 1)">&larr; &nbsp; Prev</a></li>
-                        }
-
-                        <!-- Page Number Links -->
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="@(i == Model.CurrentPage ? "active" : "")">
-                                <a href="#" data-page="@i">@i</a>
-                            </li>
-                        }
-
-                        <!-- 'Next' Link -->
-                        @if (Model.HasNextPage)
-                        {
-                            <li><a href="#" data-page="@(Model.CurrentPage + 1)">Next &nbsp; &rarr;</a></li>
-                        }
-                    </ul>
-                }
-            </div>
-        </div>
-    </div>
-}

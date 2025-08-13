@@ -22,6 +22,13 @@
                     {
                         @if (isAdmin)
                         {
+                            <!-- Toggle Sidebar -->
+                            <li>
+                                <a class="sidebar-main-toggle">
+                                    <i class="icon-menu7"></i>
+                                </a>
+                            </li>
+                            <!-- /Toggle Sidebar -->
                             <!-- Admin Navigation -->
                             <li class="navigation-header"><span>Admin Panel</span> <i class="icon-menu" title="Admin"></i></li>
                             <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">

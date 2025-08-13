@@ -31,28 +31,23 @@
                 }
                 <h4 class="text-success no-margin text-semibold">Rs. @Model.Price.ToString("F2")</h4>
             </div>
-        </div>
 
-        <!-- Stock and Rating Info -->
-        <div class="panel-body text-center" style="border-top: 1px solid #eee; background-color: #fafafa;">
-            <div class="row">
-                <div class="col-xs-6">
-                    <small class="text-muted">Stock:</small>
-                    <div class="@(Model.Stock > 0 ? "text-success" : "text-danger")">
-                        @if (Model.Stock > 0)
-                        {
-                            <i class="icon-checkmark3"></i> @Model.Stock
-                        }
-                        else
-                        {
-                            <i class="icon-cross2"></i>
-                            <text> Out of Stock </text>
-                        }
-                    </div>
-                </div>
-               
+            <!-- Stock and Rating Info -->
+            <div class="@(Model.Stock > 0 ? "text-success" : "text-danger")" style="text-align:center">
+                Stock:
+                @if (Model.Stock > 0)
+                {
+                    <i class="icon-checkmark3"></i>@Model.Stock
+                }
+                else
+                {
+                    <i class="icon-cross2"></i>
+                    <text> Out of Stock </text>
+                }
             </div>
         </div>
+
+
 
         <!-- Admin Action Buttons -->
         <div class="panel-body panel-body-accent">
@@ -96,7 +91,7 @@
                     <div class="btn-group">
                         <form method="post" action="@Url.Action("Delete", "Admin")" style="display: inline-block;">
                             <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete &quot;@Model.Title&quot;?')">
+                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete &quot;@Model.Title&quo;?')">
                                 <i class="icon-trash position-left"></i> Delete
                             </button>
                         </form>
