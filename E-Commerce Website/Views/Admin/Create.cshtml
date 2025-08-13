@@ -85,10 +85,12 @@
                     </div>
                 </div>
 
-                <div class="form-group mt-3">
-                    <label class="text-semibold">Book Image:</label>
-                    <input type="file" name="ImageFile" class="file-input" data-show-preview="false" accept=".png,.jpg,.jpeg" required>
-                    <span class="help-block">Allowed formats: PNG, JPG, JPEG</span>
+                <div class="col-sm-12">
+                    <div class="form-group">
+                        <label class="text-semibold" style="margin-right:8px">Book Image:</label>
+                        <input type="file" name="ImageFile" class="file-input" style="margin:8px" data-show-preview="true" accept=".png,.jpg,.jpeg" required>
+                        <span class="help-block">Allowed formats: PNG, JPG, JPEG</span>
+                    </div>
                 </div>
 
                 <div class="text-right">
@@ -110,7 +112,8 @@
             $('.pickadate-format').pickadate({
                 format: 'yyyy-mm-dd', // Using a simple format
                 selectMonths: true,
-                selectYears: 100
+                selectYears: 200,
+
             });
 
             // Initialize the styled file input
