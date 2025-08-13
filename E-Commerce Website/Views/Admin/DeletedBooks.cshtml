@@ -2,7 +2,14 @@
 @{
     ViewData["IsDeletedView"] = true;
     ViewData["Title"] = "Deleted Books";
-    Layout = "_MinimumLayout";
+
+    string currentSearch = ViewData["Search"] as string ?? "";
+    Guid? currentAuthorId = ViewData["AuthorId"] as Guid?;
+    Guid? currentCategoryId = ViewData["CategoryId"] as Guid?;
+    decimal? currentMinPrice = ViewData["MinPrice"] as decimal?;
+    decimal? currentMaxPrice = ViewData["MaxPrice"] as decimal?;
+
+    Layout = "_AdminLayout";
 }
 
 @if (TempData["Success"] != null)
@@ -41,32 +48,80 @@
     </div>
 </div>
 <!-- /page header -->
-<!-- Content area -->
-<div class="content">
-    <div class="container-detached">
-        <div class="content-detached">
-
-            <!-- Actions and search -->
-            <div class="panel panel-flat">
-                <div class="panel-body">
-                    <div class="row">
-                        <div class="col-md-8 col-sm-12">
-                            <a href="@Url.Action("Admin", "Admin")" class="btn btn-success"><i class="icon-list position-left"></i> Back to Active Books</a>
-                        </div>
-
-                        <!-- Active Search Input -->
-                        <div class="col-md-4 col-sm-12">
-                            <div class="form-group has-feedback has-feedback-left">
-                                <input type="search" id="deleted-book-search" class="form-control" placeholder="Type to search deleted books...">
-                                <div class="form-control-feedback">
-                                    <i class="icon-search4 text-size-small text-muted"></i>
-                                </div>
-                            </div>
+<!-- Search and filter form -->
+<div class="panel panel-flat">
+    <div class="panel-body">
+        <form action="@Url.Action("Admin","Admin")" method="get" id="filter-form">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <label class="text-semibold">Search by Title/Author</label>
+                        <input type="search" name="search" id="search-input" class="form-control" placeholder="Type to search..." value="@currentSearch">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="text-semibold">By Author</label>
+                        <select name="authorId" id="author-filter" class="form-control ui-select-lg, *-sm, *-xs" dropdown-menu>
+                            <option value="">All Authors</option>
+                            @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                            {
+                                foreach (var author in authors)
+                                {
+                                    if (author.Id == currentAuthorId)
+                                    {
+                                        <option value="@author.Id" selected>@author.AuthorName</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@author.Id">@author.AuthorName</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="text-semibold">By Category</label>
+                        <select name="categoryId" id="category-filter" class="form-control" required>
+                            <option value="">All Categories</option>
+                            @if (ViewData["Categories"] is IEnumerable<Category> categories)
+                            {
+                                foreach (var category in categories)
+                                {
+                                    if (category.Id == currentCategoryId)
+                                    {
+                                        <option value="@category.Id" selected>@category.CategoryType</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@category.Id">@category.CategoryType</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label class="text-semibold">Price Range</label>
+                        <div class="input-group">
+                            <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control price-input" value="@currentMinPrice" min="0" step="10">
+                            <span class="input-group-addon">-</span>
+                            <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control price-input" value="@currentMaxPrice min="0" step="10">
                         </div>
                     </div>
                 </div>
             </div>
+        </form>
+    </div>
+</div>
 
+<!-- Content area -->
+<div class="content">
+    <div class="container-detached">
+        <div class="content-detached">
             <!-- Grid of Deleted Books -->
             <div class="row book-grid">
                 @if (!Model.Any())
@@ -99,35 +154,6 @@
         </div>
     </div>
 
-    <!-- Detached sidebar (reused for consistent layout) -->
-    <div class="sidebar-detached">
-        <div class="sidebar sidebar-default sidebar-separate">
-            <div class="sidebar-content">
-                <div class="sidebar-category">
-                    <div class="category-title"><span>Filter Deleted Books</span></div>
-                    <div class="category-content">
-                        <form action="@Url.Action("FilterByAuthor", "Admin")" method="get">
-                            <div class="form-group">
-                                <legend class="text-size-mini text-muted no-border no-padding">By Author</legend>
-                                <select name="authorId" class="form-control">
-                                    <option value="">All Authors</option>
-                                    @if (ViewData["Authors"] is IEnumerable<Author> authors)
-                                    {
-                                        @foreach (var author in authors)
-                                        {
-                                            <option value="@author.Id">@author.AuthorName</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                            <button type="submit" class="btn bg-blue btn-block">Filter <i class="icon-filter3 position-right"></i></button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <!-- /content area -->
 @section Scripts {
     <script type="text/javascript">
