@@ -1,9 +1,9 @@
-﻿@model ECommerceWebsite.Models.Helping_Classes.PagedResult<BookDto>
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@model PagedResult<BookDto>
 @{
     ViewData["Title"] = "Admin Dashboard";
     Layout = "_AdminLayout";
 
-    // Get filter values from ViewData to repopulate the form
     string currentSearch = ViewData["Search"] as string ?? "";
     Guid? currentAuthorId = ViewData["AuthorId"] as Guid?;
     Guid? currentCategoryId = ViewData["CategoryId"] as Guid?;
@@ -49,8 +49,7 @@
     <!-- Search and filter form -->
     <div class="panel panel-flat">
         <div class="panel-body">
-            <!-- NOTE: The form method is now GET for better UX (bookmarkable URLs) -->
-            <form asp-action="Admin" method="get" id="filter-form">
+            <form action="@Url.Action("Admin","Admin")" method="get" id="filter-form">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
@@ -61,16 +60,44 @@
                     <div class="col-md-2">
                         <div class="form-group">
                             <label class="text-semibold">By Author</label>
-                            <select name="authorId" id="author-filter" class="form-control" asp-items="@(new SelectList((IEnumerable<Author>)ViewData["Authors"], "Id", "AuthorName", currentAuthorId))">
+                            <select name="authorId" id="author-filter" class="form-control ui-select-lg, *-sm, *-xs" dropdown-menu>
                                 <option value="">All Authors</option>
+                                @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                                {
+                                    foreach (var author in authors)
+                                    {
+                                        if (author.Id == currentAuthorId)
+                                        {
+                                            <option value="@author.Id" selected>@author.AuthorName</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@author.Id">@author.AuthorName</option>
+                                        }
+                                    }
+                                }
                             </select>
                         </div>
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
                             <label class="text-semibold">By Category</label>
-                            <select name="categoryId" id="category-filter" class="form-control" asp-items="@(new SelectList((IEnumerable<Category>)ViewData["Categories"], "Id", "CategoryType", currentCategoryId))">
+                            <select name="categoryId" id="category-filter" class="form-control" required>
                                 <option value="">All Categories</option>
+                                @if (ViewData["Categories"] is IEnumerable<Category> categories)
+                                {
+                                    foreach (var category in categories)
+                                    {
+                                        if (category.Id == currentCategoryId)
+                                        {
+                                            <option value="@category.Id" selected>@category.CategoryType</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@category.Id">@category.CategoryType</option>
+                                        }
+                                    }
+                                }
                             </select>
                         </div>
                     </div>
@@ -78,18 +105,10 @@
                         <div class="form-group">
                             <label class="text-semibold">Price Range</label>
                             <div class="input-group">
-                                <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control" value="@currentMinPrice">
+                                <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control price-input" value="@currentMinPrice" min="0" step="10">
                                 <span class="input-group-addon">-</span>
-                                <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control" value="@currentMaxPrice">
+                                <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control price-input" value="@currentMaxPrice min="0" step="10">
                             </div>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="form-group">
-                            <label class="display-block">&nbsp;</label>
-                            <button type="submit" class="btn bg-blue btn-block">
-                                <i class="icon-filter3 position-left"></i> Apply
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -108,15 +127,116 @@
         $(function() {
             var debounceTimeout;
 
+            // Price input validation function
+            function validatePriceInput(input) {
+                var value = parseFloat(input.val());
+                if (value < 0 || isNaN(value)) {
+                    input.val('');
+                    return false;
+                }
+                return true;
+            }
+
+            // Prevent negative values and invalid characters in price inputs
+            $('.price-input').on('input', function() {
+                var $this = $(this);
+                var value = $this.val();
+
+                // Remove any non-numeric characters except decimal point
+                value = value.replace(/[^0-9.]/g, '');
+
+                // Ensure only one decimal point
+                var parts = value.split('.');
+                if (parts.length > 2) {
+                    value = parts[0] + '.' + parts.slice(1).join('');
+                }
+
+                // Update the input value
+                $this.val(value);
+
+                // Check if value is negative after parsing
+                var numValue = parseFloat(value);
+                if (numValue < 0) {
+                    $this.val('');
+                }
+            });
+
+            // Prevent pasting negative values
+            $('.price-input').on('paste', function(e) {
+                var $this = $(this);
+                setTimeout(function() {
+                    var value = parseFloat($this.val());
+                    if (value < 0 || isNaN(value)) {
+                        $this.val('');
+                    }
+                }, 10);
+            });
+
+            // Prevent keyboard entry of minus sign and other invalid keys
+            $('.price-input').on('keydown', function(e) {
+                // Allow: backspace, delete, tab, escape, enter
+                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
+                    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
+                    (e.keyCode === 65 && e.ctrlKey === true) ||
+                    (e.keyCode === 67 && e.ctrlKey === true) ||
+                    (e.keyCode === 86 && e.ctrlKey === true) ||
+                    (e.keyCode === 88 && e.ctrlKey === true) ||
+                    // Allow: home, end, left, right, down, up
+                    (e.keyCode >= 35 && e.keyCode <= 40)) {
+                    return;
+                }
+
+                // Prevent: minus sign (109, 173, 189)
+                if (e.keyCode === 109 || e.keyCode === 173 || e.keyCode === 189) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Ensure that it is a number and stop the keypress
+                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105) && e.keyCode !== 190 && e.keyCode !== 110) {
+                    e.preventDefault();
+                }
+            });
+
+            // Category validation - ensure only valid GUIDs are selected
+            $('#category-filter').on('change', function() {
+                var $this = $(this);
+                var value = $this.val();
+
+                // If value is not empty and not a valid GUID pattern, reset it
+                if (value && value !== '' && !isValidGuid(value)) {
+                    $this.val('');
+                    alert('Invalid category selection. Please choose from the available options.');
+                    return;
+                }
+
+                fetchAdminPage(1);
+            });
+
+            // Helper function to validate GUID format
+            function isValidGuid(guid) {
+                var guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+                return guidRegex.test(guid);
+            }
+
+            // Reusable function to fetch results from the server
             function fetchAdminPage(pageNumber) {
-                // Get all filter values from the form
                 var search = $('#search-input').val();
                 var authorId = $('#author-filter').val();
                 var categoryId = $('#category-filter').val();
                 var minPrice = $('#min-price-filter').val();
                 var maxPrice = $('#max-price-filter').val();
 
-                // Construct the URL with all parameters
+                // Validate price inputs before making request
+                if (minPrice && parseFloat(minPrice) < 0) {
+                    $('#min-price-filter').val('');
+                    minPrice = '';
+                }
+                if (maxPrice && parseFloat(maxPrice) < 0) {
+                    $('#max-price-filter').val('');
+                    maxPrice = '';
+                }
+
                 var url = '@Url.Action("Admin", "Admin")' +
                     '?pageNumber=' + pageNumber +
                     '&search=' + encodeURIComponent(search) +
@@ -125,46 +245,53 @@
                     '&minPrice=' + encodeURIComponent(minPrice) +
                     '&maxPrice=' + encodeURIComponent(maxPrice);
 
-                // Show a loading indicator
                 $('#admin-book-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading...</h4></div>');
 
-                // Perform the AJAX GET request
                 $.get(url, function(data) {
-                    // Replace the content with the response from the server
                     $('#admin-book-container').html(data);
                 }).fail(function() {
-                    $('#admin-book-container').html('<div class="alert alert-danger">An error occurred while loading data. Please try again.</div>');
+                    $('#admin-book-container').html('<div class="alert alert-danger">An error occurred while loading data.</div>');
                 });
             }
 
             // --- EVENT HANDLERS ---
-
-            // 1. Handle Pagination Clicks
             $('#admin-book-container').on('click', '.pagination a', function(e) {
-                e.preventDefault(); // Stop the link from navigating directly
+                e.preventDefault();
                 var page = $(this).data('page');
                 if (page) {
                     fetchAdminPage(page);
                 }
             });
 
-            // 2. Handle Active Search and Filtering (with Debouncing)
-            // This now applies to all filter inputs
             $('#search-input, #min-price-filter, #max-price-filter').on('keyup', function() {
+                // Additional validation for price inputs on keyup
+                if ($(this).hasClass('price-input')) {
+                    validatePriceInput($(this));
+                }
+
                 clearTimeout(debounceTimeout);
                 debounceTimeout = setTimeout(function() {
                     fetchAdminPage(1);
-                }, 300); // Wait 500ms after the user stops typing
+                }, 200);
             });
 
-            // Handle dropdown selects immediately on change
-            $('#author-filter, #category-filter').on('change', function() {
-                 fetchAdminPage(1);
+            $('#author-filter').on('change', function() {
+                fetchAdminPage(1);
             });
 
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
-                fetchAdminPage(1); 
+
+                // Final validation before submission
+                var minPrice = $('#min-price-filter').val();
+                var maxPrice = $('#max-price-filter').val();
+
+                if ((minPrice && parseFloat(minPrice) < 0) || (maxPrice && parseFloat(maxPrice) < 0)) {
+                    alert('Price values cannot be negative. Please enter valid positive numbers.');
+                    return false;
+                }
+
+                fetchAdminPage(1);
             });
         });
     </script>
