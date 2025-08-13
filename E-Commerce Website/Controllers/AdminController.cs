@@ -72,7 +72,8 @@ namespace ECommerceWebsite.Controllers
             };
 
             await PopulateViewDataForAdmin();
-    
+            await SetCartItemCount();
+
             ViewData["Search"] = search;
             ViewData["AuthorId"] = authorId;
             ViewData["CategoryId"] = categoryId;
