@@ -130,7 +130,7 @@ namespace ECommerceWebsite.Repository
             return await _context.Books
                 .Where(b => b.isActive == (int)enumStatus.Active &&
                        (b.Title.ToLower().Contains(searchTerm) ||
-                        b.Description.ToLower().Contains(searchTerm)))
+                       (b.Author != null && b.Author.AuthorName.ToLower().Contains(searchTerm))))
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
         }
@@ -281,12 +281,12 @@ namespace ECommerceWebsite.Repository
             };
         }
 
-        public async Task<PagedResult<Book>> SearchActiveBooksPagedAsync(string searchTerm, int pageNumber, int pageSize)
+        public async Task<PagedResult<Book>> SearchActiveBooksPagedAsync(string searchTerm, int pageNumber, int pageSize)  //searches by author and book title
         {
             var query = _context.Books
                 .Where(b => b.isActive == (int)enumStatus.Active &&
                        (b.Title.ToLower().Contains(searchTerm) ||
-                        b.Description.ToLower().Contains(searchTerm)))
+                       (b.Author != null && b.Author.AuthorName.ToLower().Contains(searchTerm))))
                 .Include(b => b.Author)
                 .Include(b => b.Category)
                 .OrderByDescending(b => b.CreatedAt);
