@@ -232,7 +232,7 @@
                 if (page) { fetchUserPage(page); }
             });
 
-            $('#search-input, #min-price-filter, #max-price-filter').on('keyup', function() {
+            $('#search-input, #min-price-filter, #max-price-filter').on('input', function() {
                 // Additional validation for price inputs on keyup
                 if ($(this).hasClass('price-input')) {
                     validatePriceInput($(this));
