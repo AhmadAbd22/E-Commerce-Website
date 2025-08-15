@@ -88,7 +88,7 @@ namespace ECommerceWebsite.Services
                         UserId = userId,
                         Quantity = cartItem.Quantity,
                         UnitPrice = cartItem.Book.Price,
-                        // OrderetailsId = orderDetails.Id, 
+                        OrderDetailsId = orderDetails.Id,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
