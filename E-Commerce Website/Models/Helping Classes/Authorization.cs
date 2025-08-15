@@ -38,6 +38,38 @@ namespace ECommerceWebsite.Models.Helping_Classes
             return loggedInUser;
         }
 
+        public Guid GetCurrentUserId()
+        {
+            try
+            {
+                if (hcontext?.User?.Identity?.IsAuthenticated != true)
+                {
+                    return Guid.Empty;
+                }
+
+                var userIdClaim = hcontext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Sid)
+                               ?? hcontext.User.Claims.FirstOrDefault(c => c.Type == "EncId")
+                               ?? hcontext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+                {
+                    return Guid.Empty;
+                }
+
+                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
+                {
+                    return userId;
+                }
+
+                return Guid.Empty;
+            }
+            catch (Exception)
+            {
+                return Guid.Empty;
+            }
+        }
+
+
         public async Task<bool> SetUserClaims(User user)
         {
             try

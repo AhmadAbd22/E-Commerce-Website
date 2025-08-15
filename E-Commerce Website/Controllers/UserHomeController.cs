@@ -15,13 +15,15 @@ namespace ECommerceWebsite.Controllers
         private readonly ICategoryRepository _categoryRepo;
         private readonly IAuthorRepository _authorRepo;
         private readonly ICartRepository _cartRepo;
+        private readonly Authorization _authorization;
 
-        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, IAuthorRepository authorRepo, ICartRepository cartRepo)
+        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, IAuthorRepository authorRepo, ICartRepository cartRepo, Authorization authorization)
         {
             _bookRepo = bookRepo;
             _categoryRepo = categoryRepo;
             _authorRepo = authorRepo;
             _cartRepo = cartRepo;
+            _authorization = authorization;
         }
 
         [AllowAnonymous]
@@ -127,47 +129,12 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
-
-
-        //helper method
-
-        private Guid GetCurrentUserId()
-        {
-            try
-            {
-                if (!User.Identity?.IsAuthenticated ?? true)
-                {
-                    return Guid.Empty;
-                }
-
-                var userIdClaim = User.FindFirst(ClaimTypes.Sid)
-                               ?? User.FindFirst("EncId")
-                               ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
-                {
-                    return Guid.Empty;
-                }
-
-                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
-                {
-                    return userId;
-                }
-
-                return Guid.Empty;
-            }
-            catch (Exception)
-            {
-                return Guid.Empty;
-            }
-        }
-
         // Helper method
         private async Task SetCartItemCount()
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
                 if (userId != Guid.Empty)
                 {
                     var cartItemCount = await _cartRepo.GetCartItemCountAsync(userId);
