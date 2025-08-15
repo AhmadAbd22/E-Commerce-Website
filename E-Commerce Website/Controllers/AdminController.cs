@@ -93,7 +93,7 @@ namespace ECommerceWebsite.Controllers
         {
             return RedirectToAction("Admin", new { search, authorId, categoryId, minPrice, maxPrice });
         }
-   
+
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
@@ -189,7 +189,7 @@ namespace ECommerceWebsite.Controllers
             var dto = new BookDto
             {
                 CategoriesList = categories.ToList(),
-                AuthorsList = authors.ToList() 
+                AuthorsList = authors.ToList()
             };
             return View(dto);
         }
@@ -212,12 +212,15 @@ namespace ECommerceWebsite.Controllers
             }
 
             var bookId = Guid.NewGuid();
+
+            //Create directory 
             GeneralPurpose.CreateBookDirectory(bookId);
 
             var fileName = string.IsNullOrWhiteSpace(dto.FileName)
                 ? Path.GetFileName(dto.ImageFile.FileName)
                 : dto.FileName + Path.GetExtension(dto.ImageFile.FileName);
 
+            //Get file path and save
             var filePath = GeneralPurpose.GetBookImagePathForSave(bookId, fileName);
             var imageSaved = await GeneralPurpose.SaveFile(dto.ImageFile, filePath);
 
@@ -229,6 +232,7 @@ namespace ECommerceWebsite.Controllers
                 return View(dto);
             }
 
+            //Get URL for DB
             var imageUrl = GeneralPurpose.GetBookImageUrl(bookId, fileName);
 
 
@@ -286,27 +290,39 @@ namespace ECommerceWebsite.Controllers
         {
             if (!ModelState.IsValid)
             {
+                await PopulateViewDataForAdmin();
                 return View(dto);
             }
 
             var book = await _bookRepo.GetBookByIdAsync(dto.Id);
             if (book == null)
                 return NotFound();
+
+            // Handle image update if new file is provided
             if (dto.ImageFile != null && dto.ImageFile.Length > 0)
             {
-                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png" };
-                var extension = Path.GetExtension(dto.ImageFile.FileName).ToLowerInvariant();
-                if (!allowedExtensions.Contains(extension))
+                // Validate new image
+                if (!GeneralPurpose.IsValidImageExtension(dto.ImageFile.FileName))
                 {
-                    ModelState.AddModelError("ImageFile", "Only JPG and PNG images are allowed.");
-                    return View(dto);
-                }
-                if (dto.ImageFile.Length > 2 * 1024 * 1024)
-                {
-                    ModelState.AddModelError("ImageFile", "File size must be less than 2MB.");
+                    ModelState.AddModelError("ImageFile", "Only PNG, JPG and JPEG images are allowed.");
+                    await PopulateViewDataForAdmin();
                     return View(dto);
                 }
 
+                if (!GeneralPurpose.IsValidImageSize(dto.ImageFile))
+                {
+                    ModelState.AddModelError("ImageFile", "File size must be less than 2MB.");
+                    await PopulateViewDataForAdmin();
+                    return View(dto);
+                }
+
+                // Delete old image if it exists
+                if (!string.IsNullOrEmpty(book.FileName))
+                {
+                    await GeneralPurpose.DeleteBookImage(book.Id, book.FileName);
+                }
+
+                // Save new image
                 var fileName = string.IsNullOrWhiteSpace(dto.FileName)
                     ? Path.GetFileName(dto.ImageFile.FileName)
                     : dto.FileName + Path.GetExtension(dto.ImageFile.FileName);
@@ -317,13 +333,17 @@ namespace ECommerceWebsite.Controllers
                 if (!imageSaved)
                 {
                     ModelState.AddModelError("ImageFile", "Failed to save image.");
+                    await PopulateViewDataForAdmin();
                     return View(dto);
                 }
 
-                // Update the image URL
+                // Update image properties
                 book.ImageUrl = GeneralPurpose.GetBookImageUrl(book.Id, fileName);
+                book.Path = filePath;
+                book.FileName = fileName;
             }
 
+            // Update other properties
             book.Title = dto.Title;
             book.Description = dto.Description;
             book.Price = dto.Price;
@@ -331,10 +351,13 @@ namespace ECommerceWebsite.Controllers
             book.AuthorId = dto.AuthorId;
             book.CategoryId = dto.CategoryId;
             book.PublicationDate = dto.PublicationDate;
+            book.UpdatedAt = DateTime.UtcNow;
 
             await _bookRepo.UpdateBookAsync(book);
+            TempData["Success"] = "Book updated successfully!";
             return RedirectToAction("Admin");
         }
+
 
         [HttpPost]
         public async Task<IActionResult> Delete(Guid id)
@@ -418,7 +441,7 @@ namespace ECommerceWebsite.Controllers
 
             return View("Admin", dtos);
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> AddAuthor()
         {
@@ -473,7 +496,7 @@ namespace ECommerceWebsite.Controllers
 
             await PopulateViewDataForAdmin();
             ViewData["IsEditing"] = true;
-            return View("AddAuthor",dto);
+            return View("AddAuthor", dto);
         }
 
         [HttpPost]
@@ -483,8 +506,8 @@ namespace ECommerceWebsite.Controllers
             {
                 ViewData["EmptyFields"] = "Author name cannot be empty!";
                 await PopulateViewDataForAdmin();
-                ViewData["IsEditing"] = true; 
-                return View("AddAuthor", dto); 
+                ViewData["IsEditing"] = true;
+                return View("AddAuthor", dto);
             }
 
             try
@@ -531,7 +554,7 @@ namespace ECommerceWebsite.Controllers
                 }
 
                 await _authorRepo.DeleteAuthor(author);
-                TempData["Success"] = "Author deleted successfully!"; 
+                TempData["Success"] = "Author deleted successfully!";
                 return RedirectToAction("AddAuthor");
             }
             catch (Exception ex)
@@ -542,7 +565,7 @@ namespace ECommerceWebsite.Controllers
         }
 
 
-      //Category CRUD
+        //Category CRUD
 
         [HttpGet]
         public async Task<IActionResult> AddCategory()
