@@ -5,14 +5,20 @@ using System.Security.Claims;
 
 namespace ECommerceWebsite.Models.Enums
 {
-        public class GeneralPurpose
+    public class GeneralPurpose
+    {
+        private readonly HttpContext hcontext;
+        public GeneralPurpose(IHttpContextAccessor haccess)
         {
-            private readonly HttpContext hcontext;
-            public GeneralPurpose(IHttpContextAccessor haccess)
-            {
-                hcontext = haccess.HttpContext;
-            }
+            hcontext = haccess.HttpContext;
+        }
 
+        public static DateTime DateTimeNow()
+        {
+            return DateTime.UtcNow;
+        }
+
+        #region Book Image Operations - CLEANED UP VERSION
         public static void CreateBookDirectory(Guid bookId)
         {
             var rootDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
@@ -32,76 +38,26 @@ namespace ECommerceWebsite.Models.Enums
         {
             return $"/BookImages/book-{bookId}/{fileName}";
         }
-            public static DateTime DateTimeNow()
-            {
-                return DateTime.UtcNow;
-            }
 
-            #region directory creation and file upload
-            public static void CreateBookDirectory(Guid? bookId)
-            {
-                var rootDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                var bookDir = rootDir + "/BookImages" + bookId.ToString() + "/";
+        public static bool IsValidImageExtension(string fileName)
+        {
+            var allowedExtensions = new[] { ".png", ".jpg", ".jpeg" };
+            var ext = Path.GetExtension(fileName).ToLowerInvariant();
+            return allowedExtensions.Contains(ext);
+        }
 
-                if (!Directory.Exists(bookDir))
-                    Directory.CreateDirectory(bookDir);
-            }
+        public static bool IsValidImageSize(IFormFile file, int maxSizeInMB = 2)
+        {
+            var maxSizeInBytes = maxSizeInMB * 1024 * 1024;
+            return file.Length <= maxSizeInBytes;
+        }
 
-            public static bool IsValidImageExtension(string fileName)
-            {
-                var allowedExtensions = new[] { ".png", ".jpg", ".jpeg" };
-                var ext = Path.GetExtension(fileName).ToLowerInvariant();
-                return allowedExtensions.Contains(ext);
-            }
-
-            public static string GetFilePathForSave(string? bookId, string? filePath = "")
-            {
-                var rootDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-                var baseUri = rootDir + $"/BookImages{bookId}/";
-
-                if (string.IsNullOrEmpty(filePath))
-                {
-                    return baseUri;
-                }
-                return baseUri + filePath;
-
-            }
-
-            public static async Task<bool> SaveFile(IFormFile file, string filePath)
-            {
-                try
-                {
-                    var stream = new MemoryStream();
-                    await file.CopyToAsync(stream);
-                    var bytes = stream.ToArray();
-                    stream.Close();
-
-                    await File.WriteAllBytesAsync(filePath, bytes);
-
-                    return true;
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-        public static async Task<bool> DeleteFile(string userId, string filePath)
+        public static async Task<bool> SaveFile(IFormFile file, string filePath)
         {
             try
             {
-                var fileDir = GetFilePathForSave(userId.ToString());
-                if (!string.IsNullOrEmpty(filePath))
-                {
-                    string[] getName = filePath.Split("/");
-
-                    // Check if a book image already exists for the user
-                    string existingBookImagePath = Path.Combine(fileDir, getName.Last());
-                    if (System.IO.File.Exists(existingBookImagePath))
-                    {
-                        // Use Task.Run to perform file deletion asynchronously
-                        await Task.Run(() => System.IO.File.Delete(existingBookImagePath));
-                    }
-                }
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await file.CopyToAsync(stream);
                 return true;
             }
             catch
@@ -109,7 +65,25 @@ namespace ECommerceWebsite.Models.Enums
                 return false;
             }
         }
-            #endregion
 
+        public static async Task<bool> DeleteBookImage(Guid bookId, string fileName)
+        {
+            try
+            {
+                var filePath = GetBookImagePathForSave(bookId, fileName);
+                if (File.Exists(filePath))
+                {
+                    await Task.Run(() => File.Delete(filePath));
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
         }
+        #endregion
+
+    }
 }
