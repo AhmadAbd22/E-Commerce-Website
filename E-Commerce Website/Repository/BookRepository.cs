@@ -38,7 +38,10 @@ namespace ECommerceWebsite.Repository
         Task<IEnumerable<Book>> FilterBooksAsync(Guid? authorId, decimal? minPrice, decimal? maxPrice);
         Task RestoreBookAsync(Guid id);
         Task<PagedResult<Book>> SearchActiveBooksPagedAsync(string searchTerm, int pageNumber, int pageSize);
-        Task<PagedResult<Book>> FilterBooksPagedAsync(Guid? authorId, Guid? categoryId , decimal? minPrice, decimal? maxPrice, int pageNumber, int pageSize);
+        Task<PagedResult<Book>> FilterBooksPagedAsync(Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice, int pageNumber, int pageSize);
+
+        //sorting
+        Task<PagedResult<Book>> SortBooksPagedAsync(string sortBy, string sortOrder, int pageNumber, int pageSize);
     }
 
     public class BookRepository : IBookRepository
@@ -326,6 +329,47 @@ namespace ECommerceWebsite.Repository
             var items = await query.OrderByDescending(b => b.CreatedAt).Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
 
             return new PagedResult<Book> { Items = items, CurrentPage = pageNumber, PageSize = pageSize, TotalCount = totalCount };
+        }
+
+        public async Task<PagedResult<Book>> SortBooksPagedAsync(string sortBy, string sortOrder, int pageNumber, int pageSize)
+        {
+            var query = _context.Books
+                         .Include(b => b.Author)
+                         .Include(b => b.Category)
+                         .Where(b => b.isActive == (int)enumStatus.Active)
+                         .AsQueryable();
+
+            // Apply sorting based on sortBy parameter
+            query = (sortBy?.ToLower(), sortOrder?.ToLower()) switch
+            {
+                ("title", "desc") => query.OrderByDescending(b => b.Title).ThenByDescending(b => b.CreatedAt),
+                ("title", "asc") => query.OrderBy(b => b.Title).ThenByDescending(b => b.CreatedAt),
+
+                ("author", "desc") => query.OrderByDescending(b => b.Author != null ? b.Author.AuthorName : "").ThenByDescending(b => b.CreatedAt),
+                ("author", "asc") => query.OrderBy(b => b.Author != null ? b.Author.AuthorName : "").ThenByDescending(b => b.CreatedAt),
+
+                ("category", "desc") => query.OrderByDescending(b => b.Category != null ? b.Category.CategoryType : "").ThenByDescending(b => b.CreatedAt),
+                ("category", "asc") => query.OrderBy(b => b.Category != null ? b.Category.CategoryType : "").ThenByDescending(b => b.CreatedAt),
+
+                ("price", "desc") => query.OrderByDescending(b => b.Price).ThenByDescending(b => b.CreatedAt),
+                ("price", "asc") => query.OrderBy(b => b.Price).ThenByDescending(b => b.CreatedAt),
+
+                ("date", "desc") => query.OrderByDescending(b => b.CreatedAt),
+                ("date", "asc") => query.OrderBy(b => b.CreatedAt),
+
+                _ => query.OrderByDescending(b => b.CreatedAt) // Default sorting (Latest first)
+            };
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Book>
+            {
+                Items = items,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
         }
     }
 }
