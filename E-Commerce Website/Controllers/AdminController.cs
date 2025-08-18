@@ -7,7 +7,6 @@ using System;
 using System.Threading.Tasks;
 using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Models.Enums;
-using System.Net;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using ECommerceWebsite.Models.Helping_Classes;
@@ -21,29 +20,42 @@ namespace ECommerceWebsite.Controllers
         private readonly IAuthorRepository _authorRepo;
         private readonly ICategoryRepository _categoryRepo;
         private readonly ICartRepository _cartRepo;
+        private readonly Authorization _authorization;
 
-        public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo, ICategoryRepository categoryRepo, ICartRepository cartRepo)
+        public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo,
+                                ICategoryRepository categoryRepo, ICartRepository cartRepo,
+                                Authorization authorization)
         {
             _bookRepo = bookRepo;
             _authorRepo = authorRepo;
             _categoryRepo = categoryRepo;
             _cartRepo = cartRepo;
+            _authorization = authorization;
         }
 
 
         // GET: /Admin
-        public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice, int pageNumber = 1)
+        public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId,
+                                                 decimal? minPrice, decimal? maxPrice,
+                                                 string sortBy, string sortOrder,
+                                                 int pageNumber = 1)
         {
             const int pageSize = 9;
             PagedResult<Book> pagedBooks;
 
+            //priority order for filtering/sorting: Search > Filter > Sort > Default
+
             if (!string.IsNullOrWhiteSpace(search))
             {
-                pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search, pageNumber, pageSize);
+                pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search.Trim(), pageNumber, pageSize);
             }
             else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
             {
                 pagedBooks = await _bookRepo.FilterBooksPagedAsync(authorId, categoryId, minPrice, maxPrice, pageNumber, pageSize);
+            }
+            else if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                pagedBooks = await _bookRepo.SortBooksPagedAsync(sortBy, sortOrder, pageNumber, pageSize);
             }
             else
             {
@@ -74,11 +86,14 @@ namespace ECommerceWebsite.Controllers
             await PopulateViewDataForAdmin();
             await SetCartItemCount();
 
+            // Preserve all filter/sort state
             ViewData["Search"] = search;
             ViewData["AuthorId"] = authorId;
             ViewData["CategoryId"] = categoryId;
             ViewData["MinPrice"] = minPrice;
             ViewData["MaxPrice"] = maxPrice;
+            ViewData["SortBy"] = sortBy;
+            ViewData["SortOrder"] = sortOrder;
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
@@ -703,7 +718,7 @@ namespace ECommerceWebsite.Controllers
         {
             if (User.Identity?.IsAuthenticated == true)
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
                 if (userId != Guid.Empty && _cartRepo != null)
                 {
                     var cartItemCount = await _cartRepo.GetCartItemCountAsync(userId);
@@ -717,37 +732,6 @@ namespace ECommerceWebsite.Controllers
             else
             {
                 ViewBag.CartItemCount = 0;
-            }
-        }
-
-        private Guid GetCurrentUserId()
-        {
-            try
-            {
-                if (!User.Identity?.IsAuthenticated ?? true)
-                {
-                    return Guid.Empty;
-                }
-
-                var userIdClaim = User.FindFirst(ClaimTypes.Sid)
-                               ?? User.FindFirst("EncId")
-                               ?? User.FindFirst(ClaimTypes.NameIdentifier);
-
-                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
-                {
-                    return Guid.Empty;
-                }
-
-                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
-                {
-                    return userId;
-                }
-
-                return Guid.Empty;
-            }
-            catch (Exception)
-            {
-                return Guid.Empty;
             }
         }
     }
