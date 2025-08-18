@@ -4,6 +4,7 @@ using ECommerceWebsite.Models.Context;
 using ECommerceWebsite.Repository;
 using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Services;
+using ECommerceWebsite.Models.Helping_Classes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +40,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
 builder.Services.AddScoped<ICartHistoryRepository, CartHistoryRepository>();
 builder.Services.AddScoped<IOrderServiceRepository, OrderServiceRepository>();
-
+builder.Services.AddScoped<Authorization>();
 
 var app = builder.Build();
 

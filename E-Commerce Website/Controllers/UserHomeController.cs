@@ -28,18 +28,25 @@ namespace ECommerceWebsite.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> UserHome(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice, int pageNumber = 1)
+        public async Task<IActionResult> UserHome(string search, Guid? authorId, Guid? categoryId,
+    decimal? minPrice, decimal? maxPrice, string sortBy, string sortOrder,
+    string viewType = "grid", int pageNumber = 1)
         {
-            const int pageSize = 9;
+            const int pageSize = 12;
             PagedResult<Book> pagedBooks;
 
+            // Priority: Search > Filter > Sort > Default
             if (!string.IsNullOrWhiteSpace(search))
             {
-                pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search, pageNumber, pageSize);
+                pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search.Trim(), pageNumber, pageSize);
             }
             else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
             {
                 pagedBooks = await _bookRepo.FilterBooksPagedAsync(authorId, categoryId, minPrice, maxPrice, pageNumber, pageSize);
+            }
+            else if (!string.IsNullOrWhiteSpace(sortBy))
+            {
+                pagedBooks = await _bookRepo.SortBooksPagedAsync(sortBy, sortOrder, pageNumber, pageSize);
             }
             else
             {
@@ -70,11 +77,14 @@ namespace ECommerceWebsite.Controllers
             await PopulateViewDataForUser();
             await SetCartItemCount();
 
+            // Preserve all filter/sort/view state
             ViewData["Search"] = search;
             ViewData["AuthorId"] = authorId;
             ViewData["CategoryId"] = categoryId;
             ViewData["MinPrice"] = minPrice;
             ViewData["MaxPrice"] = maxPrice;
+            ViewData["SortBy"] = sortBy;
+            ViewData["SortOrder"] = sortOrder;
 
             if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
             {
@@ -151,7 +161,7 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
-    private async Task PopulateViewDataForUser()
+        private async Task PopulateViewDataForUser()
         {
             ViewData["Authors"] = await _authorRepo.GetAllAuthorsAsync();
             ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
