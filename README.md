@@ -39,5 +39,11 @@ An ASP.NET Core MVC-based e-commerce platform made using the [Repository Design 
    ```bash
    git clone https://github.com/AhmadAbd22/E-Commerce-Website.git
 2. Update the connection string in appesetting.json to point your local SQL server instance.
-3. Run the command "Update-Database" in Package Manager Console.
-4. Run the project (Ctrl + F5)
+3. Install the following dependencies from the 'NuGet Package Manager' by navigatin to ``` Tools > NuGet Package Manager > Manage NuGet Packages for Solution ```
+   - Microsoft.EntityFrameworkCore
+   - Microsoft.EntityFrameworkCore.SqlServer
+   - Microsoft.EntityFrameworkCore.Tools
+5. Navigate to ``` Tools > NuGet Package Managet > Package Manager Console ```
+6. Run the command ``` Add-Migration ``` in Package Manager Console.
+7. Run the command ``` Update-Database ``` in Package Manager Console. 
+8. Run the project (Ctrl + F5)
