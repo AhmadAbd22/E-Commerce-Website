@@ -17,58 +17,23 @@ namespace ECommerceWebsite.Controllers
         private readonly IOrderServiceRepository _orderService;
         private readonly IOrderRepository _orderRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
+        private readonly Authorization _authorization;
 
         public CartController(
             ICartRepository cartRepo,
             IBookRepository bookRepo,
             IOrderServiceRepository orderService,
             IOrderRepository orderRepo,
-            IHttpContextAccessor httpContextAccessor) 
+            IHttpContextAccessor httpContextAccessor,
+            Authorization authorization) 
         {
             _cartRepo = cartRepo;
             _bookRepo = bookRepo;
             _orderService = orderService;
             _orderRepo = orderRepo;
             _httpContextAccessor = httpContextAccessor;
+            _authorization = authorization;
         }
-
-        private Guid GetCurrentUserId()
-        {
-            try
-            {
-                if (!User.Identity?.IsAuthenticated ?? true)
-                {
-                    throw new UnauthorizedAccessException("User is not authenticated");
-                }
-
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)
-                               ?? User.FindFirst("UserId")
-                               ?? User.FindFirst("Id")
-                               ?? User.FindFirst(ClaimTypes.Sid);
-
-                if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
-                {
-                    throw new UnauthorizedAccessException("User ID claim not found in authentication token");
-                }
-
-                if (Guid.TryParse(userIdClaim.Value, out Guid userId))
-                {
-                    return userId;
-                }
-
-                throw new UnauthorizedAccessException("Invalid user ID format in authentication token");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                throw new UnauthorizedAccessException("Error retrieving user ID from authentication context", ex);
-            }
-        }
-
 
         private bool IsCurrentUserCustomer()
         {
@@ -81,7 +46,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
 
                 if (!IsCurrentUserCustomer())
                 {
@@ -139,7 +104,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
                 var cartItems = await _cartRepo.GetCartItemsByUserIdAsync(userId);
                 var cartTotal = await _cartRepo.GetCartTotalAsync(userId);
 
@@ -180,7 +145,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
 
                 if (quantity <= 0)
                 {
@@ -223,7 +188,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
 
                 var cartItem = await _cartRepo.GetCartItemByIdAsync(cartItemId);
                 if (cartItem == null)
@@ -259,7 +224,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
                 var cartItems = await _cartRepo.GetCartItemsByUserIdAsync(userId);
 
                 if (!cartItems.Any())
@@ -310,7 +275,7 @@ namespace ECommerceWebsite.Controllers
         {
             if (!ModelState.IsValid)
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
                 var cartItems = await _cartRepo.GetCartItemsByUserIdAsync(userId);
                 var total = await _orderService.CalculateCartTotalAsync(userId);
 
@@ -330,7 +295,7 @@ namespace ECommerceWebsite.Controllers
 
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
 
                 var order = await _orderService.PlaceOrderFromCartAsync(
                     userId,
@@ -366,7 +331,7 @@ namespace ECommerceWebsite.Controllers
         {
             try
             {
-                var userId = GetCurrentUserId();
+                var userId = _authorization.GetCurrentUserId();
 
                 var order = await _orderRepo.GetOrderByIdAsync(orderId);
 
