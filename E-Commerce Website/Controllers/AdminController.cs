@@ -47,19 +47,15 @@ namespace ECommerceWebsite.Controllers
 
             if (!string.IsNullOrWhiteSpace(search))
             {
+                // Search only (no filters or sorting applied to search results)
                 pagedBooks = await _bookRepo.SearchActiveBooksPagedAsync(search.Trim(), pageNumber, pageSize);
-            }
-            else if (authorId.HasValue || categoryId.HasValue || minPrice.HasValue || maxPrice.HasValue)
-            {
-                pagedBooks = await _bookRepo.FilterBooksPagedAsync(authorId, categoryId, minPrice, maxPrice, pageNumber, pageSize);
-            }
-            else if (!string.IsNullOrWhiteSpace(sortBy))
-            {
-                pagedBooks = await _bookRepo.SortBooksPagedAsync(sortBy, sortOrder, pageNumber, pageSize);
             }
             else
             {
-                pagedBooks = await _bookRepo.GetActiveBooksPagedAsync(pageNumber, pageSize);
+                // Combined Filter + Sort (or just filter, or just sort, or default)
+                pagedBooks = await _bookRepo.FilterAndSortBooksPagedAsync(
+                    authorId, categoryId, minPrice, maxPrice,
+                    sortBy, sortOrder, pageNumber, pageSize);
             }
 
             var pagedDto = new PagedResult<BookDto>
