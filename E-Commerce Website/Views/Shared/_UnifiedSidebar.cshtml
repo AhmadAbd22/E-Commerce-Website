@@ -31,10 +31,16 @@
                             <!-- /Toggle Sidebar -->
                             <!-- Admin Navigation -->
                             <li class="navigation-header"><span>Admin Panel</span> <i class="icon-menu" title="Admin"></i></li>
+                            <li class="@(currentAction == "Dashboard" ? "active" : "")">
+                                <a href="@Url.Action("Dashboard", "Admin")"><i class="icon-home4"></i> <span>Insights Dashboard</span></a>
+                            </li>
                             <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">
                                 <a href="@Url.Action("Admin", "Admin")"><i class="icon-home4"></i> <span>Dashboard</span></a>
                             </li>
-
+                            <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">
+                                <a href="@Url.Action("Orders", "Admin")">View Orders</a>
+                            </li>
+                                
                             <li class="navigation-header"><span>Content Management</span> <i class="icon-menu" title="Management"></i></li>
                             <li class="@(currentAction == "Create" ? "active" : "")">
                                 <a href="@Url.Action("Create", "Admin")"><i class="icon-plus3"></i> <span>Add New Book</span></a>
