@@ -1,0 +1,112 @@
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@using ECommerceWebsite.Models.Dtos
+@model PagedResult<AdminOrderViewDto>
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "_AdminLayout";
+
+    var currentStatus = ViewData["CurrentStatus"] as string;
+    var currentSortBy = ViewData["CurrentSortBy"] as string ?? "date_desc";
+}
+
+<!-- Page header consistent with your theme -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-list-ordered position-left"></i> <span class="text-semibold">Admin Panel</span> - Manage Orders</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Dashboard", "Admin")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li class="active">Orders</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Main content area -->
+<div class="content">
+
+    <!-- Filter and Sort Controls -->
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <form id="filter-sort-form" class="form-inline">
+                <div class="form-group">
+                    <label for="status-filter" class="control-label mr-10">Status:</label>
+                    <select id="status-filter" name="status" class="form-control">
+                        <option value="" selected="@(string.IsNullOrEmpty(currentStatus))">All Statuses</option>
+                        <option value="Pending" selected="@(currentStatus == "Pending")">Pending</option>
+                        <option value="Confirmed" selected="@(currentStatus == "Confirmed")">Confirmed</option>
+                        <option value="Shipped" selected="@(currentStatus == "Shipped")">Shipped</option>
+                        <option value="Delivered" selected="@(currentStatus == "Delivered")">Delivered</option>
+                        <option value="Cancelled" selected="@(currentStatus == "Cancelled")">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="form-group ml-20">
+                    <label for="sort-by" class="control-label mr-10">Sort By:</label>
+                    <select id="sort-by" name="sortBy" class="form-control">
+                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Newest First</option>
+                        <option value="date_asc" selected="@(currentSortBy == "date_asc")">Oldest First</option>
+                        <option value="total_desc" selected="@(currentSortBy == "total_desc")">Total (High to Low)</option>
+                        <option value="total_asc" selected="@(currentSortBy == "total_asc")">Total (Low to High)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- This container will be updated by the AJAX calls -->
+    <div id="orders-container">
+        @await Html.PartialAsync("_OrdersListPartial", Model)
+    </div>
+</div>
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function() {
+            // Reusable function to fetch and render the orders partial view
+            function fetchOrders(pageNumber) {
+                // Read the current values from the dropdowns
+                var status = $('#status-filter').val();
+                var sortBy = $('#sort-by').val();
+
+                // Construct the URL with all parameters
+                var url = '@Url.Action("Orders", "Admin")' +
+                    '?pageNumber=' + pageNumber +
+                    '&status=' + encodeURIComponent(status) +
+                    '&sortBy=' + encodeURIComponent(sortBy);
+
+                // Show a loading indicator
+                $('#orders-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4></div>');
+
+                // Perform the AJAX GET request
+                $.get(url, function(data) {
+                    // On success, replace the content of the container with the new partial view
+                    $('#orders-container').html(data);
+                }).fail(function() {
+                    // On failure, show an error message
+                    $('#orders-container').html('<div class="panel panel-body text-center text-danger"><h4>Failed to load orders. Please try again.</h4></div>');
+                });
+            }
+
+            // --- EVENT HANDLERS ---
+
+            // 1. Handle clicks on pagination links using event delegation
+            // This works even for links loaded via AJAX
+            $('#orders-container').on('click', '.pagination a', function(e) {
+                e.preventDefault(); // Prevent the browser from navigating to the link's href
+                var page = $(this).data('page');
+                if (!page) return;
+                fetchOrders(page);
+            });
+
+            // 2. Handle changes in the filter or sort dropdowns
+            $('#status-filter, #sort-by').on('change', function() {
+                // When a filter or sort is changed, always go back to the first page for the best user experience
+                fetchOrders(1);
+            });
+        });
+    </script>
+}
