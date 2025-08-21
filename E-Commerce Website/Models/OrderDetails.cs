@@ -31,6 +31,6 @@ namespace ECommerceWebsite.Models
         [ForeignKey("UserId")]
         public Guid? UserId { get; set; }
         public User? User { get; set; }
-        public ICollection<OrderItem>? OrderItems { get; set; }
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }
