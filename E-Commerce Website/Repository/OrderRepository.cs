@@ -4,6 +4,7 @@ using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Models.Enums;
 using ECommerceWebsite.Models.Helping_Classes;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace ECommerceWebsite.Repository
 {
@@ -22,22 +23,47 @@ namespace ECommerceWebsite.Repository
 
         Task<PagedResult<OrderDetails>> GetOrderPlaced(int pageNumber, int pageSize);
 
-        Task <string?> GetOrderStatus(Guid orderId, Guid userId);
+        Task<string?> GetOrderStatus(Guid orderId, Guid userId);
         Task<string?> UpdateOrderStatus(Guid orderId, Guid userId, string orderStatus);
+
+
+        #region Charts Region
+
+        #region total sales, total orders, pending orders, weekly sales, monthly sales
         Task<int> GetTotalSales();
 
-        //total orders
         Task<int> GetTotalOrders();
 
-        //pending orders
-        Task<int> GetPendingOrders();
 
-        // monthly basis sales
-        Task<decimal> GetMonthlySales();
+        Task<int> GetTotalPendingOrders();
 
-        //weekly basis sales
-        Task<decimal> GetWeeklySales();
-        Task<List<DailySalesDto>> GetWeeklySalesPerDay();
+        Task<decimal> GetTotalMonthlySales();
+        Task<decimal> GetTotalWeeklySales();
+
+        Task<decimal> GetTotalDailySales();
+        #endregion
+
+
+        #region charts by week
+        Task<List<DailySalesDto>> GetWeeklySalesByDay();
+        Task<List<WeeklySalesDto>> GetWeeklySalesByWeek();
+        #endregion
+
+        #region charts by month
+
+        Task<List<MonthlySalesDto>> GetMonthlySalesByDay();
+
+
+        #region charts by year
+
+        Task<List<YearlySalesDto>> GetYearlySalesByMonth();
+        Task<List<YearlySalesDto>> GetYearlySalesByYear();
+
+        #endregion
+        #endregion
+
+        #endregion
+
     }
     public class OrderRepository : IOrderRepository
     {
@@ -84,40 +110,30 @@ namespace ECommerceWebsite.Repository
         }
 
         #region methods for charts
-        public async Task<decimal> GetMonthlySales()
+
+        #region totals
+        public async Task<decimal> GetTotalDailySales()   //status should be delivered and sum the total of each order (repeat for all 'Total' functions
         {
             return await _context.OrderDetails
-                                 .Where(o => o.OrderStatus == "Completed" && o.OrderDate >= DateTime.Now.AddMonths(-1))
+                .Where(o => o.OrderStatus == "Delivered" && o.OrderDate.Date == DateTime.Today)
+                .SumAsync(o => o.TotalAmount);
+        }
+        public async Task<decimal> GetTotalMonthlySales()
+        {
+            return await _context.OrderDetails
+                                 .Where(o => o.OrderStatus == "Delivered" && o.OrderDate >= DateTime.Now.AddMonths(-1))
                                  .SumAsync(o => o.TotalAmount);
         }
-        public async Task<decimal> GetWeeklySales()
+        public async Task<decimal> GetTotalWeeklySales()
         {
             return await _context.OrderDetails
-                                .Where(o => o.OrderStatus == "Completed" && o.OrderDate >= DateTime.Now.AddDays(-7))
+                                .Where(o => o.OrderStatus == "Delivered" && o.OrderDate >= DateTime.Now.AddDays(-7))
                                 .Select(o => (decimal?)o.TotalAmount)
                                 .SumAsync() ?? 0m;
         }
 
-        public async Task<List<DailySalesDto>> GetWeeklySalesPerDay()
-        {
-            var today = DateTime.Today;
-            var sevenDaysAgo = today.AddDays(-6);
 
-            return await _context.OrderDetails
-                .Where(o => o.OrderStatus == "Completed" &&
-                            o.OrderDate.Date >= sevenDaysAgo &&
-                            o.OrderDate.Date <= today)
-                .GroupBy(o => o.OrderDate.Date)
-                .Select(g => new DailySalesDto
-                {
-                    Date = g.Key,
-                    TotalSales = g.Sum(o => o.TotalAmount)
-                })
-                .OrderBy(x => x.Date)
-                .ToListAsync();
-        }
-
-        public async Task<int> GetPendingOrders()
+        public async Task<int> GetTotalPendingOrders()
         {
             return await _context.OrderDetails
                                     .Where(o => o.OrderStatus == "Pending")
@@ -135,6 +151,141 @@ namespace ECommerceWebsite.Repository
             return await _context.OrderDetails
                 .Where(o => o.OrderStatus == "Completed")
                 .SumAsync(o => (int)o.TotalAmount);
+        }
+
+        #endregion
+
+
+        #region weekly 
+
+        public async Task<List<DailySalesDto>> GetWeeklySalesByDay()
+        {
+            var today = DateTime.Today;
+            var sevenDaysAgo = today.AddDays(-6);
+
+            // Generate last 7 days
+            var last7Days = Enumerable.Range(0, 7)
+                .Select(i => today.AddDays(-i))
+                .ToList();
+
+            var sales = await _context.OrderDetails
+                .Where(o => o.OrderStatus == "Completed" &&
+                            o.OrderDate.Date >= sevenDaysAgo &&
+                            o.OrderDate.Date <= today)
+                .GroupBy(o => o.OrderDate.Date)
+                .Select(g => new DailySalesDto
+                {
+                    Date = g.Key,
+                    TotalSales = g.Sum(o => o.TotalAmount)
+                })
+                .ToListAsync();
+
+            // Merge with last 7 days (fill missing with 0). 
+            var result = last7Days
+                .Select(d => new DailySalesDto
+                {
+                    Date = d,
+                    TotalSales = sales.FirstOrDefault(s => s.Date == d)?.TotalSales ?? 0
+                })
+                .OrderBy(x => x.Date)
+                .ToList();
+
+            return result;
+        }
+
+
+        /// <summary>
+        /// This method fetches weekly sales data grouped by ISO week number.
+        /// ISO week follows the ISO-8601 standard, where weeks start on Monday and week 1 is the week with the first Thursday of the year.
+        /// </summary>
+        /// <returns></returns>
+
+        public async Task<List<WeeklySalesDto>> GetWeeklySalesByWeek()
+        {
+            var today = DateTime.Today;
+
+            // Get ISO year & week for the start of the year and today
+            int startYear = ISOWeek.GetYear(new DateTime(today.Year, 1, 1));   //2025 , month (jan) , date (1)
+            int startWeek = ISOWeek.GetWeekOfYear(new DateTime(today.Year, 1, 1));  //ISO week follows ISO-8601 standard (
+            int currentYear = ISOWeek.GetYear(today);
+            int currentWeek = ISOWeek.GetWeekOfYear(today);
+
+
+            //first week start to start from the date when fetching orders.
+
+            var firstWeekStart = ISOWeek.ToDateTime(ISOWeek.GetYear(new DateTime(today.Year, 1, 4)), 1, DayOfWeek.Monday);  //Jan 4 is always in Week 1 
+
+            // The expression will be GetYear (2025,Jan,4   , 1 , DayOfWeek.Monday)  => Monday of ISO week 1), so we'll get 30 Dec, 2024
+
+            // Fetch sales data first
+
+            var orders = await _context.OrderDetails
+                .Where(o => o.OrderStatus == "Delivered" 
+                        && o.OrderDate >= firstWeekStart   // starting from 30 Dec,2024
+                        && o.OrderDate <= today)
+                .Select(o => new { o.OrderDate, o.TotalAmount })
+                .ToListAsync();
+
+            // Group by ISO year + week
+            var groupedSales = orders
+                .GroupBy(o =>
+                {
+                    int isoYear = ISOWeek.GetYear(o.OrderDate);
+                    int isoWeek = ISOWeek.GetWeekOfYear(o.OrderDate);
+                    return new { isoYear, isoWeek };
+                })
+                .ToDictionary(
+                    g => (Year: g.Key.isoYear, Week: g.Key.isoWeek),
+                    g => new { TotalSales = g.Sum(x => x.TotalAmount), OrdersCount = g.Count() }
+                );
+
+            // Generate all weeks from start of year to today
+            var result = new List<WeeklySalesDto>();
+            DateTime cursor = ISOWeek.ToDateTime(startYear, 1, DayOfWeek.Monday);
+
+            while (cursor <= today)
+            {
+                int isoYear = ISOWeek.GetYear(cursor);
+                int isoWeek = ISOWeek.GetWeekOfYear(cursor);
+                DateTime startOfWeek = ISOWeek.ToDateTime(isoYear, isoWeek, DayOfWeek.Monday);
+                DateTime endOfWeek = startOfWeek.AddDays(6);
+
+                result.Add(new WeeklySalesDto
+                {
+                    Year = isoYear,
+                    WeekNumber = isoWeek,
+                    StartDate = startOfWeek,
+                    EndDate = endOfWeek,
+                    TotalSales = groupedSales.ContainsKey((isoYear, isoWeek))
+                                ? groupedSales[(isoYear, isoWeek)].TotalSales
+                                : 0,
+                    OrdersCount = groupedSales.ContainsKey((isoYear, isoWeek))
+                    ? groupedSales[(isoYear, isoWeek)].OrdersCount
+                    : 0
+                });
+
+                cursor = cursor.AddDays(7); // jump to next week
+            }
+
+            return result.OrderBy(r => r.Year).ThenBy(r => r.WeekNumber).ToList();
+        }
+
+
+
+        #endregion
+        public Task<List<MonthlySalesDto>> GetMonthlySalesByDay()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<YearlySalesDto>> GetYearlySalesByMonth()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<YearlySalesDto>> GetYearlySalesByYear()
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
@@ -263,6 +414,8 @@ namespace ECommerceWebsite.Repository
             _context.SaveChangesAsync();
             return getStatus;
         }
+
+
 
         #endregion
     }
