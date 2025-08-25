@@ -702,6 +702,8 @@ namespace ECommerceWebsite.Controllers
         {
             ViewData["Authors"] = await _authorRepo.GetAllAuthorsAsync();
             ViewData["Categories"] = await _categoryRepo.GetAllCategoriesAsync();
+
+            await SetCartItemCount();
         }
 
         public async Task<IActionResult> ClearFilters()
