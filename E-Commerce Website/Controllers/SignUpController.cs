@@ -62,10 +62,10 @@ namespace ECommerceWebsite.Controllers
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
                 Role = (int)enumRole.Customer,
+                IsDeleted = false,
+                isActive = (int)enumStatus.Active,
 
                 //TODO: Uncomment these after chanegs in Singup.cshtml
-                //IsDeleted = false,
-                //isActive = (int)enumStatus.Active,
                 //Address = signupDto.Address,
                 //City = signupDto.City,
                 //Province = signupDto.Province,
