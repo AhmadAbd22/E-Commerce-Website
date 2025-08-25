@@ -10,30 +10,45 @@ using ECommerceWebsite.Models.Enums;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using ECommerceWebsite.Models.Helping_Classes;
+using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ECommerceWebsite.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
+        #region dependencies and constructors
+        /// Dependance Injection
         private readonly IBookRepository _bookRepo;
         private readonly IAuthorRepository _authorRepo;
         private readonly ICategoryRepository _categoryRepo;
+
+        private readonly IOrderRepository _orderRepo;
+        private readonly IUserRepository _userRepo;
         private readonly ICartRepository _cartRepo;
+        
         private readonly Authorization _authorization;
 
         public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo,
                                 ICategoryRepository categoryRepo, ICartRepository cartRepo,
+                                IOrderRepository orderRepo,
+                                IUserRepository userRepo,
                                 Authorization authorization)
         {
             _bookRepo = bookRepo;
             _authorRepo = authorRepo;
             _categoryRepo = categoryRepo;
             _cartRepo = cartRepo;
+            _orderRepo = orderRepo;
+            _userRepo = userRepo;
             _authorization = authorization;
         }
 
+        #endregion
 
+        #region Book Management
         // GET: /Admin
         public async Task<IActionResult> Admin(string search, Guid? authorId, Guid? categoryId,
                                                  decimal? minPrice, decimal? maxPrice,
@@ -42,8 +57,6 @@ namespace ECommerceWebsite.Controllers
         {
             const int pageSize = 9;
             PagedResult<Book> pagedBooks;
-
-            //priority order for filtering/sorting: Search > Filter > Sort > Default
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -80,7 +93,6 @@ namespace ECommerceWebsite.Controllers
             };
 
             await PopulateViewDataForAdmin();
-            await SetCartItemCount();
 
             // Preserve all filter/sort state
             ViewData["Search"] = search;
@@ -99,101 +111,44 @@ namespace ECommerceWebsite.Controllers
             return View(pagedDto);
         }
 
-        [HttpPost]
-        public IActionResult Admin(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice)
-        {
-            return RedirectToAction("Admin", new { search, authorId, categoryId, minPrice, maxPrice });
-        }
 
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
-            try
+            var book = await _bookRepo.GetBookByIdAsync(id);
+            if (book == null)
             {
-                var book = await _bookRepo.GetBookByIdAsync(id);
-                if (book == null)
-                {
-                    TempData["Error"] = "Book not found!";
-                    return RedirectToAction("Admin");
-                }
-
-                await PopulateViewDataForAdmin();
-                await SetCartItemCount();
-
-                var bookDto = new BookDto
-                {
-                    Id = book.Id,
-                    Title = book.Title,
-                    Price = book.Price,
-                    Stock = book.StockQuantity,
-                    Author = book.Author,
-                    Category = book.Category,
-                    ImageUrl = book.ImageUrl,
-                    Description = book.Description,
-                    PublicationDate = book.PublicationDate,
-                    AuthorId = book.AuthorId,
-                    CategoryId = book.CategoryId
-                };
-
-                return View("AdminViewProduct", bookDto);
-            }
-            catch (Exception ex)
-            {
-                TempData["Error"] = "An error occurred while loading the book details.";
+                TempData["Error"] = "Book not found!";
                 return RedirectToAction("Admin");
             }
-        }
-
-
-        // GET
-        public async Task<IActionResult> DeletedBooks()
-        {
-            var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
 
             await PopulateViewDataForAdmin();
-            await SetCartItemCount();
-            ViewData["IsDeletedView"] = true;
 
-            var dtos = deletedBooks.Select(book => new BookDto
+            var bookDto = new BookDto
             {
                 Id = book.Id,
                 Title = book.Title,
-                Description = book.Description,
                 Price = book.Price,
                 Stock = book.StockQuantity,
-                AuthorId = book.AuthorId,
-                CategoryId = book.CategoryId,
-                PublicationDate = book.PublicationDate,
                 Author = book.Author,
                 Category = book.Category,
-                ImageUrl = book.ImageUrl
-            }).ToList();
+                ImageUrl = book.ImageUrl,
+                Description = book.Description,
+                PublicationDate = book.PublicationDate,
+                AuthorId = book.AuthorId,
+                CategoryId = book.CategoryId
+            };
 
-            return View(dtos);
+            return View("AdminViewProduct", bookDto);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> RestoreBook(Guid id)
-        {
-            try
-            {
-                await _bookRepo.RestoreBookAsync(id);
-                TempData["Success"] = "Book restored successfully!";
-                return RedirectToAction("DeletedBooks");
-            }
-            catch (Exception)
-            {
-                TempData["Error"] = "Error restoring book.";
-                return RedirectToAction("DeletedBooks");
-            }
-        }
 
-        // GET
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             var categories = await _categoryRepo.GetAllCategoriesAsync();
             var authors = await _authorRepo.GetAllAuthorsAsync();
+
             await SetCartItemCount();
 
             var dto = new BookDto
@@ -376,14 +331,16 @@ namespace ECommerceWebsite.Controllers
             return RedirectToAction("Admin");
         }
 
-        // GET
-        public async Task<IActionResult> Search(string term)
-        {
-            var books = await _bookRepo.SearchActiveBooksAsync(term);
-            await PopulateViewDataForAdmin();
-            ViewData["IsDeletedView"] = false;
 
-            var dtos = books.Select(book => new BookDto
+        public async Task<IActionResult> DeletedBooks()
+        {
+            var deletedBooks = await _bookRepo.GetDeletedBooksAsync();
+
+            await PopulateViewDataForAdmin();
+
+            ViewData["IsDeletedView"] = true;
+
+            var dtos = deletedBooks.Select(book => new BookDto
             {
                 Id = book.Id,
                 Title = book.Title,
@@ -398,65 +355,102 @@ namespace ECommerceWebsite.Controllers
                 ImageUrl = book.ImageUrl
             }).ToList();
 
-            return View("Admin", dtos);
+            return View(dtos);
         }
 
-        // GET
-        public async Task<IActionResult> FilterByAuthor(Guid authorId)
+        [HttpPost]
+        public async Task<IActionResult> RestoreBook(Guid id)
         {
-            var books = await _bookRepo.GetBooksByAuthorAsync(authorId);
-
-            await PopulateViewDataForAdmin();
-            ViewData["IsDeletedView"] = false;
-
-            var dtos = books.Select(book => new BookDto
+            try
             {
-                Id = book.Id,
-                Title = book.Title,
-                Description = book.Description,
-                Price = book.Price,
-                Stock = book.StockQuantity,
-                AuthorId = book.AuthorId,
-                CategoryId = book.CategoryId,
-                PublicationDate = book.PublicationDate,
-                Author = book.Author,
-                Category = book.Category,
-                ImageUrl = book.ImageUrl
+                await _bookRepo.RestoreBookAsync(id);
+                TempData["Success"] = "Book restored successfully!";
+                return RedirectToAction("DeletedBooks");
+            }
+            catch (Exception)
+            {
+                TempData["Error"] = "Error restoring book.";
+                return RedirectToAction("DeletedBooks");
+            }
+        }
+        #endregion
+
+
+        #region Dashboard and Analytics
+        public async Task<IActionResult> Dashboard()
+        {
+            var totalSales = await _orderRepo.GetTotalSales();
+            var pendingOrders = await _orderRepo.GetTotalPendingOrders();
+            var completedOrders = await _orderRepo.GetTotalCompletedOrders();
+            var cancelledOrders = await _orderRepo.GetTotalCancelledOrders();
+            var activeUsers = await _userRepo.GetTotalUsers();
+
+            // Populate the strongly-typed DTO directly
+            var dashboardDto = new DashboardDto
+            {
+                TotalSales = totalSales,
+                PendingOrders = pendingOrders,
+                CompletedOrders = completedOrders,
+                CancelledOrders = cancelledOrders,
+                ActiveCustomers = activeUsers
+            };
+
+            return View(dashboardDto);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetWeeklySalesByWeekData()
+        {
+            var weeklySales = await _orderRepo.GetWeeklySalesByWeek();
+
+            var chartData = new ChartDataDto
+            {
+                Labels = weeklySales.Select(w => $"Week {w.WeekNumber} ({w.StartDate:yyyy-MMM-dd})").ToList(),
+                Values = weeklySales.Select(w => w.TotalSales).ToList()
+            };
+
+            return Json(chartData);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWeeklySalesByDayData(int isoYear, int isoWeek)
+        {
+            var dailySales = await _orderRepo.GetWeeklySalesByDay(isoYear, isoWeek);
+
+            var chartData = new ChartDataDto
+            {
+                Labels = dailySales.Select(d => d.Date.ToString("yyyy-MMM-dd")).ToList(),
+                Values = dailySales.Select(d => d.TotalSales).ToList()
+            };
+
+            return Json(chartData);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableWeeks()
+        {
+            var weeks = await _orderRepo.GetWeeklySalesByWeek();
+
+            var weekList = weeks.Select(w => new
+            {
+                Year = w.Year,
+                Week = w.WeekNumber,
+                Label = $"Week {w.WeekNumber} ({w.StartDate:MMM dd} - {w.EndDate:MMM dd})"
             }).ToList();
 
-            return View("Admin", dtos);
+            return Json(weekList);
         }
 
-        // GET
-        public async Task<IActionResult> FilterByCategory(Guid categoryId)
-        {
-            var books = await _bookRepo.GetBooksByCategoryAsync(categoryId);
-            await PopulateViewDataForAdmin();
-            ViewData["IsDeletedView"] = false;
+        #endregion
 
-            var dtos = books.Select(book => new BookDto
-            {
-                Id = book.Id,
-                Title = book.Title,
-                Description = book.Description,
-                Price = book.Price,
-                Stock = book.StockQuantity,
-                AuthorId = book.AuthorId,
-                CategoryId = book.CategoryId,
-                PublicationDate = book.PublicationDate,
-                Author = book.Author,
-                Category = book.Category,
-                ImageUrl = book.ImageUrl
-            }).ToList();
 
-            return View("Admin", dtos);
-        }
-
+        #region Author and Category Management
         [HttpGet]
         public async Task<IActionResult> AddAuthor()
         {
             await PopulateViewDataForAdmin();
-            await SetCartItemCount();
+
             return View();
         }
 
@@ -694,9 +688,87 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
+#endregion
 
-        //Populating data for aviwews
 
+        #region Order Management
+        [HttpGet]
+        public async Task<IActionResult> Orders(int pageNumber = 1, string? status = null, string? sortBy = null)
+        {
+            const int pageSize = 10;
+            var pagedOrders = await _orderRepo.GetAllOrdersPaged(pageNumber, pageSize, status, sortBy);
+
+            ViewData["CurrentStatus"] = status;
+            ViewData["CurrentSortBy"] = sortBy;
+
+            var orderDtos = pagedOrders.Items.Select(o => new AdminOrderViewDto
+            {
+                OrderId = o.Id,
+                OrderDate = o.OrderDate,
+                OrderStatus = o.OrderStatus,
+                UserFullName = (o.User != null) ? $"{o.User.FirstName} {o.User.LastName}" : "N/A",
+                ShippingAddress = o.ShippingAddress,
+                City = o.City,
+                PhoneNumber = o.PhoneNumber,
+                TotalAmount = o.TotalAmount,
+                TotalQuantity = o.OrderItems?.Sum(i => i.Quantity) ?? 0,
+                OrderItems = o.OrderItems?.Select(oi => new AdminOrderItemDto
+                {
+                    BookTitle = oi.Book?.Title ?? "Book Deleted",
+                    Quantity = oi.Quantity,
+                    UnitPrice = oi.UnitPrice
+                }).ToList() ?? new List<AdminOrderItemDto>()
+            }).ToList();
+
+            var pagedResultDto = new PagedResult<AdminOrderViewDto>
+            {
+                Items = orderDtos,
+                CurrentPage = pagedOrders.CurrentPage,
+                PageSize = pagedOrders.PageSize,
+                TotalCount = pagedOrders.TotalCount
+            };
+
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            {
+                return PartialView("_OrdersListPartial", pagedResultDto);
+            }
+
+            return View(pagedResultDto);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateOrderStatus(Guid orderId, string status)
+        {
+            if (orderId == Guid.Empty || string.IsNullOrEmpty(status))
+            {
+                TempData["Error"] = "Invalid order data.";
+                return RedirectToAction("Orders");
+            }
+
+            var order = await _orderRepo.GetOrderByIdAsync(orderId);
+            if (order == null)
+            {
+                TempData["Error"] = "Order not found.";
+                return RedirectToAction("Orders");
+            }
+
+            // You could add more validation here to ensure 'status' is a valid value
+            order.OrderStatus = status;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            await _orderRepo.UpdateOrderAsync(order);
+
+            TempData["Success"] = $"Order status has been updated to '{status}'.";
+            return RedirectToAction("Orders");
+        }
+
+        #endregion
+
+
+
+        #region Helper Methods
+
+        //Populating data for views
         private async Task PopulateViewDataForAdmin()
         {
             ViewData["Authors"] = await _authorRepo.GetAllAuthorsAsync();
@@ -705,10 +777,6 @@ namespace ECommerceWebsite.Controllers
             await SetCartItemCount();
         }
 
-        public async Task<IActionResult> ClearFilters()
-        {
-            return RedirectToAction("Admin");
-        }
 
 
         private async Task SetCartItemCount()
@@ -731,5 +799,7 @@ namespace ECommerceWebsite.Controllers
                 ViewBag.CartItemCount = 0;
             }
         }
+
+        #endregion
     }
 }
