@@ -383,6 +383,59 @@ namespace ECommerceWebsite.Controllers
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CancelOrder(Guid orderId)
+        {
+            if (orderId == Guid.Empty)
+            {
+                TempData["Error"] = "Invalid Order ID.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            var userId = _authorization.GetCurrentUserId();
+            var order = await _orderRepo.GetOrderByIdAsync(orderId);
+
+            //validation checks
+            if (order == null)
+            {
+                TempData["Error"] = "Order not found.";
+                return RedirectToAction("OrderHistory");
+            }
+            if (order.UserId != userId)
+            {
+                TempData["Error"] = "You are not authorized to cancel this order.";
+                return RedirectToAction("OrderHistory");
+            }
+            if (order.OrderStatus != "Pending" && order.OrderStatus != "Confirmed")
+            {
+                TempData["Error"] = "This order cannot be cancelled as it has already been processed or shipped.";
+                return RedirectToAction("OrderHistory");
+            }
+
+            // Update status to "Cancelled"
+            order.OrderStatus = "Cancelled";
+            order.UpdatedAt = DateTime.UtcNow;
+
+            // Replenish stock
+            if (order.OrderItems != null)
+            {
+                foreach (var item in order.OrderItems)
+                {
+                    if (item.Book != null)
+                    {
+                        item.Book.StockQuantity += item.Quantity;
+                        await _bookRepo.UpdateBookAsync(item.Book);
+                    }
+                }
+            }
+
+            await _orderRepo.UpdateOrderAsync(order);
+
+            TempData["Success"] = "Your order has been successfully cancelled.";
+            return RedirectToAction("OrderHistory");
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> OrderHistory()
         {
