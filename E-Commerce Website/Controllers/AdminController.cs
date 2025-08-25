@@ -105,7 +105,6 @@ namespace ECommerceWebsite.Controllers
             return RedirectToAction("Admin", new { search, authorId, categoryId, minPrice, maxPrice });
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Details(Guid id)
         {
