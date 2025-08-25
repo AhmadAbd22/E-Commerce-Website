@@ -17,7 +17,9 @@ namespace ECommerceWebsite.Controllers
         private readonly ICartRepository _cartRepo;
         private readonly Authorization _authorization;
 
-        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, IAuthorRepository authorRepo, ICartRepository cartRepo, Authorization authorization)
+        public UserHomeController(IBookRepository bookRepo, ICategoryRepository categoryRepo, 
+                                IAuthorRepository authorRepo, ICartRepository cartRepo,
+                                Authorization authorization)
         {
             _bookRepo = bookRepo;
             _categoryRepo = categoryRepo;
