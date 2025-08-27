@@ -32,13 +32,13 @@
                             <!-- Admin Navigation -->
                             <li class="navigation-header"><span>Admin Panel</span> <i class="icon-menu" title="Admin"></i></li>
                             <li class="@(currentAction == "Dashboard" ? "active" : "")">
-                                <a href="@Url.Action("Dashboard", "Admin")"><i class="icon-home4"></i> <span>Insights Dashboard</span></a>
+                                <a href="@Url.Action("Dashboard", "Admin")"><i class="glyphicon glyphicon-dashboard"></i> <span>Dashboard</span></a>
                             </li>
                             <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">
-                                <a href="@Url.Action("Admin", "Admin")"><i class="icon-home4"></i> <span>Dashboard</span></a>
+                                <a href="@Url.Action("Admin", "Admin")"><i class="icon-home4"></i> <span>Home</span></a>
                             </li>
                             <li class="@(currentAction == "Admin" && !isDeletedView ? "active" : "")">
-                                <a href="@Url.Action("Orders", "Admin")">View Orders</a>
+                                <a href="@Url.Action("Orders", "Admin")"><i class="icon-cart2"></i><span>View Orders</span></a>
                             </li>
                                 
                             <li class="navigation-header"><span>Content Management</span> <i class="icon-menu" title="Management"></i></li>

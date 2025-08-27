@@ -20,11 +20,11 @@
             @await Html.PartialAsync("_BookCardPartial", book)
         }
     }
-    <!-- div added to render the -->
-    <div class="row"> 
-        <div class="col-xs-12">
-            @await Html.PartialAsync("_PaginationPartial", Model)
-        </div>
+</div>
+
+<div class="panel panel-flat">
+    <div class="panel-footer" ">
+    @await Html.PartialAsync("_PaginationPartial", Model)
     </div>
 </div>
 
@@ -106,7 +106,6 @@
             border-color: #ddd;
         }
 
-        /* Make pagination more prominent */
         .pagination > li > a {
             min-width: 45px;
             text-align: center;
