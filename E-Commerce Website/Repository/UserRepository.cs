@@ -91,8 +91,7 @@ namespace ECommerceWebsite.Repository
         public async Task<int> GetTotalUsers()
         {
             return await _context.Users
-                            .Where(u => u.Role != (int)enumRole.Admin && u.isActive == (int)enumStatus.Active)
-                            .CountAsync();
+                            .CountAsync(u => u.Role != (int)enumRole.Admin && u.isActive == (int)enumStatus.Active);
         }
     }
 }
