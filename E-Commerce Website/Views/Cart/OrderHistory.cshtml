@@ -1,4 +1,5 @@
-﻿@model OrderHistoryDto
+﻿@using ECommerceWebsite.Models.Dtos
+@model OrderHistoryDto
 @{
     ViewData["Title"] = "Order History";
     Layout = "_UserLayout";
@@ -105,7 +106,7 @@
                     <div class="col-md-8">
                         <h6 class="panel-title">
                             <i class="icon-bag position-left"></i>
-                            Order #@order.OrderId.ToString().Substring(0, 8)
+                            Order #@order.OrderId.ToString().Substring(0, 8).ToUpper()
                             <span class="label label-@order.StatusColor">
                                 <i class="@order.StatusIcon position-left"></i>
                                 @order.OrderStatus
@@ -137,7 +138,6 @@
                         @if (order.EstimatedDeliveryDate.HasValue)
                         {
                             <strong>Estimated Delivery:</strong>
-
                             <br>
                             @order.EstimatedDeliveryDate.Value.ToString("MMM dd, yyyy")
                         }
@@ -162,11 +162,13 @@
                                     <td>
                                         <div class="media">
                                             <div class="media-left">
-                                                <img src="@item.ImageUrl" alt="@item.BookTitle" class="img-rounded" style="width: 50px; height: 60px;">
+                                                <!-- Added a fallback image -->
+                                                <img src="@(item.ImageUrl ?? "/images/default_book.png")" alt="@item.BookTitle" class="img-rounded" style="width: 50px; height: 60px;">
                                             </div>
                                             <div class="media-body">
                                                 <h6 class="media-heading">
-                                                    <a href="@Url.Action("ViewProduct", "Product", new { id = item.BookId })">@item.BookTitle</a>
+                                                    <!-- Link to book details page -->
+                                                    <a href="@Url.Action("Details", "UserHome", new { id = item.BookId })">@item.BookTitle</a>
                                                 </h6>
                                                 <span class="text-muted text-size-small">by @item.AuthorName</span>
                                             </div>
@@ -184,31 +186,41 @@
                 </div>
 
                 <!-- Order Actions -->
-                <div class="text-right">
+                <div class="text-right mt-10">
                     <a href="@Url.Action("OrderConfirmation", "Cart", new { orderId = order.OrderId })" class="btn btn-default">
                         <i class="icon-eye position-left"></i> View Details
                     </a>
-                    @if (order.OrderStatus.ToLower() == "pending")
+
+        
+                    <!-- Conditionally show Cancel Order button. Button won't show if the order has been shipped -->
+                    @if (order.OrderStatus.ToLower() == "pending" || order.OrderStatus.ToLower() == "confirmed")
                     {
-                        <button type="button" class="btn btn-danger" onclick="cancelOrder('@order.OrderId')">
-                            <i class="icon-cross2 position-left"></i> Cancel Order
-                        </button>
-                    }
-                    @if (order.OrderStatus.ToLower() == "delivered")
-                    {
-                        <button type="button" class="btn btn-success" disabled>
-                            <i class="icon-checkmark3 position-left"></i> Order Complete
-                        </button>
+                        <!-- Use a form for the POST action -->
+                        <form action="@Url.Action("CancelOrder","Cart")" method="post" onsubmit="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');" style="display: inline-block; margin-left: 5px;">
+                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                            <button type="submit" class="btn btn-danger">
+                                <i class="icon-cross2 position-left"></i> Cancel Order
+                            </button>
+                        </form>
                     }
                 </div>
             </div>
         </div>
- }
+    }
+
+    @if (!Model.Orders.Any())
+    {
+        <div class="panel panel-body text-center">
+            <i class="icon-cart-remove icon-3x text-muted"></i>
+            <h5 class="text-semibold mt-15">You haven't placed any orders yet.</h5>
+            <p class="text-muted mb-15">Browse our collection and find your next favorite book!</p>
+        </div>
+    }
 
     <!-- Back to Shopping Button -->
-    <div class="text-center">
+    <div class="text-center mt-20">
         <a href="@Url.Action("UserHome", "UserHome")" class="btn btn-primary btn-lg">
-            <i class="icon-cart-add position-left"></i> Continue Shopping
+            <i class="icon-arrow-left13 position-left"></i> Continue Shopping
         </a>
     </div>
 
@@ -216,24 +228,14 @@
 <!-- /content area -->
 @section Scripts {
     <script>
-        function cancelOrder(orderId) {
-            if (confirm('Are you sure you want to cancel this order?')) {
-                // Implement cancel order functionality
-                $.post('@Url.Action("CancelOrder", "Cart")', { orderId: orderId })
-                    .done(function(response) {
-                        location.reload();
-                    })
-                    .fail(function() {
-                        alert('Error cancelling order. Please try again.');
-                    });
-            }
-        }
-
         // Auto-hide alerts after 5 seconds
         $(document).ready(function() {
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
+            // Check if an alert exists
+            if($('.alert').length > 0) {
+                setTimeout(function() {
+                    $('.alert').fadeOut('slow');
+                }, 5000); // 5000 milliseconds = 5 seconds
+            }
         });
     </script>
 }
@@ -241,7 +243,7 @@
 @section Styles {
     <style>
         .has-bg-image {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgdmlld0JveD0iMCAwIDIwMCAyMDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImEiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMSkiLz48Y2lyY2xlIGN4PSIyMCIgY3k9IjIwIiByPSIxMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2EpIi8+PC9zdmc+');
+            background-size: cover;
         }
 
         .media img {
@@ -250,16 +252,18 @@
 
         .badge-flat {
             border-radius: 0;
+            font-weight: 500;
         }
 
         .panel-heading .row {
             margin: 0;
+            align-items: center;
         }
 
         .label {
             font-size: 11px;
-            padding: 3px 7px;
+            padding: 4px 8px;
+            vertical-align: middle;
         }
     </style>
 }
-

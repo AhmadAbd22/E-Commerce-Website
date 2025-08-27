@@ -1,0 +1,104 @@
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@using ECommerceWebsite.Models.Dtos
+@model PagedResult<AdminOrderViewDto>
+@{
+    ViewData["Title"] = "Manage Orders";
+    Layout = "_AdminLayout";
+
+    var currentStatus = ViewData["CurrentStatus"] as string;
+    var currentSortBy = ViewData["CurrentSortBy"] as string ?? "date_desc";
+}
+
+<!-- Page header consistent with your theme -->
+<div class="page-header page-header-default">
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-list-ordered position-left"></i> <span class="text-semibold">Admin Panel</span> - Manage Orders</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Dashboard", "Admin")"><i class="icon-home2 position-left"></i> Home</a></li>
+            <li class="active">Orders</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Main content area -->
+<div class="content">
+
+    <!-- Filter and Sort Controls -->
+    <div class="panel panel-flat">
+        <div class="panel-body">
+            <form id="filter-sort-form" class="form-inline">
+                <div class="form-group">
+                    <label for="status-filter" class="control-label mr-10">Status:</label>
+                    <select id="status-filter" name="status" class="form-control">
+                        <option value="" selected="@(string.IsNullOrEmpty(currentStatus))">All Statuses</option>
+                        <option value="Pending" selected="@(currentStatus == "Pending")">Pending</option>
+                        <option value="Confirmed" selected="@(currentStatus == "Confirmed")">Confirmed</option>
+                        <option value="Shipped" selected="@(currentStatus == "Shipped")">Shipped</option>
+                        <option value="Delivered" selected="@(currentStatus == "Delivered")">Delivered</option>
+                        <option value="Cancelled" selected="@(currentStatus == "Cancelled")">Cancelled</option>
+                    </select>
+                </div>
+
+                <div class="form-group ml-20">
+                    <label for="sort-by" class="control-label mr-10">Sort By:</label>
+                    <select id="sort-by" name="sortBy" class="form-control">
+                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Newest First</option>
+                        <option value="date_asc" selected="@(currentSortBy == "date_asc")">Oldest First</option>
+                        <option value="total_desc" selected="@(currentSortBy == "total_desc")">Total (High to Low)</option>
+                        <option value="total_asc" selected="@(currentSortBy == "total_asc")">Total (Low to High)</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    <div class="orders-container">
+        @await Html.PartialAsync("_OrdersListPartial", Model)
+    </div>
+
+
+@section Scripts {
+    <script type="text-javascript">
+        $(function() {
+            function fetchOrders(pageNumber) {
+                var status = $('#status-filter').val();
+                var sortBy = $('#sort-by').val();
+                var pageSize = $('#orders-container #page-size-selector').val() || 10;  // Read the page size from the dropdown inside the container. Default to 10.
+
+                // Add the new pageSize parameter to the request.
+                var url = '@Url.Action("Orders", "Admin")' +
+                    '?pageNumber=' + pageNumber +
+                    '&pageSize=' + pageSize +
+                    '&status=' + encodeURIComponent(status) +
+                    '&sortBy=' + encodeURIComponent(sortBy);
+
+                    $('#orders-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4></div>');
+
+                $.get(url, function(data) {
+                    $('#orders-container').html(data);
+                    $('#orders-container .bootstrap-select').selectpicker();
+                });
+            }
+
+            // --- EVENT HANDLERS ---
+
+            $('.content').on('click', '#orders-container .pagination a', function(e) {
+                 e.preventDefault();
+                var page = $(this).data('page');
+                if (page) fetchOrders(page);
+            });
+
+            $('#status-filter, #sort-by').on('change', function() {
+                fetchOrders(1);
+            });
+
+            $('#orders-container').on('change', '#page-size-selector', function() {
+                fetchOrders(1);
+            });
+        });
+    </script>
+}

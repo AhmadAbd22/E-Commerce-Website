@@ -199,6 +199,7 @@
                 var minPrice = $('#min-price-filter').val();
                 var maxPrice = $('#max-price-filter').val();
                 var sortValues = getCurrentSortValues();
+                var pageSize = $('#admin-book-container #page-size-selector').val() || 9;
 
                 // Validate price inputs before making request
                 if (minPrice && parseFloat(minPrice) < 0) {
@@ -212,6 +213,7 @@
 
                 var url = '@Url.Action("Admin", "Admin")' +
                     '?pageNumber=' + pageNumber +
+                    '&pageSize=' + pageSize +
                     '&search=' + encodeURIComponent(search) +
                     '&authorId=' + encodeURIComponent(authorId) +
                     '&categoryId=' + encodeURIComponent(categoryId) +
@@ -319,6 +321,10 @@
             $('#filter-form').on('submit', function(e) {
                 e.preventDefault();
                 fetchAdminPage(1);
+            });
+
+             $('#admin-book-container').on('change', '#page-size-selector', function() {
+                fetchAdminPage(1); 
             });
         });
     </script>

@@ -1,6 +1,20 @@
 ﻿namespace ECommerceWebsite.Models.Helping_Classes
 {
-    public class PagedResult<T>
+
+    public interface IPagedResult
+    {
+        int CurrentPage { get; }
+        int PageSize { get; }
+        int TotalCount { get; }
+        int TotalPages { get; }
+        bool HasPreviousPage { get; }
+        bool HasNextPage { get; }
+        int StartItem { get; }
+        int EndItem { get; }
+    }
+
+
+    public class PagedResult<T> : IPagedResult
     {
         public List<T> Items { get; set; }
         public int CurrentPage { get; set; }

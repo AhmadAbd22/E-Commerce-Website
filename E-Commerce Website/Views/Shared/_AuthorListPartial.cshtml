@@ -1,0 +1,50 @@
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@model PagedResult<Author>
+
+<div class="table-responsive border-top-lg border-top-primary">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Author Name</th>
+                <th class="text-center" style="width: 100px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Items.Any())
+            {
+                <tr>
+                    <td colspan="2" class="text-center text-muted">No authors found.</td>
+                </tr>
+            }
+            @foreach (var author in Model.Items)
+            {
+                <tr>
+                    <td>@author.AuthorName</td>
+                    <td class="text-center">
+                        <ul class="icons-list">
+                            <li class="text-primary-600">
+                                <a href="@Url.Action("EditAuthor", "Admin", new { id = author.Id })" data-popup="tooltip" title="Edit">
+                                    <i class="icon-pencil7"></i>
+                                </a>
+                            </li>
+                            <li class="text-danger-600">
+                                <form action="@Url.Action("RemoveAuthor", "Admin")" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this author? This cannot be undone.');">
+                                    <input type="hidden" name="authorId" value="@author.Id" />
+                                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;" data-popup="tooltip" title="Delete">
+                                        <i class="icon-trash"></i>
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="panel panel-flat">
+    <div class="panel-footer" style="margin-top:20px">
+        @await Html.PartialAsync("_PaginationPartial", Model)
+    </div>
+</div>

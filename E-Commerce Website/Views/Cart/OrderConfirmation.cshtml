@@ -3,6 +3,32 @@
 @{
     ViewData["Title"] = "Order Confirmation";
     Layout = "_UserLayout";
+
+
+    string processingClass = "";
+    string shippedClass = "";
+    string deliveredClass = "";
+    bool isCancelled = false;
+
+    switch (Model.OrderStatus?.ToLower())
+    {
+        case "pending":
+        case "confirmed":
+            processingClass = "active";
+            break;
+        case "shipped":
+            processingClass = "completed";
+            shippedClass = "active";
+            break;
+        case "delivered":
+            processingClass = "completed";
+            shippedClass = "completed";
+            deliveredClass = "completed"; 
+            break;
+        case "cancelled":
+            isCancelled = true;
+            break;
+    }
 }
 
 <!-- Page header -->
@@ -133,31 +159,49 @@
                 </div>
             </div>
 
-            <!-- Next Steps -->
             <div class="panel panel-flat">
                 <div class="panel-heading">
                     <h5 class="panel-title">What's Next?</h5>
                 </div>
                 <div class="panel-body">
                     <div class="step-basic">
-                        <ul class="list-unstyled">
-                            <li class="completed">
-                                <span class="step">1</span>
-                                <span class="step-content">Order Placed</span>
-                            </li>
-                            <li class="active">
-                                <span class="step">2</span>
-                                <span class="step-content">Processing</span>
-                            </li>
-                            <li>
-                                <span class="step">3</span>
-                                <span class="step-content">Shipped</span>
-                            </li>
-                            <li>
-                                <span class="step">4</span>
-                                <span class="step-content">Delivered</span>
-                            </li>
-                        </ul>
+
+                        @if (isCancelled)
+                        {
+                            <!-- Special tracker for Cancelled orders -->
+                            <ul class="list-unstyled">
+                                <li class="completed">
+                                    <span class="step"><i class="icon-check"></i></span>
+                                    <span class="step-content">Order Placed</span>
+                                </li>
+                                <li class="step-cancelled">
+                                    <span class="step"><i class="icon-cross2"></i></span>
+                                    <span class="step-content">Order Cancelled</span>
+                                </li>
+                            </ul>
+                        }
+                        else
+                        {
+                            <!-- Standard tracker for active/completed orders -->
+                            <ul class="list-unstyled">
+                                <li class="completed">
+                                    <span class="step">1</span>
+                                    <span class="step-content">Order Placed</span>
+                                </li>
+                                <li class="@processingClass">
+                                    <span class="step">2</span>
+                                    <span class="step-content">Processing</span>
+                                </li>
+                                <li class="@shippedClass">
+                                    <span class="step">3</span>
+                                    <span class="step-content">Shipped</span>
+                                </li>
+                                <li class="@deliveredClass">
+                                    <span class="step">4</span>
+                                    <span class="step-content">Delivered</span>
+                                </li>
+                            </ul>
+                        }
                     </div>
 
                     <div class="mt-20">
@@ -207,6 +251,11 @@
             color: white;
         }
 
+        .step-basic .step-cancelled .step {
+            background: #F44336;
+            color: white;
+        }
+        /* Style for the cancelled step */
         .step-basic li {
             margin-bottom: 15px;
             position: relative;

@@ -1,0 +1,221 @@
+﻿@model ECommerceWebsite.Models.Dtos.DashboardDto
+@{
+    ViewData["Title"] = "Admin Dashboard";
+    Layout = "_AdminLayout";
+}
+
+<div class="content">
+
+    <!-- KPI Cards / Widgets -->
+    <div class="row">
+        <div class="col-lg-3 col-sm-6">
+            <div class="panel panel-body bg-blue-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-body">
+                        <h3 class="no-margin">Rs. @Model.TotalSales.ToString("N0")</h3>
+                        <span class="text-uppercase text-size-mini">Total Sales</span>
+                    </div>
+                    <div class="media-right media-middle">
+                        <i class="icon-cash3 icon-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="panel panel-body bg-danger-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-body">
+                        <h3 class="no-margin">@Model.PendingOrders</h3>
+                        <span class="text-uppercase text-size-mini">Pending Orders</span>
+                    </div>
+                    <div class="media-right media-middle">
+                        <i class="icon-hour-glass2 icon-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="panel panel-body bg-success-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-body">
+                        <h3 class="no-margin">@Model.CompletedOrders</h3>
+                        <span class="text-uppercase text-size-mini">Completed Orders</span>
+                    </div>
+                    <div class="media-right media-middle">
+                        <i class="icon-checkmark4 icon-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-sm-6">
+            <div class="panel panel-body bg-indigo-400 has-bg-image">
+                <div class="media no-margin">
+                    <div class="media-body">
+                        <h3 class="no-margin">@Model.ActiveCustomers</h3>
+                        <span class="text-uppercase text-size-mini">Active Customers</span>
+                    </div>
+                    <div class="media-right media-middle">
+                        <i class="icon-users4 icon-3x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weekly Sales Chart with Arrow Navigation -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Weekly Sales Performance (By Day)</h5>
+                    <div class="heading-elements">
+                        <div class="btn-group">
+                            <button type="button" id="prevWeekBtn" class="btn btn-default btn-icon"><i class="icon-chevron-left"></i></button>
+                            <button type="button" class="btn btn-default" id="currentWeekLabel" style="width: 220px;">Loading...</button>
+                            <button type="button" id="nextWeekBtn" class="btn btn-default btn-icon"><i class="icon-chevron-left"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div id="weeklySalesByDayChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bar and Donut Chart Row -->
+    <div class="row">
+        <!-- Sales by Week Bar Chart -->
+        <div class="col-md-8">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Sales by Week (This Year)</h5>
+                </div>
+                <div class="panel-body">
+                    <div id="weeklySalesByWeekChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status Donut Chart -->
+        <div class="col-md-4">
+            <div class="panel panel-flat">
+                <div class="panel-heading">
+                    <h5 class="panel-title">Order Status Overview</h5>
+                </div>
+                <div class="panel-body">
+                    <div id="orderStatusDonutChart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        $(function () {
+            // Global state for line chart navigation
+            var availableWeeks = [];
+            var currentWeekIndex = -1;
+
+            // --- Function for Line Chart (Weekly Sales by Day) ---
+            function loadWeeklyLineChart(isoYear, isoWeek) {
+                $.getJSON(`/Admin/GetWeeklySalesByDayData?isoYear=${isoYear}&isoWeek=${isoWeek}`, function (data) {
+                    var options = {
+                        chart: { type: 'area', height: 350, toolbar: { show: false } },
+                        series: [{ name: 'Sales (Rs.)', data: data.values }],
+                        xaxis: { categories: data.labels, type: 'datetime' },
+                        yaxis: { labels: { formatter: function (val) { return "Rs. " + val.toFixed(0); } } },
+                        dataLabels: { enabled: false },
+                        stroke: { curve: 'smooth', width: 2 },
+                        fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.4, opacityTo: 0.1, stops: [0, 90, 100] } },
+                        tooltip: { x: { format: 'dd MMM yyyy' }, y: { formatter: function (val) { return "Rs. " + val.toFixed(2); } } }
+                    };
+                    if (window.weeklyChart) window.weeklyChart.destroy();
+                    window.weeklyChart = new ApexCharts(document.querySelector("#weeklySalesByDayChart"), options);
+                    window.weeklyChart.render();
+                });
+            }
+
+            function displayCurrentWeek() {
+                if (currentWeekIndex < 0 || availableWeeks.length === 0) return;
+                var week = availableWeeks[currentWeekIndex];
+                $('#currentWeekLabel').text(week.label);
+                loadWeeklyLineChart(week.year, week.week);
+                $('#prevWeekBtn').prop('disabled', currentWeekIndex === 0);
+                $('#nextWeekBtn').prop('disabled', currentWeekIndex === availableWeeks.length - 1);
+            }
+
+            // --- Function for Bar Chart (Sales by Week) ---
+            function renderWeeklyBarChart() {
+                $.getJSON('/Admin/GetWeeklySalesByWeekData', function (data) {
+                    var options = {
+                        chart: { type: 'bar', height: 350, toolbar: { show: false } },
+                        series: [{ name: 'Total Sales', data: data.values }],
+                        xaxis: { categories: data.labels, labels: { hideOverlappingLabels: false,} },
+                        yaxis: { labels: { formatter: function (val) { return "Rs. " + val.toFixed(0); } } },
+                        plotOptions: { bar: { horizontal: false, columnWidth: '50%', endingShape: 'rounded' } },
+                        dataLabels: { enabled: false },
+                        stroke: { show: true, width: 2, colors: ['transparent'] },
+                        tooltip: { y: { formatter: function (val) { return "Rs. " + val.toFixed(2); } } },
+                        fill: { opacity: 1 }
+                    };
+                    var chart = new ApexCharts(document.querySelector("#weeklySalesByWeekChart"), options);
+                    chart.render();
+                });
+            }
+
+            // --- Function for Donut Chart (Order Status) ---
+            function renderOrderStatusDonutChart() {
+                var pending = @Model.PendingOrders;
+                var delivered = @Model.CompletedOrders;
+                var cancelled = @Model.CancelledOrders;
+                var total = pending + delivered + cancelled;
+
+                if (total === 0) {
+                    $('#orderStatusDonutChart').html('<div class="text-center text-muted pt-5 pb-5">No order data available.</div>');
+                    return;
+                }
+
+                var options = {
+                    chart: { type: 'donut', height: 350 },
+                    series: [pending, delivered, cancelled],
+                    labels: ['Pending', 'Delivered', 'Cancelled'],
+                    colors: ['#FFC107', '#28a745', '#dc3545'], // Warning Yellow, Success Green, Danger Red
+                    responsive: [{ breakpoint: 480, options: { chart: { width: 200 }, legend: { position: 'bottom' } } }],
+                    legend: { position: 'bottom' },
+                    tooltip: { y: { formatter: function (val) { return val + " orders"; } } },
+                    dataLabels: { formatter: function (val, { seriesIndex, w }) { return w.globals.series[seriesIndex] } }
+                };
+                var chart = new ApexCharts(document.querySelector("#orderStatusDonutChart"), options);
+                chart.render();
+            }
+
+            // --- Initial Load and Event Handlers ---
+            // This initializes the LINE CHART and arrow navigation
+            $.getJSON('/Admin/GetAvailableWeeks', function (weeks) {
+                if (weeks && weeks.length > 0) {
+                    availableWeeks = weeks;
+                    currentWeekIndex = weeks.length - 1;
+                    displayCurrentWeek();
+                } else {
+                    $('#currentWeekLabel').text("No Sales Data");
+                    $('#prevWeekBtn, #nextWeekBtn').prop('disabled', true);
+                }
+            });
+
+            // Call the other chart rendering functions on page load
+            renderWeeklyBarChart();
+            renderOrderStatusDonutChart();
+
+            // Event handlers for line chart navigation
+            $('#prevWeekBtn').on('click', function () { if (currentWeekIndex > 0) { currentWeekIndex--; displayCurrentWeek(); } });
+            $('#nextWeekBtn').on('click', function () { if (currentWeekIndex < availableWeeks.length - 1) { currentWeekIndex++; displayCurrentWeek(); } });
+        });
+    </script>
+}

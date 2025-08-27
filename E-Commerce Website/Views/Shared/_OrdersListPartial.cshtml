@@ -1,0 +1,140 @@
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@using ECommerceWebsite.Models.Dtos
+@model PagedResult<AdminOrderViewDto>
+
+@{
+    var statuses = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "Pending", Text = "Pending" },
+        new SelectListItem { Value = "Confirmed", Text = "Confirmed" },
+        new SelectListItem { Value = "Shipped", Text = "Shipped" },
+        new SelectListItem { Value = "Delivered", Text = "Delivered" },
+        new SelectListItem { Value = "Cancelled", Text = "Cancelled" }
+    };
+}
+<div class="content">
+@if (!Model.Items.Any())
+{
+    <!-- "No Results" Message -->
+    <div class="panel panel-flat">
+        <div class="panel-body text-center"><i class="icon-cart-remove icon-3x text-muted"></i><h5 class="text-semibold mt-15">No orders found.</h5></div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="panel-footer">
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 text-center-xs mb-10-xs">
+                <div class="form-inline">
+                    <label for="page-size-selector" class="mr-10">Show</label>
+                    <select id="page-size-selector" class="form-control" style="display: inline-block; width: auto;">
+                        <option value="10" selected="@(Model.PageSize == 10)">10</option>
+                        <option value="20" selected="@(Model.PageSize == 20)">20</option>
+                        <option value="30" selected="@(Model.PageSize == 30)">30</option>
+                    </select>
+                    <span class="text-muted ml-10">
+                        Showing @Model.StartItem to @Model.EndItem of @Model.TotalCount entries
+                    </span>
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6 text-right text-center-xs">
+                <ul class="pagination pagination-rounded" style="margin: 0;">
+                    <li class="disabled"><a href="#"><i class="icon-chevron-left"></i></a></li>
+                    <li class="active"><a href="#">1</a></li>
+                    <li class="disabled"><a href="#"><i class="icon-chevron-left"></i></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Loop through each order and display it -->
+    @foreach (var order in Model.Items)
+    {
+        <div class="panel panel-flat">
+            <div class="panel-heading">
+                <h6 class="panel-title">Order ID: @order.OrderId.ToString("N").Substring(0, 8).ToUpper()</h6>
+                <div class="heading-elements">
+                    <span class="label label-info">@order.OrderStatus</span>
+                    <span class="text-muted ml-10">Placed on: @order.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</span>
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-semibold">User Details</h6>
+                        <dl class="dl-horizontal">
+                            <dt>Full Name</dt>
+                            <dd>@order.UserFullName</dd>
+                            <dt>Address</dt>
+                            <dd>@order.ShippingAddress</dd>
+                            <dt>City</dt>
+                            <dd>@order.City</dd>
+                            <dt>Phone</dt>
+                            <dd>@order.PhoneNumber</dd>
+                        </dl>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-semibold">Order Contents</h6>
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Product Name</th>
+                                        <th class="text-center">Quantity</th>
+                                        <th class="text-right">Unit Price</th>
+                                        <th class="text-right">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in order.OrderItems)
+                                    {
+                                        <tr>
+                                            <td>@item.BookTitle</td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-right">@item.UnitPrice.ToString("C")</td>
+                                            <td class="text-right">@item.Subtotal.ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <hr class="mt-10 mb-10">
+                        <div class="text-right">
+                            <p>Total Quantity: <span class="text-semibold">@order.TotalQuantity</span></p>
+                            <h4>Total Amount: <span class="text-semibold">@order.TotalAmount.ToString("C")</span></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <div class="row">
+                    <div class="col-md-8">
+                        <span class="text-muted">Update order status:</span>
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <form action="@Url.Action("UpdateOrderStatus", "Admin")" method="post" class="form-inline">
+                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                            <div class="form-group">
+                                <select name="status" class="form-control">
+                                    @foreach (var statusItem in statuses)
+                                    {
+                                        <option value="@statusItem.Value" selected="@(order.OrderStatus == statusItem.Value)">@statusItem.Text</option>
+                                    }
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm ml-5">Update</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+</div>
+
+<div class="panel panel-flat">
+    <div class="panel-footer">
+        @await Html.PartialAsync("_PaginationPartial", Model)
+    </div>
+</div>

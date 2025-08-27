@@ -1,5 +1,6 @@
 ﻿using ECommerceWebsite.Models;
 using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceWebsite.Repository
@@ -7,12 +8,13 @@ namespace ECommerceWebsite.Repository
     public interface IUserRepository
     {
         Task<IEnumerable<User>> GetAllUsersAsync();                 //READ
-        Task<User?> GetUserByIdAsync(Guid id);                      
+        Task<User?> GetUserByIdAsync(Guid id);
         Task AddUserAsync(User user);                               //CREATE
         Task UpdateUserAsync(User user);                            //UPDATE        
         Task DeleteUserAsync(Guid id);                              //DELETE
         Task<User?> GetUserByEmailAsync(string email);              //READ
         Task<User?> GetUserByUsernameAsync(string username);        //READ by username
+        Task<int> GetTotalUsers();
     }
 
     public class UserRepository : IUserRepository
@@ -68,7 +70,7 @@ namespace ECommerceWebsite.Repository
             {
                 throw new KeyNotFoundException("User not found");
             }
-           
+
             existingUser.FirstName = user.FirstName;
             existingUser.LastName = user.LastName;
             existingUser.Username = user.Username;
@@ -83,6 +85,13 @@ namespace ECommerceWebsite.Repository
 
             // Save changes to the database
             await _context.SaveChangesAsync();
+        }
+
+        //method for dashboard charts
+        public async Task<int> GetTotalUsers()
+        {
+            return await _context.Users
+                            .CountAsync(u => u.Role != (int)enumRole.Admin && u.isActive == (int)enumStatus.Active);
         }
     }
 }
