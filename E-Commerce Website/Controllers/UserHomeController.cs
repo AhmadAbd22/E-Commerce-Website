@@ -31,10 +31,9 @@ namespace ECommerceWebsite.Controllers
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> UserHome(string search, Guid? authorId, Guid? categoryId,
-    decimal? minPrice, decimal? maxPrice, string sortBy, string sortOrder,
-    string viewType = "grid", int pageNumber = 1)
+                                                decimal? minPrice, decimal? maxPrice, string sortBy, string sortOrder,
+                                                int pageNumber = 1, int pageSize = 10)
         {
-            const int pageSize = 12;
             PagedResult<Book> pagedBooks;
 
             if (!string.IsNullOrWhiteSpace(search))
@@ -88,12 +87,6 @@ namespace ECommerceWebsite.Controllers
             }
 
             return View(pagedDto);
-        }
-
-        [HttpPost]
-        public IActionResult UserHome(string search, Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice)
-        {
-            return RedirectToAction("UserHome", new { search, authorId, categoryId, minPrice, maxPrice });
         }
 
         [AllowAnonymous]
