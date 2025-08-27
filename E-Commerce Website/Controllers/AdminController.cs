@@ -562,9 +562,8 @@ namespace ECommerceWebsite.Controllers
         //Category CRUD
 
         [HttpGet]
-        public async Task<IActionResult> AddCategory(string search, string sortBy = "name_asc", int pageNumber = 1)
+        public async Task<IActionResult> AddCategory(string search, string sortBy = "name_asc", int pageNumber = 1, int pageSize = 10)
         {
-            const int pageSize = 10;
             var pagedCategories = await _categoryRepo.GetAllCategoriesPagedAsync(search, sortBy, pageNumber, pageSize);
 
             // Preserve state for the view's controls
