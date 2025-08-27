@@ -1,5 +1,6 @@
 ﻿using ECommerceWebsite.Models;
 using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Helping_Classes;
 using Microsoft.EntityFrameworkCore;
 
 namespace ECommerceWebsite.Repository
@@ -13,6 +14,7 @@ namespace ECommerceWebsite.Repository
         Task UpdateAuthorAsync(Author author);
         Task<Author?> GetAuthorWithBooksAsync(Guid id);
         Task<Author?> GetActiveAuthorByIdAsync(Guid id);
+        Task<PagedResult<Author>> GetAllAuthorsPagedAsync(string search, string sortBy, int pageNumber, int pageSize);
     }
 
     public class AuthorRepository : IAuthorRepository
@@ -109,5 +111,35 @@ namespace ECommerceWebsite.Repository
                 .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
         }
 
+        public async Task<PagedResult<Author>> GetAllAuthorsPagedAsync(string search, string sortBy, int pageNumber, int pageSize)
+        {
+            var query = _context.Authors.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                query = query.Where(a => a.AuthorName.ToLower().Contains(search.ToLower()));
+            }
+
+            switch (sortBy)
+            {
+                case "name_desc":
+                    query = query.OrderByDescending(a => a.AuthorName);
+                    break;
+                default: // "name_asc" or any other value
+                    query = query.OrderBy(a => a.AuthorName);
+                    break;
+            }
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Author>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
     }
 }
