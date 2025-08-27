@@ -30,12 +30,14 @@ namespace ECommerceWebsite.Repository
         #region Charts Region
 
         #region total sales, total orders, pending orders, weekly sales, monthly sales
-        Task<int> GetTotalSales();
+        Task<decimal> GetTotalSales();
 
         Task<int> GetTotalOrders();
 
 
         Task<int> GetTotalPendingOrders();
+        Task<int> GetTotalCompletedOrders();
+        Task<int> GetTotalCancelledOrders();
 
         Task<decimal> GetTotalMonthlySales();
         Task<decimal> GetTotalWeeklySales();
@@ -45,7 +47,7 @@ namespace ECommerceWebsite.Repository
 
 
         #region charts by week
-        Task<List<DailySalesDto>> GetWeeklySalesByDay();
+        Task<List<DailySalesDto>> GetWeeklySalesByDay(int isoYear, int isoWeek);
         Task<List<WeeklySalesDto>> GetWeeklySalesByWeek();
         #endregion
 
@@ -104,7 +106,7 @@ namespace ECommerceWebsite.Repository
             if (existingOrder != null)
             {
                 existingOrder.OrderStatus = order.OrderStatus;
-                existingOrder.UpdatedAt = order.UpdatedAt;
+                existingOrder.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
         }
@@ -136,8 +138,7 @@ namespace ECommerceWebsite.Repository
         public async Task<int> GetTotalPendingOrders()
         {
             return await _context.OrderDetails
-                                    .Where(o => o.OrderStatus == "Pending")
-                                    .CountAsync();
+                                    .CountAsync(o => o.OrderStatus == "Pending");
         }
 
         public async Task<int> GetTotalOrders()
@@ -146,11 +147,11 @@ namespace ECommerceWebsite.Repository
                                  .CountAsync();
         }
 
-        public async Task<int> GetTotalSales()
+        public async Task<decimal> GetTotalSales()
         {
             return await _context.OrderDetails
-                .Where(o => o.OrderStatus == "Completed")
-                .SumAsync(o => (int)o.TotalAmount);
+                .Where(o => o.OrderStatus == "Delivered")
+                .SumAsync(o => o.TotalAmount);
         }
 
         #endregion
@@ -158,40 +159,40 @@ namespace ECommerceWebsite.Repository
 
         #region weekly 
 
-        public async Task<List<DailySalesDto>> GetWeeklySalesByDay()
+        public async Task<List<DailySalesDto>> GetWeeklySalesByDay(int isoYear, int isoWeek)
         {
-            var today = DateTime.Today;
-            var sevenDaysAgo = today.AddDays(-6);
-
-            // Generate last 7 days
-            var last7Days = Enumerable.Range(0, 7)
-                .Select(i => today.AddDays(-i))
-                .ToList();
+            var startOfWeek = ISOWeek.ToDateTime(isoYear, isoWeek, DayOfWeek.Monday);
+            var endOfWeek = startOfWeek.AddDays(6);
 
             var sales = await _context.OrderDetails
-                .Where(o => o.OrderStatus == "Completed" &&
-                            o.OrderDate.Date >= sevenDaysAgo &&
-                            o.OrderDate.Date <= today)
+                .Where(o => o.OrderStatus == "Delivered"
+                         && o.OrderDate >= startOfWeek
+                         && o.OrderDate <= endOfWeek)
                 .GroupBy(o => o.OrderDate.Date)
                 .Select(g => new DailySalesDto
                 {
                     Date = g.Key,
-                    TotalSales = g.Sum(o => o.TotalAmount)
+                    TotalSales = g.Sum(x => x.TotalAmount),
+                    OrderCount = g.Count()
                 })
                 .ToListAsync();
 
-            // Merge with last 7 days (fill missing with 0). 
-            var result = last7Days
-                .Select(d => new DailySalesDto
+            // Fill missing days with 0 sales
+            var result = Enumerable.Range(0, 7).Select(i =>
+            {
+                var day = startOfWeek.AddDays(i).Date;
+                var daySales = sales.FirstOrDefault(s => s.Date == day);
+                return new DailySalesDto
                 {
-                    Date = d,
-                    TotalSales = sales.FirstOrDefault(s => s.Date == d)?.TotalSales ?? 0
-                })
-                .OrderBy(x => x.Date)
-                .ToList();
+                    Date = day,
+                    TotalSales = daySales?.TotalSales ?? 0,
+                    OrderCount = daySales?.OrderCount ?? 0
+                };
+            }).ToList();
 
             return result;
         }
+
 
 
         /// <summary>
@@ -413,6 +414,18 @@ namespace ECommerceWebsite.Repository
             _context.OrderDetails.Update(order);
             _context.SaveChangesAsync();
             return getStatus;
+        }
+
+        public async Task<int> GetTotalCompletedOrders()
+        {
+            return await _context.OrderDetails
+                                     .CountAsync(o => o.OrderStatus == "Delivered");
+        }
+
+        public async Task<int> GetTotalCancelledOrders()
+        {
+            return await _context.OrderDetails
+                                     .CountAsync(o => o.OrderStatus == "Cancelled");
         }
 
 
