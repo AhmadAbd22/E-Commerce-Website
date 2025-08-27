@@ -55,56 +55,48 @@
             </form>
         </div>
     </div>
-
-    <!-- This container will be updated by the AJAX calls -->
-    <div id="orders-container">
+</div>
+    <div class="orders-container">
         @await Html.PartialAsync("_OrdersListPartial", Model)
     </div>
-</div>
 
 
 @section Scripts {
-    <script type="text/javascript">
+    <script type="text-javascript">
         $(function() {
-            // Reusable function to fetch and render the orders partial view
             function fetchOrders(pageNumber) {
-                // Read the current values from the dropdowns
                 var status = $('#status-filter').val();
                 var sortBy = $('#sort-by').val();
+                var pageSize = $('#orders-container #page-size-selector').val() || 10;  // Read the page size from the dropdown inside the container. Default to 10.
 
-                // Construct the URL with all parameters
+                // Add the new pageSize parameter to the request.
                 var url = '@Url.Action("Orders", "Admin")' +
                     '?pageNumber=' + pageNumber +
+                    '&pageSize=' + pageSize +
                     '&status=' + encodeURIComponent(status) +
                     '&sortBy=' + encodeURIComponent(sortBy);
 
-                // Show a loading indicator
-                $('#orders-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4></div>');
+                    $('#orders-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4></div>');
 
-                // Perform the AJAX GET request
                 $.get(url, function(data) {
-                    // On success, replace the content of the container with the new partial view
                     $('#orders-container').html(data);
-                }).fail(function() {
-                    // On failure, show an error message
-                    $('#orders-container').html('<div class="panel panel-body text-center text-danger"><h4>Failed to load orders. Please try again.</h4></div>');
+                    $('#orders-container .bootstrap-select').selectpicker();
                 });
             }
 
             // --- EVENT HANDLERS ---
 
-            // 1. Handle clicks on pagination links using event delegation
-            // This works even for links loaded via AJAX
-            $('#orders-container').on('click', '.pagination a', function(e) {
-                e.preventDefault(); // Prevent the browser from navigating to the link's href
+            $('.content').on('click', '#orders-container .pagination a', function(e) {
+                 e.preventDefault();
                 var page = $(this).data('page');
-                if (!page) return;
-                fetchOrders(page);
+                if (page) fetchOrders(page);
             });
 
-            // 2. Handle changes in the filter or sort dropdowns
             $('#status-filter, #sort-by').on('change', function() {
-                // When a filter or sort is changed, always go back to the first page for the best user experience
+                fetchOrders(1);
+            });
+
+            $('#orders-container').on('change', '#page-size-selector', function() {
                 fetchOrders(1);
             });
         });
