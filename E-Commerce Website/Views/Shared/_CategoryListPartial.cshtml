@@ -22,14 +22,17 @@
                     <td>@category.CategoryType</td>
                     <td class="text-center">
                         <ul class="icons-list">
-                            <li><a href="@Url.Action("EditCategory", "Admin", new { id = category.Id })" data-popup="tooltip" title="Edit"><i class="icon-pencil7"></i></a></li>
                             <li>
-                                <form method="post" action="@Url.Action("RemoveCategory", "Admin")" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this category? This cannot be undone.')">
-                                    <input type="hidden" name="categoryId" value="@category.Id" />
-                                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer; color:#D84315;" data-popup="tooltip" title="Delete">
-                                        <i class="icon-trash"></i>
-                                    </button>
-                                </form>
+                                <button type="button" class="btn btn-link edit-category-btn" data-toggle="modal" data-target="#categoryModal"
+                                        data-category-id="@category.Id" data-category-name="@category.CategoryType" title="Edit">
+                                    <i class="icon-pencil7"></i>
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-link text-danger-600 delete-category-btn" data-toggle="modal" data-target="#categoryModal"
+                                        data-category-id="@category.Id" data-category-name="@category.CategoryType" title="Delete">
+                                    <i class="icon-trash"></i>
+                                </button>
                             </li>
                         </ul>
                     </td>

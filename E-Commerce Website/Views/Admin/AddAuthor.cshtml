@@ -3,7 +3,7 @@
     ViewData["Title"] = "Manage Authors";
     Layout = "_AdminLayout";
 
-    var isEditing = ViewData["IsEditing"] as bool? == true;
+    var isDeleting = ViewData["isDeleting"] as bool? == true;
     var currentSearch = ViewData["CurrentSearch"] as string;
     var currentSortBy = ViewData["CurrentSortBy"] as string ?? "name_asc";
     var existingAuthors = ViewData["ExistingAuthors"] as ECommerceWebsite.Models.Helping_Classes.PagedResult<Author>;
@@ -16,45 +16,15 @@
 </div>
 
 <div class="content">
-    <div class="row">
-        <!-- Add/Edit Author Form Panel -->
-        <div class="col-md-4">
-            <form action="@(isEditing ? Url.Action("EditAuthor", "Admin") : Url.Action("AddAuthor", "Admin"))" method="post">
-                <div class="panel panel-flat">
-                    <div class="panel-heading"><h6 class="panel-title">@(isEditing ? "Edit Author" : "Add New Author")</h6></div>
-                    <div class="panel-body">
-                        @if (isEditing)
-                        {
-                            <input type="hidden" name="AuthorId" value="@Model.AuthorId" />
-                        }
-                        <div class="form-group">
-                            <label>Author Name:</label>
-                            <input type="text" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien" value="@Model.Name">
-                            @if (ViewData["EmptyFields"] != null)
-                            {
-                                <span class="help-block text-danger">@ViewData["EmptyFields"]</span>
-                            }
-                            @if (ViewData["AuthorExists"] != null)
-                            {
-                                <span class="help-block text-danger">@ViewData["AuthorExists"]</span>
-                            }
-                        </div>
-                        <div class="text-right">
-                            @if (isEditing)
-                            {
-                                <a href="@Url.Action("AddAuthor", "Admin")" class="btn btn-default">Cancel</a>
-                            }
-                            <button type="submit" class="btn btn-primary">Save Author <i class="glyphicon glyphicon-floppy-disk"></i></button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+    
 
         <!-- Existing Authors List Panel -->
-        <div class="col-md-8">
+        <div>
             <div class="panel panel-flat">
-                <div class="panel-heading"><h6 class="panel-title">Existing Authors</h6></div>
+                <div class="panel-heading"><h4 class="panel-title col-md-11">Existing Authors</h4>
+                    <button type="button" id="addAuthorButton" class="btn btn-primary btn-sm legitRipple" data-toggle="modal" data-target="#addAuthorModal">Add Author<i class="icon-plus3 position-right"></i></button>
+                </div>
+
                 <div class="panel-body">
                     <!-- Filter and Sort Controls -->
                     <div class="row">
@@ -65,6 +35,8 @@
                             <select id="sort-by" class="form-control">
                                 <option value="name_asc" selected="@(currentSortBy == "name_asc")">Sort by Name (A-Z)</option>
                                 <option value="name_desc" selected="@(currentSortBy == "name_desc")">Sort by Name (Z-A)</option>
+                                <option value="date_desc" selected="@(currentSortBy == "date_desc")">Sort by Date(Newest First)</option>
+                                <option value="date_asc" selected="@(currentSortBy == "date_asc")">Sort by Date(Oldest First)</option>
                             </select>
                         </div>
                     </div>
@@ -79,8 +51,38 @@
                 </div>
             </div>
         </div>
+</div>
+
+<!-- Add Author Modal -->
+<div id="addAuthorModal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" style="margin: 300px auto">
+        <div class="modal-content">
+            <form id="authorForm" method="post">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                    <h5 class="modal-title" id="modalTitle">Add New Author</h5>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="authorId" name="AuthorId" />
+
+                    <div id="modalBodyContent">
+                        <div class="form-group">
+                            <label>Author Name:</label>
+                            <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="modalSubmitButton" class="btn btn-primary">Save Author</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
 
 @section Scripts {
     <script type="text/javascript">
@@ -99,11 +101,71 @@
                 });
             }
 
+
+            $('#addAuthorButton').on('click', function() {
+            var form = $('#authorForm');
+            form.attr('action', '@Url.Action("AddAuthor", "Admin")'); // Set form action for ADD
+
+            $('#modalTitle').text('Add New Author');
+            $('#modalBodyContent').html(`
+                <div class="form-group">
+                    <label>Author Name:</label>
+                    <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
+                </div>
+            `);
+            $('#modalSubmitButton').text('Save Author').removeClass('btn-danger').addClass('btn-primary');
+            $('#authorId').val(''); // Clear hidden ID
+            $('#authorName').val(''); // Clear name field
+        });
+
+        // 2. When an "Edit Author" button in the list is clicked
+        $('#author-list-container').on('click', '.edit-author-btn', function() {
+            var button = $(this);
+            var authorId = button.data('author-id');
+            var authorName = button.data('author-name');
+
+            var form = $('#authorForm');
+            form.attr('action', '@Url.Action("EditAuthor", "Admin")'); // Set form action for EDIT
+
+            $('#modalTitle').text('Edit Author');
+            $('#modalBodyContent').html(`
+                <div class="form-group">
+                    <label>Author Name:</label>
+                    <input type="text" id="authorName" name="Name" class="form-control" value="${authorName}">
+                </div>
+            `);
+            $('#modalSubmitButton').text('Update Author').removeClass('btn-danger').addClass('btn-primary');
+            $('#authorId').val(authorId); // Set hidden ID
+        });
+
+        // 3. When a "Delete Author" button in the list is clicked
+        $('#author-list-container').on('click', '.delete-author-btn', function() {
+            var button = $(this);
+            var authorId = button.data('author-id');
+            var authorName = button.data('author-name');
+
+            var form = $('#authorForm');
+            form.attr('action', '@Url.Action("RemoveAuthor", "Admin")'); // Set form action for DELETE
+
+            $('#modalTitle').text('Delete Author');
+            // Show the confirmation message
+            $('#modalBodyContent').html(`
+                <p>Are you sure you want to delete the author "<strong>${authorName}</strong>"? This action cannot be undone.</p>
+            `);
+            // Change button to a red "Delete" button
+            $('#modalSubmitButton').text('Delete').removeClass('btn-primary').addClass('btn-danger');
+            $('#authorId').val(authorId); // Set hidden ID for the form submission
+        });
+
+
+
+
             // --- EVENT HANDLERS ---
             $('#author-list-container').on('click', '.pagination a', function(e) { e.preventDefault(); var page = $(this).data('page'); if(page) fetchAuthors(page); });
             $('#author-list-container').on('change', '#page-size-selector', function() { fetchAuthors(1); });
             $('#sort-by').on('change', function() { fetchAuthors(1); });
             $('#search-input').on('input', function() { clearTimeout(debounceTimeout); debounceTimeout = setTimeout(() => fetchAuthors(1), 300); });
+            $('#addAuthorForm').on('submit', function(e) { e.preventDefault(); });
         });
     </script>
 }

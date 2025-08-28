@@ -4,9 +4,9 @@
 <div class="table-responsive border-top-lg border-top-primary">
     <table class="table table-hover">
         <thead>
-            <tr>
+            <tr class="bg-blue">
                 <th>Author Name</th>
-                <th class="text-center" style="width: 100px;">Actions</th>
+                <th class="text-center text-size-large" style="width: 100px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -18,22 +18,20 @@
             }
             @foreach (var author in Model.Items)
             {
-                <tr>
+                <tr class="text-size-large">
                     <td>@author.AuthorName</td>
                     <td class="text-center">
                         <ul class="icons-list">
                             <li class="text-primary-600">
-                                <a href="@Url.Action("EditAuthor", "Admin", new { id = author.Id })" data-popup="tooltip" title="Edit">
-                                    <i class="icon-pencil7"></i>
-                                </a>
+                                <button type="button" class="btn btn-link edit-author-btn" data-toggle="modal" data-target="#addAuthorModal" data-author-id="@author.Id" data-author-name="@author.AuthorName" title="Edit">
+                                    <i class="icon-pencil7 icon-2x"></i>
+                                </button>
                             </li>
                             <li class="text-danger-600">
-                                <form action="@Url.Action("RemoveAuthor", "Admin")" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this author? This cannot be undone.');">
                                     <input type="hidden" name="authorId" value="@author.Id" />
-                                    <button type="submit" style="background:none; border:none; padding:0; cursor:pointer;" data-popup="tooltip" title="Delete">
-                                        <i class="icon-trash"></i>
+                                <button type="submit" class="btn btn-link text-danger-600 delete-author-btn" data-toggle="modal" data-target="#addAuthorModal" data-author-id="@author.Id" data-author-name="@author.AuthorName" title="Delete">
+                                        <i class="icon-trash icon-2x"></i>
                                     </button>
-                                </form>
                             </li>
                         </ul>
                     </td>
