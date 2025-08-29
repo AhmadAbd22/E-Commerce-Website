@@ -9,6 +9,8 @@ An ASP.NET Core MVC-based e-commerce platform made using the [Repository Design 
 - Search functionality
 - View detailed book information
 - Add books to cart
+- Cart persistence with history tracking after checkout
+- Separate active cart vs. past orders
 - Place orders
 
 ### 🔐 Authentication
@@ -27,9 +29,10 @@ An ASP.NET Core MVC-based e-commerce platform made using the [Repository Design 
 
 ### 🧱 Tech Stack
 - **Backend:** ASP.NET Core MVC
-- **Frontend:** Razor Views, Bootstrap, Material theme
+- **Frontend:** Razor Views, Bootstrap, Material theme (Limitless)
 - **Database:** Entity Framework Core with SQL Server
-- **Authentication:** ASP.NET Identity
+- **Authentication:** Custom cookie-based authentication using ASP.NET Core's built-in 
+Cookie Authentication middleware with role-based access policies (`Admin`, `User`).
 
 
 
