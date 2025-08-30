@@ -1,0 +1,38 @@
+﻿@model BookDto
+
+<div class="row">
+    <div class="col-md-4 text-center">
+        <div class="thumb" style="max-width: 300px; margin: auto;">
+            <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive img-rounded">
+        </div>
+    </div>
+    <div class="col-md-8">
+        <h3 class="no-margin">@Model.Title</h3>
+        <p class="text-muted">by @(Model.Author?.AuthorName ?? "Unknown Author")</p>
+        <hr>
+        <div class="row">
+            <div class="col-sm-6">
+                <h2 class="text-success-600 no-margin" style="font-size: 28px;">@Model.Price.ToString("C")</h2>
+                <span class="@(Model.Stock > 0 ? "text-success" : "text-danger")">
+                    @if (Model.Stock > 0)
+                    {
+                        <i class="icon-checkmark3"></i> <span>In Stock (@Model.Stock available)</span>
+                    }
+                    else
+                    {
+                        <i class="icon-cross2"></i> <span>Out of Stock</span>
+                    }
+                </span>
+            </div>
+            <div class="col-sm-6">
+                <ul class="list list-unstyled">
+                    <li><strong>Category:</strong> @(Model.Category?.CategoryType ?? "N/A")</li>
+                    <li><strong>Published:</strong> @(Model.PublicationDate?.ToString("MMMM dd, yyyy") ?? "N/A")</li>
+                </ul>
+            </div>
+        </div>
+        <hr>
+        <h6 class="text-semibold">Description</h6>
+        <p>@Model.Description</p>
+    </div>
+</div>
