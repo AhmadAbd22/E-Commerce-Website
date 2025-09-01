@@ -1,0 +1,15 @@
+﻿<script type="text/javascript">
+    function initializePlugins(container) {
+        // re-init selects
+        container.find('.select-picker').selectpicker();
+
+        // re-init tooltips
+        container.find('[data-popup="tooltip"]').tooltip();
+
+        // re-init datepickers (if any in modals)
+        container.find('.pickadate').pickadate();
+
+        // (optional) re-init uniform checkboxes/radios
+        container.find('.styled').uniform();
+    }
+</script>
