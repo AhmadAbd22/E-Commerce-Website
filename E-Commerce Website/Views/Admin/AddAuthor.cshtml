@@ -32,7 +32,7 @@
                             <input type="search" id="search-input" class="form-control" placeholder="Search authors..." value="@currentSearch">
                         </div>
                         <div class="col-md-6">
-                            <select id="sort-by" class="form-control">
+                            <select id="sort-by" class="select-picker">
                                 <option value="name_asc" selected="@(currentSortBy == "name_asc")">Sort by Name (A-Z)</option>
                                 <option value="name_desc" selected="@(currentSortBy == "name_desc")">Sort by Name (Z-A)</option>
                                 <option value="date_desc" selected="@(currentSortBy == "date_desc")">Sort by Date(Newest First)</option>
@@ -89,6 +89,12 @@
         $(function() {
             var debounceTimeout;
 
+            // Initialize plugins for dynamically loaded content
+            function initializePlugins(container) {
+                container.find('.select-picker').selectpicker(); // activate bootstrap-select
+                container.find('[data-popup="tooltip"]').tooltip();
+            }
+
             function fetchAuthors(pageNumber) {
                 var search = $('#search-input').val();
                 var sortBy = $('#sort-by').val();
@@ -98,74 +104,76 @@
                 $('#author-list-container').html('<div class="text-center p-20"><i class="icon-spinner2 spinner"></i></div>');
                 $.get(url, function (data) {
                     $('#author-list-container').html(data);
+                    initializePlugins($('#author-list-container')); //  re-init after AJAX load
                 });
             }
 
-
+            // --- MODAL HANDLERS ---
             $('#addAuthorButton').on('click', function() {
-            var form = $('#authorForm');
-            form.attr('action', '@Url.Action("AddAuthor", "Admin")'); // Set form action for ADD
+                var form = $('#authorForm');
+                form.attr('action', '@Url.Action("AddAuthor", "Admin")');
 
-            $('#modalTitle').text('Add New Author');
-            $('#modalBodyContent').html(`
-                <div class="form-group">
-                    <label>Author Name:</label>
-                    <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
-                </div>
-            `);
-            $('#modalSubmitButton').text('Save Author').removeClass('btn-danger').addClass('btn-primary');
-            $('#authorId').val(''); // Clear hidden ID
-            $('#authorName').val(''); // Clear name field
-        });
+                $('#modalTitle').text('Add New Author');
+                $('#modalBodyContent').html(`
+                    <div class="form-group">
+                        <label>Author Name:</label>
+                        <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
+                    </div>
+                `);
+                $('#modalSubmitButton').text('Save Author').removeClass('btn-danger').addClass('btn-primary');
+                $('#authorId').val('');
+                $('#authorName').val('');
+            });
 
-        // 2. When an "Edit Author" button in the list is clicked
-        $('#author-list-container').on('click', '.edit-author-btn', function() {
-            var button = $(this);
-            var authorId = button.data('author-id');
-            var authorName = button.data('author-name');
+            $('#author-list-container').on('click', '.edit-author-btn', function() {
+                var button = $(this);
+                var authorId = button.data('author-id');
+                var authorName = button.data('author-name');
 
-            var form = $('#authorForm');
-            form.attr('action', '@Url.Action("EditAuthor", "Admin")'); // Set form action for EDIT
+                var form = $('#authorForm');
+                form.attr('action', '@Url.Action("EditAuthor", "Admin")');
 
-            $('#modalTitle').text('Edit Author');
-            $('#modalBodyContent').html(`
-                <div class="form-group">
-                    <label>Author Name:</label>
-                    <input type="text" id="authorName" name="Name" class="form-control" value="${authorName}">
-                </div>
-            `);
-            $('#modalSubmitButton').text('Update Author').removeClass('btn-danger').addClass('btn-primary');
-            $('#authorId').val(authorId); // Set hidden ID
-        });
+                $('#modalTitle').text('Edit Author');
+                $('#modalBodyContent').html(`
+                    <div class="form-group">
+                        <label>Author Name:</label>
+                        <input type="text" id="authorName" name="Name" class="form-control" value="${authorName}">
+                    </div>
+                `);
+                $('#modalSubmitButton').text('Update Author').removeClass('btn-danger').addClass('btn-primary');
+                $('#authorId').val(authorId);
+            });
 
-        // 3. When a "Delete Author" button in the list is clicked
-        $('#author-list-container').on('click', '.delete-author-btn', function() {
-            var button = $(this);
-            var authorId = button.data('author-id');
-            var authorName = button.data('author-name');
+            $('#author-list-container').on('click', '.delete-author-btn', function() {
+                var button = $(this);
+                var authorId = button.data('author-id');
+                var authorName = button.data('author-name');
 
-            var form = $('#authorForm');
-            form.attr('action', '@Url.Action("RemoveAuthor", "Admin")'); // Set form action for DELETE
+                var form = $('#authorForm');
+                form.attr('action', '@Url.Action("RemoveAuthor", "Admin")');
 
-            $('#modalTitle').text('Delete Author');
-            // Show the confirmation message
-            $('#modalBodyContent').html(`
-                <p>Are you sure you want to delete the author "<strong>${authorName}</strong>"? This action cannot be undone.</p>
-            `);
-            // Change button to a red "Delete" button
-            $('#modalSubmitButton').text('Delete').removeClass('btn-primary').addClass('btn-danger');
-            $('#authorId').val(authorId); // Set hidden ID for the form submission
-        });
-
-
-
+                $('#modalTitle').text('Delete Author');
+                $('#modalBodyContent').html(`
+                    <p>Are you sure you want to delete the author "<strong>${authorName}</strong>"? This action cannot be undone.</p>
+                `);
+                $('#modalSubmitButton').text('Delete').removeClass('btn-primary').addClass('btn-danger');
+                $('#authorId').val(authorId);
+            });
 
             // --- EVENT HANDLERS ---
-            $('#author-list-container').on('click', '.pagination a', function(e) { e.preventDefault(); var page = $(this).data('page'); if(page) fetchAuthors(page); });
+            $('#author-list-container').on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                if(page) fetchAuthors(page);
+            });
             $('#author-list-container').on('change', '#page-size-selector', function() { fetchAuthors(1); });
             $('#sort-by').on('change', function() { fetchAuthors(1); });
-            $('#search-input').on('input', function() { clearTimeout(debounceTimeout); debounceTimeout = setTimeout(() => fetchAuthors(1), 300); });
-            $('#addAuthorForm').on('submit', function(e) { e.preventDefault(); });
+            $('#search-input').on('input', function() {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => fetchAuthors(1), 300);
+            });
+
+            initializePlugins($('.content'));
         });
     </script>
 }

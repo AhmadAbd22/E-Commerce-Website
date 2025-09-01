@@ -9,20 +9,27 @@
 
 <!-- Page header -->
 <div class="page-header page-header-default">
-    <div class="page-header-content"><div class="page-title"><h4><i class="icon-price-tags2 position-left"></i> <span class="text-semibold">Categories</span> - Management</h4></div></div>
-    <div class="breadcrumb-line"><ul class="breadcrumb"><li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Admin</a></li><li class="active">Categories</li></ul></div>
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-price-tags2 position-left"></i> <span class="text-semibold">Categories</span> - Management</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Admin</a></li>
+            <li class="active">Categories</li>
+        </ul>
+    </div>
 </div>
 
 <div class="content">
     <!-- Existing Categories List Panel -->
     <div class="panel panel-flat">
         <div class="panel-heading">
-            <h4 class="panel-title" style="display: inline-block;">Existing Categories</h4>
-            <div class="heading-elements">
-                <button type="button" id="addCategoryButton" class="btn btn-primary btn-sm legitRipple" data-toggle="modal" data-target="#categoryModal">
-                    Add Category <i class="icon-plus3 position-right"></i>
-                </button>
-            </div>
+            <h4 class="panel-title col-md-10">Existing Categories</h4>
+            <button type="button" id="addCategoryButton" class="btn btn-primary btn-sm legitRipple" data-toggle="modal" data-target="#categoryModal">
+                Add Category <i class="icon-plus3 position-right"></i>
+            </button>
         </div>
 
         <div class="panel-body">
@@ -31,11 +38,12 @@
                 <div class="col-md-6">
                     <input type="search" id="search-input" class="form-control" placeholder="Search categories..." value="@currentSearch">
                 </div>
-                <div class="col-md-6">
-                    <select id="sort-by" class="form-control">
+                <div class="col-md-2">
+                    <select id="sort-by" class="select-picker">
                         <option value="name_asc" selected="@(currentSortBy == "name_asc")">Sort by Name (A-Z)</option>
                         <option value="name_desc" selected="@(currentSortBy == "name_desc")">Sort by Name (Z-A)</option>
-                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Newest First</option>
+                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Sort by Date (Newest First)</option>
+                        <option value="date_asc" selected="@(currentSortBy == "date_asc")">Sort by (Oldest First)</option>
                     </select>
                 </div>
             </div>
@@ -53,7 +61,7 @@
 
 <!-- Generic Category Modal -->
 <div id="categoryModal" class="modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
+    <div class="modal-dialog" style="margin: 300px auto">
         <div class="modal-content">
             <form id="categoryForm" method="post">
                 <div class="modal-header">
@@ -77,3 +85,84 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            var debounceTimeout;
+
+            function fetchCategories(pageNumber) {
+                var search = $('#search-input').val();
+                var sortBy = $('#sort-by').val();
+                var pageSize = $('#category-list-container #page-size-selector').val() || 10;
+                var url = `@Url.Action("AddCategory", "Admin")?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&sortBy=${encodeURIComponent(sortBy)}`;
+
+                $('#category-list-container').html('<div class="text-center p-20"><i class="icon-spinner2 spinner"></i></div>');
+                $.get(url, function (data) {
+                    $('#category-list-container').html(data);
+                });
+            }
+
+            // Add Category
+            $('#addCategoryButton').on('click', function () {
+                var form = $('#categoryForm');
+                form.attr('action', '@Url.Action("AddCategory", "Admin")');
+
+                $('#modalTitle').text('Add New Category');
+                $('#modalBodyContent').html(`
+                    <div class="form-group">
+                        <label>Category Name:</label>
+                        <input type="text" id="categoryName" name="CategoryType" class="form-control" placeholder="e.g., Science Fiction">
+                    </div>
+                `);
+                $('#modalSubmitButton').text('Save Category').removeClass('btn-danger').addClass('btn-primary');
+                $('#categoryId').val('');
+                $('#categoryName').val('');
+            });
+
+            // Edit Category
+            $('#category-list-container').on('click', '.edit-category-btn', function () {
+                var button = $(this);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+
+                var form = $('#categoryForm');
+                form.attr('action', '@Url.Action("EditCategory", "Admin")');
+
+                $('#modalTitle').text('Edit Category');
+                $('#modalBodyContent').html(`
+                    <div class="form-group">
+                        <label>Category Name:</label>
+                        <input type="text" id="categoryName" name="CategoryType" class="form-control" value="${categoryName}">
+                    </div>
+                `);
+                $('#modalSubmitButton').text('Update Category').removeClass('btn-danger').addClass('btn-primary');
+                $('#categoryId').val(categoryId);
+            });
+
+            // Delete Category
+            $('#category-list-container').on('click', '.delete-category-btn', function () {
+                var button = $(this);
+                var categoryId = button.data('category-id');
+                var categoryName = button.data('category-name');
+
+                var form = $('#categoryForm');
+                form.attr('action', '@Url.Action("RemoveCategory", "Admin")');
+
+                $('#modalTitle').text('Delete Category');
+                $('#modalBodyContent').html(`
+                    <p>Are you sure you want to delete the category "<strong>${categoryName}</strong>"? This action cannot be undone.</p>
+                `);
+                $('#modalSubmitButton').text('Delete').removeClass('btn-primary').addClass('btn-danger');
+                $('#categoryId').val(categoryId);
+            });
+
+            // --- EVENT HANDLERS ---
+            $('#category-list-container').on('click', '.pagination a', function (e) { e.preventDefault(); var page = $(this).data('page'); if (page) fetchCategories(page); });
+            $('#category-list-container').on('change', '#page-size-selector', function () { fetchCategories(1); });
+            $('#sort-by').on('change', function () { fetchCategories(1); });
+            $('#search-input').on('input', function () { clearTimeout(debounceTimeout); debounceTimeout = setTimeout(() => fetchCategories(1), 300); });
+            $('#categoryForm').on('submit', function (e) { e.preventDefault(); });
+        });
+    </script>
+}
