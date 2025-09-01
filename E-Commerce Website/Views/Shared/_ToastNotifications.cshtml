@@ -1,47 +1,28 @@
-﻿@{
-    var notifications = new List<(string Type, string Icon, string Message)>();
+﻿@using Microsoft.AspNetCore.Html
 
+@{
     if (TempData["Success"] != null)
     {
-        notifications.Add(("success", "bi-check-circle-fill", TempData["Success"].ToString()));
+        <script>
+            toastr.success("@Html.Raw(TempData["Success"].ToString().Replace("\"", "\\\""))");
+        </script>
     }
     if (TempData["Error"] != null)
     {
-        notifications.Add(("danger", "bi-x-circle-fill", TempData["Error"].ToString()));
+        <script>
+            toastr.error("@Html.Raw(TempData["Error"].ToString().Replace("\"", "\\\""))");
+        </script>
     }
     if (TempData["Info"] != null)
     {
-        notifications.Add(("info", "bi-info-circle-fill", TempData["Info"].ToString()));
+        <script>
+            toastr.info("@Html.Raw(TempData["Info"].ToString().Replace("\"", "\\\""))");
+        </script>
     }
     if (TempData["Warning"] != null)
     {
-        notifications.Add(("warning", "bi-exclamation-triangle-fill", TempData["Warning"].ToString()));
+        <script>
+            toastr.warning("@Html.Raw(TempData["Warning"].ToString().Replace("\"", "\\\""))");
+        </script>
     }
-}
-
-@if (notifications.Any())
-{
-    <div class="toast-container position-fixed bottom-0 end-0 p-3">
-        @foreach (var n in notifications)
-        {
-            var toastId = "toast_" + Guid.NewGuid().ToString("N");
-            <div id="@toastId" class="toast align-items-center text-bg-@n.Type border-0 mb-2"
-                 role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body d-flex align-items-center">
-                        <i class="bi @n.Icon me-2"></i>
-                        <span>@n.Message</span>
-                    </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-                </div>
-            </div>
-            <script>
-                document.addEventListener("DOMContentLoaded", function () {
-                    var el = document.getElementById("@toastId");
-                    var toast = new bootstrap.Toast(el, { delay: 5000 });
-                    toast.show();
-                });
-            </script>
-        }
-    </div>
 }

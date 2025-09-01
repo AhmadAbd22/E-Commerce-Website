@@ -14,7 +14,7 @@
     <div class="page-size-controls">
         <div class="form-inline">
             <label class="ml-10">Show</label>
-            <select id="page-size-selector" class="form-control" style="display: inline-block; width: auto;">
+            <select id="page-size-selector" class="select-picker" style="display: inline-block; width:60%;">
                 <option value="10" selected="@(Model.PageSize == 10)">10</option>
                 <option value="15" selected="@(Model.PageSize == 15)">15</option>
                 <option value="20" selected="@(Model.PageSize == 20)">20</option>
@@ -74,3 +74,12 @@
         .page-size-controls { position: static; transform: none; margin: 0 auto; left: auto; top: auto; }
     }
 </style>
+
+@section Scripts {
+        function initializePlugins(pagination-container) {
+                    // activate all themed selects within the given container
+                    container.find('.select-picker').selectpicker();
+                    // tooltips (if any)
+                    container.find('[data-popup="tooltip"]').tooltip();
+                }
+}

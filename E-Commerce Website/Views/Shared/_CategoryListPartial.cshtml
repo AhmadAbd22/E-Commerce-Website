@@ -2,11 +2,11 @@
 @model PagedResult<Category>
 
 <div class="table-responsive border-top-lg border-top-primary">
-    <table class="table table-striped table-hover">
+    <table class="table table-hover">
         <thead>
             <tr class="bg-blue">
                 <th>Category Name</th>
-                <th class="text-center" style="width: 100px;">Actions</th>
+                <th class="text-center text-size-large" style="width: 100px;">Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -18,20 +18,20 @@
             }
             @foreach (var category in Model.Items)
             {
-                <tr>
-                    <td>@category.CategoryType</td>
-                    <td class="text-center">
+                <tr class="text-size-large">
+                    <td class="col-md-10">@category.CategoryType</td>
+                    <td class="text-center col-md-2">
                         <ul class="icons-list">
-                            <li>
+                            <li class="text-primary-600">
                                 <button type="button" class="btn btn-link edit-category-btn" data-toggle="modal" data-target="#categoryModal"
                                         data-category-id="@category.Id" data-category-name="@category.CategoryType" title="Edit">
-                                    <i class="icon-pencil7"></i>
+                                    <i class="icon-pencil7 icon-2x"></i>
                                 </button>
                             </li>
-                            <li>
+                            <li class="text-danger-600">
                                 <button type="button" class="btn btn-link text-danger-600 delete-category-btn" data-toggle="modal" data-target="#categoryModal"
                                         data-category-id="@category.Id" data-category-name="@category.CategoryType" title="Delete">
-                                    <i class="icon-trash"></i>
+                                    <i class="icon-trash icon-2x"></i>
                                 </button>
                             </li>
                         </ul>
@@ -42,8 +42,6 @@
     </table>
 </div>
 
-<div class="panel panel-flat">
-    <div class="panel-footer" style="margin-top:20px">
-        @await Html.PartialAsync("_PaginationPartial", Model)
-    </div>
+<div class="panel-footer" style="margin-top:20px">
+    @await Html.PartialAsync("_PaginationPartial", Model)
 </div>

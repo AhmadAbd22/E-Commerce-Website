@@ -19,8 +19,8 @@
             @foreach (var author in Model.Items)
             {
                 <tr class="text-size-large">
-                    <td>@author.AuthorName</td>
-                    <td class="text-center">
+                    <td class="col-md-10">@author.AuthorName</td>
+                    <td class="text-center col-md-2">
                         <ul class="icons-list">
                             <li class="text-primary-600">
                                 <button type="button" class="btn btn-link edit-author-btn" data-toggle="modal" data-target="#addAuthorModal" data-author-id="@author.Id" data-author-name="@author.AuthorName" title="Edit">
@@ -41,8 +41,6 @@
     </table>
 </div>
 
-<div class="panel panel-flat">
     <div class="panel-footer" style="margin-top:20px">
         @await Html.PartialAsync("_PaginationPartial", Model)
     </div>
-</div>

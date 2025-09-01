@@ -13,6 +13,10 @@
     <link href="~/assets/css/core.css" rel="stylesheet" type="text/css">
     <link href="~/assets/css/components.css" rel="stylesheet" type="text/css">
     <link href="~/assets/css/colors.css" rel="stylesheet" type="text/css">
+
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -48,6 +52,23 @@
     <script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.js"></script>
     <script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.date.js"></script>
     <script type="text/javascript" src="~/assets/js/core/app.js"></script>
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <!-- Toastr config -->
+    <script>
+        toastr.options = {
+            "closeButton": true,
+            "progressBar": true,
+            "positionClass": "toast-bottom-right",
+            "timeOut": "4000"
+        };
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
+    @await Html.PartialAsync("_ToastNotifications")
+    @await Html.PartialAsync("_ScriptsHelper")
 </body>
 </html>
