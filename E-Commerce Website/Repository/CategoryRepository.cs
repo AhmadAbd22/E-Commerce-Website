@@ -1,4 +1,6 @@
 using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Dtos;
+using ECommerceWebsite.Models.Enums;
 using ECommerceWebsite.Models.Helping_Classes;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,16 +37,33 @@ namespace ECommerceWebsite.Models.Repository
             return await _context.Categories.FindAsync(id);
         }
 
-        public async Task AddCategoryAsync(Category category)
+        public async Task AddCategoryAsync(Category cat)
         {
+            var category = new Category
+            {
+                Id = Guid.NewGuid(),
+                CategoryType = cat.CategoryType.ToLower(),
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                isActive = (int)enumStatus.Active,
+                IsDeleted = false,
+            };
+
             await _context.Categories.AddAsync(category);
             await _context.SaveChangesAsync();
         }
 
-        public async Task UpdateCategoryAsync(Category category)
+        public async Task UpdateCategoryAsync(Category cat)
         {
-            _context.Categories.Update(category);
-            await _context.SaveChangesAsync();
+            var existingCategory = await _context.Categories.FindAsync(cat.Id);
+            if (existingCategory != null)
+            {
+                existingCategory.CategoryType = cat.CategoryType.ToLower();
+                existingCategory.UpdatedAt = DateTime.UtcNow;
+
+                _context.Categories.Update(existingCategory);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task DeleteCategoryAsync(Guid id)
@@ -71,6 +90,12 @@ namespace ECommerceWebsite.Models.Repository
                 case "name_desc":
                     query = query.OrderByDescending(c => c.CategoryType);
                     break;
+                case "date_desc":
+                    query = query.OrderByDescending(c => c.CreatedAt);
+                     break;
+                case "date_asc":
+                    query = query.OrderBy(c => c.CreatedAt);
+                     break;
                 default: 
                     query = query.OrderBy(c => c.CategoryType);
                     break;
