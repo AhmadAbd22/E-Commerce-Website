@@ -1,4 +1,4 @@
-using ECommerceWebsite.Models;
+﻿using ECommerceWebsite.Models;
 using ECommerceWebsite.Models.Dtos;
 using ECommerceWebsite.Repository;
 using ECommerceWebsite.Services;
@@ -50,7 +50,7 @@ namespace ECommerceWebsite.Controllers
 
                 if (!IsCurrentUserCustomer())
                 {
-                    TempData["Error"] = "Admin users cannot add items to cart.";
+                    TempData.SetError("Admin users are not allowed to add items to the cart.");
                     return RedirectToAction("UserHome", "UserHome");
                 }
 
@@ -58,13 +58,13 @@ namespace ECommerceWebsite.Controllers
 
                 if (book == null)
                 {
-                    TempData["Error"] = "Book not found!";
+                    TempData.SetError("The selected book could not be found.");
                     return RedirectToAction("UserHome", "UserHome");
                 }
 
                 if (book.StockQuantity < quantity)
                 {
-                    TempData["Error"] = "Not enough stock available!";
+                    TempData.SetError("Not enough stock available for your request.");
                     return RedirectToAction("UserHome", "UserHome");
                 }
 
@@ -78,23 +78,23 @@ namespace ECommerceWebsite.Controllers
                 };
 
                 await _cartRepo.AddToCartAsync(cartItem);
-                TempData["Success"] = $"{book.Title} has been added to your cart!";
+                TempData.SetSuccess($"<i class='{NotificationIcons.Success}'></i> '{book.Title}' added to your cart.");
 
                 return RedirectToAction("UserHome", "UserHome");
             }
             catch (UnauthorizedAccessException ex)
             {
-                TempData["Error"] = "Please log in to add items to your cart.";
+                TempData.SetError("Please log in to add items to your cart.");
                 return RedirectToAction("Login", "Login");
             }
             catch (InvalidOperationException ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData.SetError(ex.Message);
                 return RedirectToAction("UserHome", "UserHome");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred while adding to cart.";
+                TempData.SetError(ex.Message);
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
@@ -130,12 +130,12 @@ namespace ECommerceWebsite.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to view your cart.";
+                TempData.SetError("Please log in to view your cart.");
                 return RedirectToAction("Login", "Login");
             }
             catch (Exception)
             {
-                TempData["Error"] = "Error loading cart.";
+                TempData.SetError("Error loading cart.");
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
@@ -155,30 +155,30 @@ namespace ECommerceWebsite.Controllers
                 var cartItem = await _cartRepo.GetCartItemByIdAsync(cartItemId);
                 if (cartItem == null)
                 {
-                    TempData["Error"] = "Cart item not found.";
+                    TempData.SetSuccess("Cart updated successfully.");
                     return RedirectToAction("ViewCart");
                 }
 
                 if (cartItem.UserId != userId)
                 {
-                    TempData["Error"] = "Unauthorized access to cart item.";
+                    TempData.SetError("Unauthorized access to cart item");
                     return RedirectToAction("ViewCart");
                 }
 
                 cartItem.Quantity = quantity;
                 await _cartRepo.UpdateCartItemAsync(cartItem);
 
-                TempData["Success"] = "Cart updated successfully!";
+                TempData.SetSuccess("Cart updated successfully!");
                 return RedirectToAction("ViewCart");
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to update your cart.";
+                TempData.SetError("Please log in to update your cart.");
                 return RedirectToAction("Login", "Login");
             }
             catch (InvalidOperationException ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData.SetError(ex.Message);
                 return RedirectToAction("ViewCart");
             }
         }
@@ -193,28 +193,28 @@ namespace ECommerceWebsite.Controllers
                 var cartItem = await _cartRepo.GetCartItemByIdAsync(cartItemId);
                 if (cartItem == null)
                 {
-                    TempData["Error"] = "Cart item not found.";
+                    TempData.SetError("Cart item not found.");
                     return RedirectToAction("ViewCart");
                 }
 
                 if (cartItem.UserId != userId)
                 {
-                    TempData["Error"] = "Unauthorized access to cart item.";
+                    TempData.SetError("Unauthorized access to cart item.");
                     return RedirectToAction("ViewCart");
                 }
 
                 await _cartRepo.RemoveCartItemAsync(cartItemId);
-                TempData["Success"] = "Item removed from cart.";
+                TempData.SetSuccess("Item removed from cart.");
                 return RedirectToAction("ViewCart");
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to modify your cart.";
+                TempData.SetError("Please log in to modify your cart.");
                 return RedirectToAction("Login", "Login");
             }
             catch (Exception)
             {
-                TempData["Error"] = "Error removing item from cart.";
+                TempData.SetError("Error removing item from cart.");
                 return RedirectToAction("ViewCart");
             }
         }
@@ -229,13 +229,13 @@ namespace ECommerceWebsite.Controllers
 
                 if (!cartItems.Any())
                 {
-                    TempData["Error"] = "Your cart is empty.";
+                    TempData.SetError("Your cart is empty.");
                     return RedirectToAction("ViewCart");
                 }
 
                 if (!await _orderService.ValidateCartStockAsync(userId))
                 {
-                    TempData["Error"] = "Some items in your cart are no longer available in the requested quantity.";
+                    TempData.SetError("Some items in your cart are no longer available in the requested quantity.");
                     return RedirectToAction("ViewCart");
                 }
 
@@ -259,12 +259,12 @@ namespace ECommerceWebsite.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to checkout.";
+                TempData.SetError("Please log in to checkout.");
                 return RedirectToAction("Login", "Login");
             }
             catch (Exception)
             {
-                TempData["Error"] = "Error loading checkout page.";
+                TempData.SetError("Error loading checkout page.");
                 return RedirectToAction("ViewCart");
             }
         }
@@ -304,22 +304,22 @@ namespace ECommerceWebsite.Controllers
                     checkoutDto.PhoneNumber
                 );
 
-                TempData["Success"] = $"Order placed successfully! Order ID: {order.Id}";
+                TempData.SetSuccess($"Order placed successfully! Order ID: {order.Id}");
                 return RedirectToAction("OrderConfirmation", new { orderId = order.Id });
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to place an order.";
+                TempData.SetError("Please log in to place an order.");
                 return RedirectToAction("Login", "Login");
             }
             catch (InvalidOperationException ex)
             {
-                TempData["Error"] = ex.Message;
+                TempData.SetError(ex.Message);
                 return View("Checkout", checkoutDto);
             }
             catch (Exception)
             {
-                TempData["Error"] = "An error occurred while placing your order.";
+                TempData.SetError("An error occurred while placing your order.");
                 return View("Checkout", checkoutDto);
             }
         }
@@ -337,13 +337,13 @@ namespace ECommerceWebsite.Controllers
 
                 if (order == null)
                 {
-                    TempData["Error"] = "Order not found.";
+                    TempData.SetError("Order not found.");
                     return RedirectToAction("ViewCart");
                 }
 
                 if (order.UserId != userId)
                 {
-                    TempData["Error"] = "Unauthorized access to order.";
+                    TempData.SetError("Unauthorized access to order.");
                     return RedirectToAction("UserHome", "UserHome");
                 }
 
@@ -372,13 +372,13 @@ namespace ECommerceWebsite.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to view order confirmation.";
+                TempData.SetError("Please log in to view order confirmation.");
                 return RedirectToAction("Login", "Login");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Order placement error: {ex.Message}");
-                TempData["Error"] = "An error occurred while loading order confirmation.";
+                TempData.SetError("An error occurred while loading order confirmation.");
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
@@ -388,7 +388,7 @@ namespace ECommerceWebsite.Controllers
         {
             if (orderId == Guid.Empty)
             {
-                TempData["Error"] = "Invalid Order ID.";
+                TempData.SetError("Invalid Order ID.");
                 return RedirectToAction("OrderHistory");
             }
 
@@ -398,17 +398,17 @@ namespace ECommerceWebsite.Controllers
             //validation checks
             if (order == null)
             {
-                TempData["Error"] = "Order not found.";
+                TempData.SetError("Order not found.");
                 return RedirectToAction("OrderHistory");
             }
             if (order.UserId != userId)
             {
-                TempData["Error"] = "You are not authorized to cancel this order.";
+                TempData.SetError("You are not authorized to cancel this order.");
                 return RedirectToAction("OrderHistory");
             }
             if (order.OrderStatus != "Pending" && order.OrderStatus != "Confirmed")
             {
-                TempData["Error"] = "This order cannot be cancelled as it has already been processed or shipped.";
+                TempData.SetError("This order cannot be cancelled as it has already been processed or shipped.");
                 return RedirectToAction("OrderHistory");
             }
 
@@ -431,7 +431,7 @@ namespace ECommerceWebsite.Controllers
 
             await _orderRepo.UpdateOrderAsync(order);
 
-            TempData["Success"] = "Your order has been successfully cancelled.";
+            TempData.SetSuccess("Your order has been successfully cancelled.");
             return RedirectToAction("OrderHistory");
         }
 
@@ -491,14 +491,14 @@ namespace ECommerceWebsite.Controllers
             }
             catch (UnauthorizedAccessException)
             {
-                TempData["Error"] = "Please log in to view your order history.";
+                TempData.SetError("Please log in to view your order history.");
                 return RedirectToAction("Login", "Login");
             }
             catch (Exception ex)
             {
                 // This will now only catch unexpected errors
                 System.Diagnostics.Debug.WriteLine($"Order history error: {ex.Message}");
-                TempData["Error"] = "An error occurred while loading your order history.";
+                TempData.SetError("An error occurred while loading your order history.");
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
