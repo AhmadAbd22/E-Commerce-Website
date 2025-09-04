@@ -112,13 +112,12 @@ namespace ECommerceWebsite.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Details(Guid id)
+        public async Task<IActionResult> BookDetailsPartial(Guid id)
         {
             var book = await _bookRepo.GetBookByIdAsync(id);
             if (book == null)
             {
-                TempData["Error"] = "Book not found!";
-                return RedirectToAction("Admin");
+                return Content("<div class='alert alert-danger'>Book not found.</div>");
             }
 
             await PopulateViewDataForAdmin();
@@ -138,7 +137,7 @@ namespace ECommerceWebsite.Controllers
                 CategoryId = book.CategoryId
             };
 
-            return View("AdminViewProduct", bookDto);
+            return PartialView("_BookDetailsModalPartial", bookDto);
         }
 
         
@@ -318,7 +317,7 @@ namespace ECommerceWebsite.Controllers
             book.UpdatedAt = DateTime.UtcNow;
 
             await _bookRepo.UpdateBookAsync(book);
-            TempData["Success"] = "Book updated successfully!";
+            TempData.SetSuccess( "Book updated successfully!");
             return RedirectToAction("Admin");
         }
 
@@ -363,12 +362,12 @@ namespace ECommerceWebsite.Controllers
             try
             {
                 await _bookRepo.RestoreBookAsync(id);
-                TempData["Success"] = "Book restored successfully!";
+                TempData.SetSuccess( "Book restored successfully!");
                 return RedirectToAction("DeletedBooks");
             }
             catch (Exception)
             {
-                TempData["Error"] = "Error restoring book.";
+                TempData.SetError( "Error restoring book.");
                 return RedirectToAction("DeletedBooks");
             }
         }
@@ -469,19 +468,15 @@ namespace ECommerceWebsite.Controllers
         {
             if (string.IsNullOrWhiteSpace(authDto.Name) || (await _authorRepo.GetAllAuthorsAsync()).Any(a => a.AuthorName.Equals(authDto.Name.Trim(), StringComparison.OrdinalIgnoreCase)))
             {
-                // Handle validation errors...
-                if (string.IsNullOrWhiteSpace(authDto.Name))
-                    ViewData["EmptyFields"] = "Author name cannot be empty!";
-                else
-                    ViewData["AuthorExists"] = "Author already exists!";
+                TempData.SetError( string.IsNullOrWhiteSpace(authDto.Name)
+                    ? "Author name cannot be empty!"
+                    : "Author already exists!");
 
-                ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync(null, "name_asc", 1, 10);
-                return View(authDto);
+                return RedirectToAction("AddAuthor");
             }
 
-            var author = new Author { Id = Guid.NewGuid(), AuthorName = authDto.Name.Trim() };
-            await _authorRepo.AddAuthorAsync(author);
-            TempData["Message"] = "Author added successfully!";
+            await _authorRepo.AddAuthorAsync(authDto);
+            TempData.SetSuccess( "Author added successfully!");
             return RedirectToAction("AddAuthor");
         }
         [HttpGet]
@@ -490,10 +485,15 @@ namespace ECommerceWebsite.Controllers
             var author = await _authorRepo.GetAuthorByIdAsync(id);
             if (author == null) return NotFound();
 
-            ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync(null, "name_asc", 1, 10);
+            ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync("", "name_asc", 1, 10);
             ViewData["IsEditing"] = true;
 
-            var dto = new AuthorDto { AuthorId = author.Id, Name = author.AuthorName };
+            var dto = new AuthorDto { 
+                AuthorId = author.Id,
+                Name = author.AuthorName,
+            };
+
+            await _authorRepo.UpdateAuthorAsync(dto);
 
             return View("AddAuthor", dto);
         }
@@ -504,7 +504,7 @@ namespace ECommerceWebsite.Controllers
             if (string.IsNullOrWhiteSpace(dto.Name))
             {
                 ViewData["EmptyFields"] = "Author name cannot be empty!";
-                ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync(null, "name_asc", 1, 10);
+                ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync("", "name_asc", 1, 10);
                 ViewData["IsEditing"] = true;
                 return View("AddAuthor", dto);
             }
@@ -514,7 +514,8 @@ namespace ECommerceWebsite.Controllers
                 var author = await _authorRepo.GetAuthorByIdAsync(dto.AuthorId);
                 if (author == null) return NotFound();
                 author.AuthorName = dto.Name.Trim();
-                await _authorRepo.UpdateAuthorAsync(author);
+
+                await _authorRepo.UpdateAuthorAsync(dto);
             }
             catch (InvalidOperationException ex)
             {
@@ -524,7 +525,7 @@ namespace ECommerceWebsite.Controllers
                 return View("AddAuthor", dto);
             }
 
-            TempData["Success"] = "Author updated successfully!";
+            TempData.SetSuccess( "Author updated successfully!");
             return RedirectToAction("AddAuthor");
         }
 
@@ -536,24 +537,24 @@ namespace ECommerceWebsite.Controllers
                 var author = await _authorRepo.GetAuthorByIdAsync(authorId);
                 if (author == null)
                 {
-                    TempData["Error"] = "Author not found!";
+                    TempData.SetError( "Author not found!");
                     return RedirectToAction("AddAuthor");
                 }
 
                 var booksByAuthor = await _bookRepo.GetBooksByAuthorAsync(authorId);
                 if (booksByAuthor.Any())
                 {
-                    TempData["Error"] = "Cannot delete author. Books are associated with this author.";
+                    TempData.SetError( "Cannot delete author. Books are associated with this author.");
                     return RedirectToAction("AddAuthor");
                 }
 
                 await _authorRepo.DeleteAuthor(author);
-                TempData["Success"] = "Author deleted successfully!";
+                TempData.SetSuccess( "Author deleted successfully!");
                 return RedirectToAction("AddAuthor");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred while deleting the author.";
+                TempData.SetError( "An error occurred while deleting the author.");
                 return RedirectToAction("AddAuthor");
             }
         }
@@ -591,13 +592,13 @@ namespace ECommerceWebsite.Controllers
                     ViewData["CategoryExists"] = "A category with this name already exists!";
 
                 // IMPORTANT: Reload the list before returning the view on failure
-                ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync(null, "name_asc", 1, 10);
+                ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync("", "name_asc", 1, 10);
                 return View(catDto);
             }
 
-            var category = new Category { Id = Guid.NewGuid(), CategoryType = catDto.CategoryType.Trim() };
-            await _categoryRepo.AddCategoryAsync(category);
-            TempData["Success"] = "Category added successfully!";
+
+            await _categoryRepo.AddCategoryAsync(catDto);
+            TempData.SetSuccess( "Category added successfully!");
             return RedirectToAction("AddCategory");
         }
 
@@ -607,10 +608,10 @@ namespace ECommerceWebsite.Controllers
             var category = await _categoryRepo.GetCategoryByIdAsync(id);
             if (category == null) return NotFound();
 
-            ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync(null, "name_asc", 1, 10);
+            ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync("", "name_asc", 1, 10);
             ViewData["IsEditing"] = true;
 
-            var dto = new CategoryDto { Id = category.Id, CategoryType = category.CategoryType };
+            var dto = new CategoryDto { Id = category.Id, CategoryType = category.CategoryType,};
 
             return View("AddCategory", dto);
         }
@@ -621,14 +622,14 @@ namespace ECommerceWebsite.Controllers
             if (string.IsNullOrWhiteSpace(dto.CategoryType))
             {
                 ViewData["EmptyFields"] = "Category name cannot be empty!";
-                ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync(null, "name_asc", 1, 10);
+                ViewData["ExistingCategories"] = await _categoryRepo.GetAllCategoriesPagedAsync("", "name_asc", 1, 10);
                 ViewData["IsEditing"] = true;
                 return View("AddCategory", dto);
             }
 
-            // ... (your existing update logic is fine, just ensure redirects are correct)
+            await _categoryRepo.UpdateCategoryAsync(dto);
 
-            TempData["Success"] = "Category updated successfully!";
+            TempData.SetSuccess( "Category updated successfully!");
             return RedirectToAction("AddCategory");
         }
 
@@ -637,7 +638,7 @@ namespace ECommerceWebsite.Controllers
         {
             if (categoryId == Guid.Empty)
             {
-                TempData["Error"] = "Invalid category ID.";
+                TempData.SetError("Invalid category ID.");
                 return RedirectToAction("AddCategory");
             }
 
@@ -646,24 +647,24 @@ namespace ECommerceWebsite.Controllers
                 var booksInCategory = await _bookRepo.GetBooksByCategoryAsync(categoryId);
                 if (booksInCategory.Any())
                 {
-                    TempData["Error"] = $"Cannot delete this category because it is still used by {booksInCategory.Count()} book(s). Please reassign them first.";
+                    TempData.SetError($"Cannot delete this category because it is still used by {booksInCategory.Count()} book(s). Please reassign them first.");
                     return RedirectToAction("AddCategory");
                 }
 
                 var category = await _categoryRepo.GetCategoryByIdAsync(categoryId);
                 if (category == null)
                 {
-                    TempData["Error"] = "Category not found.";
+                    TempData.SetError( "Category not found.");
                     return RedirectToAction("AddCategory");
                 }
 
                 await _categoryRepo.DeleteCategoryAsync(categoryId);
-                TempData["Success"] = "Category deleted successfully!";
+                TempData.SetSuccess( "Category deleted successfully!");
                 return RedirectToAction("AddCategory");
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred while deleting the category.";
+                TempData.SetError( "An error occurred while deleting the category.");
                 return RedirectToAction("AddCategory");
             }
         }
@@ -721,14 +722,14 @@ namespace ECommerceWebsite.Controllers
         {
             if (orderId == Guid.Empty || string.IsNullOrEmpty(status))
             {
-                TempData["Error"] = "Invalid order data.";
+                TempData.SetError( "Invalid order data.");
                 return RedirectToAction("Orders");
             }
 
             var order = await _orderRepo.GetOrderByIdAsync(orderId);
             if (order == null)
             {
-                TempData["Error"] = "Order not found.";
+                TempData.SetError( "Order not found.");
                 return RedirectToAction("Orders");
             }
 
@@ -737,7 +738,7 @@ namespace ECommerceWebsite.Controllers
 
             await _orderRepo.UpdateOrderAsync(order);
 
-            TempData["Success"] = $"Order status has been updated to '{status}'.";
+            TempData.SetSuccess( $"Order status has been updated to '{status}'.");
             return RedirectToAction("Orders");
         }
 
