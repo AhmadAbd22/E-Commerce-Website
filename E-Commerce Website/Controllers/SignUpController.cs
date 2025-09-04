@@ -33,20 +33,20 @@ namespace ECommerceWebsite.Controllers
                 string.IsNullOrEmpty(signupDto.FirstName) || string.IsNullOrEmpty(signupDto.LastName) ||
                 string.IsNullOrEmpty(signupDto.Email) )
             {
-                ViewData["UsernameError"] = "All fields are required.";
+                TempData.SetError("All fields are required.");
                 return View(signupDto);
             }
 
             var existingUser = await _userRepo.GetUserByEmailAsync(signupDto.Email);
             if(existingUser != null)
             {
-                ViewData["ExistUser"] = "User already exists with this email. Use another email";
+                TempData.SetWarning("User already exists with this email. Use another email");
                 return View(signupDto);
             }
             
             if (signupDto.Password != signupDto.ConfirmPassword)
             {
-                ViewData["PasswordError"] = "Passwords do not match.";
+                TempData.SetError("Passwords do not match.");
                 return View(signupDto);
             }
 
@@ -76,7 +76,7 @@ namespace ECommerceWebsite.Controllers
 
             await _userRepo.AddUserAsync(user);
 
-            TempData["Message"] = "Sign-up successful!";
+            TempData.SetSuccess("Sign-up successful! Please log in to continue.");
             return RedirectToAction("Login", "Login");
         }
     }
