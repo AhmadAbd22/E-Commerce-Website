@@ -89,8 +89,10 @@
 @section Scripts {
     <script type="text/javascript">
         $(function () {
-            var debounceTimeout;
 
+            $('.select-picker').selectpicker();
+
+            var debounceTimeout;
             function fetchCategories(pageNumber) {
                 var search = $('#search-input').val();
                 var sortBy = $('#sort-by').val();
