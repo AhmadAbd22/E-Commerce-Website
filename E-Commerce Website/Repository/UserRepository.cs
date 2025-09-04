@@ -37,7 +37,11 @@ namespace ECommerceWebsite.Repository
             var user = await GetUserByIdAsync(id);
             if (user != null)
             {
-                _context.Users.Remove(user);
+                user.isActive = (int)enumStatus.Inactive; // Soft delete by setting isActive to Inactive
+                user.IsDeleted = true;                    // Mark as deleted
+                user.UpdatedAt = DateTime.UtcNow;
+
+                _context.Users.Update(user);
                 await _context.SaveChangesAsync();
             }
         }
