@@ -2,8 +2,6 @@
 @{
     ViewData["Title"] = "Manage Authors";
     Layout = "_AdminLayout";
-
-    var isDeleting = ViewData["isDeleting"] as bool? == true;
     var currentSearch = ViewData["CurrentSearch"] as string;
     var currentSortBy = ViewData["CurrentSortBy"] as string ?? "name_asc";
     var existingAuthors = ViewData["ExistingAuthors"] as ECommerceWebsite.Models.Helping_Classes.PagedResult<Author>;
@@ -11,50 +9,58 @@
 
 <!-- Page header -->
 <div class="page-header page-header-default">
-    <div class="page-header-content"><div class="page-title"><h4><i class="icon-user-plus position-left"></i> <span class="text-semibold">Authors</span> - Management</h4></div></div>
-    <div class="breadcrumb-line"><ul class="breadcrumb"><li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Home</a></li><li class="active">Authors</li></ul></div>
+    <div class="page-header-content">
+        <div class="page-title">
+            <h4><i class="icon-user-tie position-left"></i> <span class="text-semibold">Authors</span> - Management</h4>
+        </div>
+    </div>
+    <div class="breadcrumb-line">
+        <ul class="breadcrumb">
+            <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Admin</a></li>
+            <li class="active">Authors</li>
+        </ul>
+    </div>
 </div>
 
 <div class="content">
-    
+    <!-- Existing Authors List Panel -->
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h4 class="panel-title col-md-10">Existing Authors</h4>
+            <button type="button" id="addAuthorButton" class="btn btn-primary btn-sm legitRipple" data-toggle="modal" data-target="#authorModal">
+                Add Author <i class="icon-plus3 position-right"></i>
+            </button>
+        </div>
 
-        <!-- Existing Authors List Panel -->
-        <div>
-            <div class="panel panel-flat">
-                <div class="panel-heading"><h4 class="panel-title col-md-11">Existing Authors</h4>
-                    <button type="button" id="addAuthorButton" class="btn btn-primary btn-sm legitRipple" data-toggle="modal" data-target="#addAuthorModal">Add Author<i class="icon-plus3 position-right"></i></button>
+        <div class="panel-body">
+            <!-- Filter and Sort Controls -->
+            <div class="row">
+                <div class="col-md-6">
+                    <input type="search" id="search-input" class="form-control" placeholder="Search authors..." value="@currentSearch">
                 </div>
-
-                <div class="panel-body">
-                    <!-- Filter and Sort Controls -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="search" id="search-input" class="form-control" placeholder="Search authors..." value="@currentSearch">
-                        </div>
-                        <div class="col-md-6">
-                            <select id="sort-by" class="select-picker">
-                                <option value="name_asc" selected="@(currentSortBy == "name_asc")">Sort by Name (A-Z)</option>
-                                <option value="name_desc" selected="@(currentSortBy == "name_desc")">Sort by Name (Z-A)</option>
-                                <option value="date_desc" selected="@(currentSortBy == "date_desc")">Sort by Date(Newest First)</option>
-                                <option value="date_asc" selected="@(currentSortBy == "date_asc")">Sort by Date(Oldest First)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- AJAX Container for the list -->
-                <div id="author-list-container">
-                    @if (existingAuthors != null)
-                    {
-                        @await Html.PartialAsync("_AuthorListPartial", existingAuthors)
-                    }
+                <div class="col-md-2">
+                    <select id="sort-by" class="select-picker">
+                        <option value="name_asc" selected="@(currentSortBy == "name_asc")">Sort by Name (A-Z)</option>
+                        <option value="name_desc" selected="@(currentSortBy == "name_desc")">Sort by Name (Z-A)</option>
+                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Sort by Date (Newest First)</option>
+                        <option value="date_asc" selected="@(currentSortBy == "date_asc")">Sort by (Oldest First)</option>
+                    </select>
                 </div>
             </div>
         </div>
+
+        <!-- AJAX Container for the list -->
+        <div id="author-list-container">
+            @if (existingAuthors != null)
+            {
+                @await Html.PartialAsync("_AuthorListPartial", existingAuthors)
+            }
+        </div>
+    </div>
 </div>
 
-<!-- Add Author Modal -->
-<div id="addAuthorModal" class="modal fade" tabindex="-1" role="dialog">
+<!-- Generic Author Modal -->
+<div id="authorModal" class="modal fade" tabindex="-1" role="dialog">
     <div class="modal-dialog" style="margin: 300px auto">
         <div class="modal-content">
             <form id="authorForm" method="post">
@@ -62,18 +68,15 @@
                     <button type="button" class="close" data-dismiss="modal">×</button>
                     <h5 class="modal-title" id="modalTitle">Add New Author</h5>
                 </div>
-
                 <div class="modal-body">
-                    <input type="hidden" id="authorId" name="AuthorId" />
-
+                    <input type="hidden" id="authorId" name="Id" />
                     <div id="modalBodyContent">
                         <div class="form-group">
                             <label>Author Name:</label>
-                            <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
+                            <input type="text" id="authorName" name="AuthorName" class="form-control" placeholder="e.g., J.K. Rowling">
                         </div>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                     <button type="submit" id="modalSubmitButton" class="btn btn-primary">Save Author</button>
@@ -83,41 +86,34 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script type="text/javascript">
-        $(function() {
+        $(function () {
+            $('.select-picker').selectpicker();
+
             var debounceTimeout;
-
-            // Initialize plugins for dynamically loaded content
-            function initializePlugins(container) {
-                container.find('.select-picker').selectpicker(); // activate bootstrap-select
-                container.find('[data-popup="tooltip"]').tooltip();
-            }
-
             function fetchAuthors(pageNumber) {
                 var search = $('#search-input').val();
                 var sortBy = $('#sort-by').val();
                 var pageSize = $('#author-list-container #page-size-selector').val() || 10;
-                var url = `@Url.Action("AddAuthor", "Admin")?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&sortBy=${encodeURIComponent(sortBy)}`;
+                var url = `@Url.Action("AddAuthors", "Admin")?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&sortBy=${encodeURIComponent(sortBy)}`;
 
                 $('#author-list-container').html('<div class="text-center p-20"><i class="icon-spinner2 spinner"></i></div>');
                 $.get(url, function (data) {
                     $('#author-list-container').html(data);
-                    initializePlugins($('#author-list-container')); //  re-init after AJAX load
                 });
             }
 
-            // --- MODAL HANDLERS ---
-            $('#addAuthorButton').on('click', function() {
+            // Add Author
+            $('#addAuthorButton').on('click', function () {
                 var form = $('#authorForm');
-                form.attr('action', '@Url.Action("AddAuthor", "Admin")');
+                form.attr('action', '@Url.Action("AddAuthors", "Admin")');
 
                 $('#modalTitle').text('Add New Author');
                 $('#modalBodyContent').html(`
                     <div class="form-group">
                         <label>Author Name:</label>
-                        <input type="text" id="authorName" name="Name" class="form-control" placeholder="e.g., J.R.R. Tolkien">
+                        <input type="text" id="authorName" name="AuthorName" class="form-control" placeholder="e.g., J.K. Rowling">
                     </div>
                 `);
                 $('#modalSubmitButton').text('Save Author').removeClass('btn-danger').addClass('btn-primary');
@@ -125,7 +121,8 @@
                 $('#authorName').val('');
             });
 
-            $('#author-list-container').on('click', '.edit-author-btn', function() {
+            // Edit Author
+            $('#author-list-container').on('click', '.edit-author-btn', function () {
                 var button = $(this);
                 var authorId = button.data('author-id');
                 var authorName = button.data('author-name');
@@ -137,14 +134,15 @@
                 $('#modalBodyContent').html(`
                     <div class="form-group">
                         <label>Author Name:</label>
-                        <input type="text" id="authorName" name="Name" class="form-control" value="${authorName}">
+                        <input type="text" id="authorName" name="AuthorName" class="form-control" value="${authorName}">
                     </div>
                 `);
                 $('#modalSubmitButton').text('Update Author').removeClass('btn-danger').addClass('btn-primary');
                 $('#authorId').val(authorId);
             });
 
-            $('#author-list-container').on('click', '.delete-author-btn', function() {
+            // Delete Author
+            $('#author-list-container').on('click', '.delete-author-btn', function () {
                 var button = $(this);
                 var authorId = button.data('author-id');
                 var authorName = button.data('author-name');
@@ -161,19 +159,11 @@
             });
 
             // --- EVENT HANDLERS ---
-            $('#author-list-container').on('click', '.pagination a', function(e) {
-                e.preventDefault();
-                var page = $(this).data('page');
-                if(page) fetchAuthors(page);
-            });
-            $('#author-list-container').on('change', '#page-size-selector', function() { fetchAuthors(1); });
-            $('#sort-by').on('change', function() { fetchAuthors(1); });
-            $('#search-input').on('input', function() {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => fetchAuthors(1), 300);
-            });
-
-            initializePlugins($('.content'));
+            $('#author-list-container').on('click', '.pagination a', function (e) { e.preventDefault(); var page = $(this).data('page'); if (page) fetchAuthors(page); });
+            $('#author-list-container').on('change', '#page-size-selector', function () { fetchAuthors(1); });
+            $('#sort-by').on('change', function () { fetchAuthors(1); });
+            $('#search-input').on('input', function () { clearTimeout(debounceTimeout); debounceTimeout = setTimeout(() => fetchAuthors(1), 300); });
+            $('#authorForm').on('submit', function (e) { e.preventDefault(); });
         });
     </script>
 }
