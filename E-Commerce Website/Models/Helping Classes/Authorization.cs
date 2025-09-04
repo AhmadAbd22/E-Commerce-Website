@@ -74,7 +74,9 @@ namespace ECommerceWebsite.Models.Helping_Classes
         {
             try
             {
-                string roleString = user.Role == (int)enumRole.Admin ? "Admin" : "User";
+                string roleString = user.Role.HasValue
+                                        ? Enum.GetName(typeof(enumRole), user.Role.Value) ?? "Customer"
+                                        : "Customer";
                 List<Claim> claims = new List<Claim>()
                 {
                     new Claim(ClaimTypes.Sid, user.Id.ToString()),
