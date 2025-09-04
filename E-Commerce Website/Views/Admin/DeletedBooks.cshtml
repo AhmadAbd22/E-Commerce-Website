@@ -12,23 +12,6 @@
     Layout = "_AdminLayout";
 }
 
-@if (TempData["Success"] != null)
-{
-    <div class="alert alert-success alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert"><span>×</span></button>
-        <i class="icon-checkmark position-left"></i>
-        @TempData["Success"]
-    </div>
-}
-@if (TempData["Error"] != null)
-{
-    <div class="alert alert-danger alert-dismissible">
-        <button type="button" class="close" data-dismiss="alert"><span>×</span></button>
-        <i class="icon-blocked position-left"></i>
-        @TempData["Error"]
-    </div>
-}
-
 <!-- Page header -->
 <div class="page-header page-header-default">
     <div class="page-header-content">
@@ -62,7 +45,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="text-semibold">By Author</label>
-                        <select name="authorId" id="author-filter" class="form-control ui-select-lg, *-sm, *-xs" dropdown-menu>
+                        <select name="authorId" id="author-filter" class="form-control select-picker" dropdown-menu>
                             <option value="">All Authors</option>
                             @if (ViewData["Authors"] is IEnumerable<Author> authors)
                             {
@@ -84,7 +67,7 @@
                 <div class="col-md-2">
                     <div class="form-group">
                         <label class="text-semibold">By Category</label>
-                        <select name="categoryId" id="category-filter" class="form-control" required>
+                        <select name="categoryId" id="category-filter" class="form-control select-picker" required>
                             <option value="">All Categories</option>
                             @if (ViewData["Categories"] is IEnumerable<Category> categories)
                             {
@@ -158,6 +141,20 @@
 @section Scripts {
     <script type="text/javascript">
         $(function() {
+
+                function initializePlugins(container) {
+                    // activate all themed selects within the given container
+                    container.find('.select-picker').selectpicker();
+                    // tooltips (if any)
+                    container.find('[data-popup="tooltip"]').tooltip();
+                }
+
+                // Initialize STATIC controls at first load
+                // (keep these because some controls are outside #admin-book-container)
+                $('#sort-dropdown').selectpicker();
+                $('#author-filter').selectpicker();
+                $('#category-filter').selectpicker();
+
             $('#deleted-book-search').on('keyup', function() {
                 var searchTerm = $(this).val().toLowerCase();
                 var visibleCount = 0;
