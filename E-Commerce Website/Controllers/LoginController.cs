@@ -36,20 +36,20 @@ namespace ECommerceWebsite.Controllers
             //checking if fields are null
             if (string.IsNullOrEmpty(loginDto.Username) || string.IsNullOrEmpty(loginDto.Password))
             {
-                ViewData["LoginError"] = "Username and Password are required.";
+                TempData.SetError("Username and Password are required.");
                 return View(loginDto);
             }
 
             var user = await _userRepo.GetUserByUsernameAsync(loginDto.Username);
             if (user == null)
             {
-                ViewData["LoginError"] = "Invalid username or User Doesn't Exist";
+                TempData.SetError("Invalid username or User Doesn't Exist");
                 return View(loginDto);
             }
 
             if (user.IsDeleted)
             {
-                TempData["LoginError"] = "Your account has been deactivated. Please contact support.";
+                TempData.SetWarning("Your account has been deactivated. Please contact support.");
                 return View(loginDto);
             }
 
@@ -57,7 +57,7 @@ namespace ECommerceWebsite.Controllers
             string hashedInputPassword = PasswordHelper.HashPassword(loginDto.Password);
             if (user.Password != hashedInputPassword)
             {
-                TempData["Error"] = "Incorrect password.";
+                TempData.SetError("Incorrect password. Please try again.");
                 return View(loginDto);
             }
 
@@ -67,12 +67,12 @@ namespace ECommerceWebsite.Controllers
 
             if (user.Role == (int)enumRole.Admin)
             {
-                TempData["Success"] = "Welcome Back, Admin!";
+                TempData.SetSuccess("Welcome Back, Admin!");
                 return RedirectToAction("Admin", "Admin");
             }
             else
             {
-                TempData["Success"] = $"Welcome Back, {user.FirstName}!";
+                TempData.SetSuccess($"Welcome Back, {user.FirstName}!");
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
@@ -82,7 +82,7 @@ namespace ECommerceWebsite.Controllers
         {
             ViewData["Login"] = false; 
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            TempData["Success"] = "You have been successfully logged out.";
+            TempData.SetInfo("You have been successfully logged out.");
             return RedirectToAction("Login", "Login");
         }
     }
