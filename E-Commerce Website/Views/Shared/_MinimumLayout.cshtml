@@ -39,7 +39,18 @@
 	<!-- Plugin for file uploader -->
 	<script type="text/javascript" src="~/assets/js/plugins/uploaders/dropzone.min.js"></script>
 
-	
+	<!-- Toastr JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+	<!-- Toastr config -->
+	<script>
+		toastr.options = {
+			"closeButton": true,
+			"progressBar": true,
+			"positionClass": "toast-bottom-right",
+			"timeOut": "4000"
+		};
+	</script>
 
 </head>
 	@RenderSection("Styles", required: false)
@@ -63,6 +74,7 @@
 	
 	<!-- Page-specific scripts -->
 	@await RenderSectionAsync("Scripts", required: false)
-
+	@await Html.PartialAsync("_ToastNotifications")
+	@await Html.PartialAsync("_ScriptsHelper")
 </body>
 </html>

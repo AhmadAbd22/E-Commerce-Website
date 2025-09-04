@@ -1,7 +1,6 @@
 ﻿@using ECommerceWebsite.Models.Helping_Classes
 @model PagedResult<BookDto>
 
-<!-- Renders the grid of book cards -->
 <div class="row">
     @if (!Model.Items.Any())
     {
@@ -22,24 +21,56 @@
     }
 </div>
 
-    <div class="panel-footer" >
+<div class="panel-footer">
     @await Html.PartialAsync("_PaginationPartial", Model)
+</div>
+
+<!-- Shared Modal -->
+<div class="modal fade" id="userBookModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="userBookModalBody">
+                <div class="text-center">
+                    <i class="icon-spinner2 spinner"></i> Loading...
+                </div>
+            </div>
+        </div>
     </div>
-<!-- 🔹 Shared modal -->
-@await Html.PartialAsync("_BookModalPartial")
+</div>
+
+<!-- Shared Modal for User Books -->
+<div class="modal fade" id="userBookModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="userBookModalBody">
+                <div class="text-center">
+                    <i class="icon-spinner2 spinner"></i> Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @section Scripts {
     <script>
-        // Handle View Product button click
         $(document).on("click", ".view-book-btn", function () {
-            var bookId = $(this).data("id");
-            $("#bookModal").modal("show");
-            $("#bookModalBody").html('<div class="text-center"><i class="icon-spinner2 spinner"></i> Loading...</div>');
+            var bookId = $(this).data("book-id"); 
+            $("#userBookModal").modal("show");
+            $("#userBookModalBody").html('<div class="text-center"><i class="icon-spinner2 spinner"></i> Loading...</div>');
 
-            $.get("/Book/GetBookDetails", { id: bookId }, function (data) {
-                $("#bookModalBody").html(data);
+            $.get("/UserHome/Details", { id: bookId }, function (data) {
+                $("#userBookModalBody").html(data);
             }).fail(function () {
-                $("#bookModalBody").html('<div class="alert alert-danger">Failed to load book details.</div>');
+                $("#userBookModalBody").html('<div class="alert alert-danger">Failed to load book details.</div>');
             });
         });
     </script>

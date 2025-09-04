@@ -1,8 +1,10 @@
 ﻿@using ECommerceWebsite.Models.Helping_Classes
 @model PagedResult<BookDto>
+
 @{
     ViewData["Title"] = "Our Bookstore";
     Layout = "_UserLayout";
+
     string currentSearch = ViewData["Search"] as string ?? "";
     Guid? currentAuthorId = ViewData["AuthorId"] as Guid?;
     Guid? currentCategoryId = ViewData["CategoryId"] as Guid?;
@@ -10,9 +12,12 @@
     decimal? currentMaxPrice = ViewData["MaxPrice"] as decimal?;
     string currentSortBy = ViewData["SortBy"] as string ?? "";
     string currentSortOrder = ViewData["SortOrder"] as string ?? "";
+
+    IEnumerable<Author> authors = ViewData["Authors"] as IEnumerable<Author> ?? new List<Author>();
+    IEnumerable<Category> categories = ViewData["Categories"] as IEnumerable<Category> ?? new List<Category>();
 }
 
-<!-- Page header -->
+<!-- Page Header -->
 <div class="page-header page-header-default">
     <div class="page-header-content">
         <div class="page-title">
@@ -26,104 +31,87 @@
         </ul>
     </div>
 </div>
-<!-- /page header -->
-<!-- Content area -->
+
+<!-- Content Area -->
 <div class="content">
+
     <!-- Filter Panel -->
     <div class="panel panel-flat">
         <div class="panel-heading">
             <h6 class="panel-title">
-                <i class="icon-filter4 position-left"></i>
-                Search, Filter & Sort Options
+                <i class="icon-filter4 position-left"></i> Search, Filter & Sort Options
             </h6>
         </div>
         <div class="panel-body">
+
             <!-- Sort Row -->
             <div class="row mb-15">
                 <div class="col-md-4">
-                    <div class="form-group">
-                        <label class="text-semibold">
-                            <i class="icon-sort-amount-asc position-left"></i>
-                            Sort By
-                        </label>
-                        <select id="sort-dropdown" class="form-control select-picker" select-picker">
-                            @{
-                                string currentSort = !string.IsNullOrEmpty(currentSortBy) ? $"{currentSortBy}|{currentSortOrder}" : "";
-                            }
-                            <option value="" selected="@(string.IsNullOrEmpty(currentSortBy))">Default (Newest First)</option>
-                            <option value="title|asc" selected="@(currentSort == "title|asc")">Title (A-Z)</option>
-                            <option value="title|desc" selected="@(currentSort == "title|desc")">Title (Z-A)</option>
-                            <option value="author|asc" selected="@(currentSort == "author|asc")">Author (A-Z)</option>
-                            <option value="author|desc" selected="@(currentSort == "author|desc")">Author (Z-A)</option>
-                            <option value="category|asc" selected="@(currentSort == "category|asc")">Category (A-Z)</option>
-                            <option value="category|desc" selected="@(currentSort == "category|desc")">Category (Z-A)</option>
-                            <option value="price|asc" selected="@(currentSort == "price|asc")">Price (Low to High)</option>
-                            <option value="price|desc" selected="@(currentSort == "price|desc")">Price (High to Low)</option>
-                            <option value="date|desc" selected="@(currentSort == "date|desc")">Date (Newest First)</option>
-                            <option value="date|asc" selected="@(currentSort == "date|asc")">Date (Oldest First)</option>
-                        </select>
-                    </div>
+                    <label class="text-semibold">
+                        <i class="icon-sort-amount-asc position-left"></i> Sort By
+                    </label>
+                    <select id="sort-dropdown" class="form-control select-picker">
+                        @{
+                            string currentSort = !string.IsNullOrEmpty(currentSortBy) ? $"{currentSortBy}|{currentSortOrder}" : "";
+                        }
+                        <option value="" selected="@(string.IsNullOrEmpty(currentSortBy))">Default (Newest First)</option>
+                        <option value="title|asc" selected="@(currentSort == "title|asc")">Title (A-Z)</option>
+                        <option value="title|desc" selected="@(currentSort == "title|desc")">Title (Z-A)</option>
+                        <option value="author|asc" selected="@(currentSort == "author|asc")">Author (A-Z)</option>
+                        <option value="author|desc" selected="@(currentSort == "author|desc")">Author (Z-A)</option>
+                        <option value="category|asc" selected="@(currentSort == "category|asc")">Category (A-Z)</option>
+                        <option value="category|desc" selected="@(currentSort == "category|desc")">Category (Z-A)</option>
+                        <option value="price|asc" selected="@(currentSort == "price|asc")">Price (Low to High)</option>
+                        <option value="price|desc" selected="@(currentSort == "price|desc")">Price (High to Low)</option>
+                        <option value="date|desc" selected="@(currentSort == "date|desc")">Date (Newest First)</option>
+                        <option value="date|asc" selected="@(currentSort == "date|asc")">Date (Oldest First)</option>
+                    </select>
                 </div>
-
                 <div class="col-md-8 text-right">
                     <button type="button" id="clear-all-btn" class="btn btn-default">
-                        <i class="icon-reset position-left"></i>
-                        Clear All Filters
+                        <i class="icon-reset position-left"></i> Clear All Filters
                     </button>
                 </div>
             </div>
 
             <hr class="content-divider">
 
-            <!-- Search and Filter Form -->
-            <form action="@Url.Action("UserHome","UserHome")" method="get" id="user-filter-form">
+            <!-- Filter Form -->
+            <form id="user-filter-form" action="@Url.Action("UserHome", "UserHome")" method="get">
                 <div class="row">
                     <div class="col-md-4">
-                        <label class="text-semibold">
-                            <i class="icon-search4 position-left"></i>
-                            Search by Title/Author
-                        </label>
-                        <input type="search" name="search" id="search-input" class="form-control select-picker" 
-                               placeholder="Search books..." value="@currentSearch">
+                        <label class="text-semibold"><i class="icon-search4 position-left"></i> Search by Title/Author</label>
+                        <input type="search" name="search" id="search-input" class="form-control" placeholder="Search books..." value="@currentSearch">
                     </div>
+
                     <div class="col-md-2">
                         <label class="text-semibold">Author</label>
                         <select name="authorId" id="author-filter" class="form-control select-picker" data-live-search="true">
                             <option value="">All Authors</option>
-                            @if (ViewData["Authors"] is IEnumerable<Author> authors)
+                            @foreach (var author in authors)
                             {
-                                foreach (var author in authors)
-                                {
-                                    <option value="@author.Id" selected="@(author.Id == currentAuthorId)">
-                                        @author.AuthorName
-                                    </option>
-                                }
+                                <option value="@author.Id" selected="@(author.Id == currentAuthorId)">@author.AuthorName</option>
                             }
                         </select>
                     </div>
+
                     <div class="col-md-2">
                         <label class="text-semibold">Category</label>
                         <select name="categoryId" id="category-filter" class="form-control select-picker" data-live-search="true">
                             <option value="">All Categories</option>
-                            @if (ViewData["Categories"] is IEnumerable<Category> categories)
+                            @foreach (var category in categories)
                             {
-                                foreach (var category in categories)
-                                {
-                                    <option value="@category.Id" selected="@(category.Id == currentCategoryId)">
-                                        @category.CategoryType
-                                    </option>
-                                }
+                                <option value="@category.Id" selected="@(category.Id == currentCategoryId)">@category.CategoryType</option>
                             }
                         </select>
                     </div>
+
                     <div class="col-md-4">
                         <label class="text-semibold">Price Range</label>
                         <div class="input-group">
-                            <input type="number" name="minPrice" id="min-price-filter" placeholder="Min"
-                                   class="form-control select-picker price-input" value="@currentMinPrice" min="0" step="0.01">
+                            <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control price-input" value="@currentMinPrice" min="0" step="0.01">
                             <span class="input-group-addon">-</span>
-                            <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max"
-                                   class="form-control select-picker price-input" value="@currentMaxPrice" min="0" step="0.01">
+                            <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control price-input" value="@currentMaxPrice" min="0" step="0.01">
                         </div>
                     </div>
                 </div>
@@ -131,76 +119,59 @@
         </div>
     </div>
 
-    <!-- AJAX Updatable Area -->
+    <!-- AJAX Book List -->
     <div id="user-book-container">
         @await Html.PartialAsync("_UserBookGridPartial", Model)
     </div>
 </div>
-<!-- /content area -->
+
+<!-- Book Modal -->
+<div class="modal fade" id="userBookModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userBookModalTitle">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="userBookModalBody">
+                <div class="text-center"><i class="icon-spinner2 spinner icon-2x"></i> Loading...</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="addToCartBtn"><i class="icon-cart-plus position-left"></i> Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script type="text/javascript">
         $(function() {
-
-            function initializePlugins(container) {
-                // activate all themed selects within the given container
-                container.find('.select-picker').selectpicker();
-                // tooltips (if any)
-                container.find('[data-popup="tooltip"]').tooltip();
-            }
-
-            // Initialize STATIC controls at first load
-            // (keep these because some controls are outside #admin-book-container)
-            $('#sort-dropdown').selectpicker();
-            $('#author-filter').selectpicker();
-            $('#category-filter').selectpicker();
-
-            // Also run the generic initializer on the whole page once
-            initializePlugins($(document.body));
-
-
+            // Initialize selectpickers
+            $('.select-picker').selectpicker();
 
             var debounceTimeout;
 
-            // Get current sort values
             function getCurrentSortValues() {
                 var sortValue = $('#sort-dropdown').val();
                 if (!sortValue) return { sortBy: '', sortOrder: '' };
-
                 var parts = sortValue.split('|');
-                return {
-                    sortBy: parts[0] || '',
-                    sortOrder: parts[1] || ''
-                };
+                return { sortBy: parts[0] || '', sortOrder: parts[1] || '' };
             }
 
-            // Price input validation function
             function validatePriceInput(input) {
                 var value = parseFloat(input.val());
-                if (value < 0 || isNaN(value)) {
-                    input.val('');
-                    return false;
-                }
+                if (value < 0 || isNaN(value)) { input.val(''); return false; }
                 return true;
             }
 
-            // Main fetch function with sorting support
             function fetchUserPage(pageNumber) {
                 var search = $('#search-input').val();
                 var authorId = $('#author-filter').val();
                 var categoryId = $('#category-filter').val();
                 var minPrice = $('#min-price-filter').val();
                 var maxPrice = $('#max-price-filter').val();
-                var sortValues = getCurrentSortValues(); // Get sort values
-
-                // Validate price inputs before making request
-                if (minPrice && parseFloat(minPrice) < 0) {
-                    $('#min-price-filter').val('');
-                    minPrice = '';
-                }
-                if (maxPrice && parseFloat(maxPrice) < 0) {
-                    $('#max-price-filter').val('');
-                    maxPrice = '';
-                }
+                var sortValues = getCurrentSortValues();
 
                 var url = '@Url.Action("UserHome", "UserHome")' +
                     '?pageNumber=' + pageNumber +
@@ -209,131 +180,64 @@
                     '&categoryId=' + encodeURIComponent(categoryId) +
                     '&minPrice=' + encodeURIComponent(minPrice) +
                     '&maxPrice=' + encodeURIComponent(maxPrice) +
-                    '&sortBy=' + encodeURIComponent(sortValues.sortBy) +      
+                    '&sortBy=' + encodeURIComponent(sortValues.sortBy) +
                     '&sortOrder=' + encodeURIComponent(sortValues.sortOrder);
 
                 $('#user-book-container').html('<div class="text-center p-20"><h4><i class="icon-spinner2 spinner"></i> Loading Books...</h4></div>');
 
                 $.get(url, function(data) {
                     $('#user-book-container').html(data);
+                    $('.select-picker').selectpicker();
                 }).fail(function() {
-                    $('#user-book-container').html('<div class="alert alert-danger">An error occurred while loading books. Please try again.</div>');
+                    $('#user-book-container').html('<div class="alert alert-danger">Failed to load books.</div>');
                 });
             }
 
-            // --- EVENT HANDLERS ---
-
-            // Sort dropdown change handler
-            $('#sort-dropdown').on('change', function() {
-                fetchUserPage(1);
-            });
-
-            // Clear all filters and sorting
+            // Event Handlers
+            $('#sort-dropdown').on('change', function() { fetchUserPage(1); });
             $('#clear-all-btn').on('click', function() {
-                $('#search-input').val('');
-                $('#author-filter').val('');
-                $('#category-filter').val('');
-                $('#min-price-filter').val('');
-                $('#max-price-filter').val('');
-                $('#sort-dropdown').val(''); // Clear sorting
+                $('#user-filter-form')[0].reset();
+                $('.select-picker').selectpicker('refresh');
                 fetchUserPage(1);
             });
-
-            // Pagination clicks
+            $('#author-filter, #category-filter').on('change', function() { fetchUserPage(1); });
+            $('#search-input, #min-price-filter, #max-price-filter').on('input', function() {
+                validatePriceInput($(this));
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(function() { fetchUserPage(1); }, 300);
+            });
             $('#user-book-container').on('click', '.pagination a', function(e) {
                 e.preventDefault();
                 var page = $(this).data('page');
-                if (page) {
-                    fetchUserPage(page);
-                }
+                if(page) fetchUserPage(page);
             });
+            $('#user-filter-form').on('submit', function(e) { e.preventDefault(); fetchUserPage(1); });
 
-            // Search and price inputs with debounce
-            $('#search-input, #min-price-filter, #max-price-filter').on('input', function() {
-                if ($(this).hasClass('price-input')) {
-                    validatePriceInput($(this));
-                }
+            // View Book Modal & Add to Cart
+            $(document).on('click', '.view-book-btn', function() {
+                var bookId = $(this).data('book-id');
 
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(function() {
-                    fetchUserPage(1);
-                }, 300);
-            });
+                $("#userBookModal").modal('show');
+                $("#userBookModalTitle").text('Loading Details...');
+                $("#userBookModalBody").html('<div class="text-center"><i class="icon-spinner2 spinner icon-2x"></i></div>');
 
-            // Filter dropdowns
-            $('#author-filter, #category-filter').on('change', function() {
-                fetchUserPage(1);
-            });
+                $.get('/UserHome/Details', { id: bookId }, function(data) {
+                    $("#userBookModalBody").html(data);
+                    var title = $(data).find('h3').first().text();
+                    $("#userBookModalTitle").text(title || 'Book Details');
 
-            // Price input validation and restrictions
-            $('.price-input').on('input', function() {
-                var $this = $(this);
-                var value = $this.val();
-
-                // Remove any non-numeric characters except decimal point
-                value = value.replace(/[^0-9.]/g, '');
-
-                // Ensure only one decimal point
-                var parts = value.split('.');
-                if (parts.length > 2) {
-                    value = parts[0] + '.' + parts.slice(1).join('');
-                }
-
-                $this.val(value);
-
-                // Check if value is negative after parsing
-                var numValue = parseFloat(value);
-                if (numValue < 0) {
-                    $this.val('');
-                }
-            });
-
-            // Prevent keyboard entry of invalid characters
-            $('.price-input').on('keydown', function(e) {
-                // Allow: backspace, delete, tab, escape, enter, home, end, left, right, down, up
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 35, 36, 37, 38, 39, 40]) !== -1 ||
-                    // Allow: Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X
-                    (e.keyCode === 65 && e.ctrlKey === true) ||
-                    (e.keyCode === 67 && e.ctrlKey === true) ||
-                    (e.keyCode === 86 && e.ctrlKey === true) ||
-                    (e.keyCode === 88 && e.ctrlKey === true)) {
-                    return;
-                }
-
-                // Prevent: minus sign
-                if (e.keyCode === 109 || e.keyCode === 173 || e.keyCode === 189) {
-                    e.preventDefault();
-                    return;
-                }
-
-                // Ensure that it is a number and stop the keypress
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) &&
-                    (e.keyCode < 96 || e.keyCode > 105) &&
-                    e.keyCode !== 190 && e.keyCode !== 110) {
-                    e.preventDefault();
-                }
-            });
-
-            // Form submission prevention
-            $('#user-filter-form').on('submit', function(e) {
-                e.preventDefault();
-                fetchUserPage(1);
+                    // Add to Cart button
+                    $("#addToCartBtn").show().off('click').on('click', function() {
+                        $.post('/Cart/Add', { bookId: bookId, quantity: 1 }, function(res) {
+                            if(res.success) { alert('Book added to cart!'); $("#userBookModal").modal('hide'); }
+                            else { alert('Failed to add book to cart.'); }
+                        });
+                    });
+                }).fail(function() {
+                    $("#userBookModalTitle").text('Error');
+                    $("#userBookModalBody").html('<div class="alert alert-danger">Failed to load book details.</div>');
+                });
             });
         });
     </script>
-
-    <style>
-        .mb-15 {
-            margin-bottom: 15px;
-        }
-
-        .content-divider {
-            margin: 15px 0;
-            border-color: #ddd;
-        }
-
-        .p-20 {
-            padding: 20px;
-        }
-    </style>
 }
