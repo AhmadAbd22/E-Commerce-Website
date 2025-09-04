@@ -8,7 +8,7 @@ using ECommerceWebsite.Models.Helping_Classes;
 
 namespace ECommerceWebsite.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "Customer")]
     public class UserHomeController : Controller
     {
         private readonly IBookRepository _bookRepo;

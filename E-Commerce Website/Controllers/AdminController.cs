@@ -475,7 +475,17 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("AddAuthor");
             }
 
-            await _authorRepo.AddAuthorAsync(authDto);
+            var newAuthor = new Author
+            {
+                Id = Guid.NewGuid(),
+                AuthorName = authDto.Name.Trim(),
+                isActive = (int)enumStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false
+            };
+
+            await _authorRepo.AddAuthorAsync(newAuthor);
             TempData.SetSuccess( "Author added successfully!");
             return RedirectToAction("AddAuthor");
         }
@@ -488,14 +498,9 @@ namespace ECommerceWebsite.Controllers
             ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync("", "name_asc", 1, 10);
             ViewData["IsEditing"] = true;
 
-            var dto = new AuthorDto { 
-                AuthorId = author.Id,
-                Name = author.AuthorName,
-            };
+            await _authorRepo.UpdateAuthorAsync(author);
 
-            await _authorRepo.UpdateAuthorAsync(dto);
-
-            return View("AddAuthor", dto);
+            return View("AddAuthor", author);
         }
 
         [HttpPost]
@@ -514,8 +519,9 @@ namespace ECommerceWebsite.Controllers
                 var author = await _authorRepo.GetAuthorByIdAsync(dto.AuthorId);
                 if (author == null) return NotFound();
                 author.AuthorName = dto.Name.Trim();
+                author.UpdatedAt = DateTime.UtcNow;
 
-                await _authorRepo.UpdateAuthorAsync(dto);
+                await _authorRepo.UpdateAuthorAsync(author);
             }
             catch (InvalidOperationException ex)
             {
@@ -596,8 +602,17 @@ namespace ECommerceWebsite.Controllers
                 return View(catDto);
             }
 
+            var newCategory = new Category
+            {
+                CategoryType = catDto.CategoryType.Trim(),
+                isActive = (int)enumStatus.Active,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                IsDeleted = false,
 
-            await _categoryRepo.AddCategoryAsync(catDto);
+            };
+
+            await _categoryRepo.AddCategoryAsync(newCategory);
             TempData.SetSuccess( "Category added successfully!");
             return RedirectToAction("AddCategory");
         }
@@ -626,11 +641,19 @@ namespace ECommerceWebsite.Controllers
                 ViewData["IsEditing"] = true;
                 return View("AddCategory", dto);
             }
-
-            await _categoryRepo.UpdateCategoryAsync(dto);
-
-            TempData.SetSuccess( "Category updated successfully!");
-            return RedirectToAction("AddCategory");
+            var existingCategory = await _categoryRepo.GetCategoryByIdAsync(dto.Id);
+            if (existingCategory != null)
+            {
+                existingCategory.CategoryType = dto.CategoryType.Trim();
+                existingCategory.UpdatedAt = DateTime.UtcNow;
+                await _categoryRepo.UpdateCategoryAsync(existingCategory);
+                TempData.SetSuccess("Category updated successfully!");
+            }
+            else
+            {
+                TempData.SetError("Category not found!");
+            }
+                return RedirectToAction("AddCategory");
         }
 
         [HttpPost]
