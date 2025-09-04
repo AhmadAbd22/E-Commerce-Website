@@ -46,7 +46,7 @@
                             <i class="icon-sort-amount-asc position-left"></i>
                             Sort By
                         </label>
-                        <select id="sort-dropdown" class="form-control">
+                        <select id="sort-dropdown" class="form-control select-picker" select-picker">
                             @{
                                 string currentSort = !string.IsNullOrEmpty(currentSortBy) ? $"{currentSortBy}|{currentSortOrder}" : "";
                             }
@@ -83,12 +83,12 @@
                             <i class="icon-search4 position-left"></i>
                             Search by Title/Author
                         </label>
-                        <input type="search" name="search" id="search-input" class="form-control"
+                        <input type="search" name="search" id="search-input" class="form-control select-picker" 
                                placeholder="Search books..." value="@currentSearch">
                     </div>
                     <div class="col-md-2">
                         <label class="text-semibold">Author</label>
-                        <select name="authorId" id="author-filter" class="form-control">
+                        <select name="authorId" id="author-filter" class="form-control select-picker" data-live-search="true">
                             <option value="">All Authors</option>
                             @if (ViewData["Authors"] is IEnumerable<Author> authors)
                             {
@@ -103,7 +103,7 @@
                     </div>
                     <div class="col-md-2">
                         <label class="text-semibold">Category</label>
-                        <select name="categoryId" id="category-filter" class="form-control">
+                        <select name="categoryId" id="category-filter" class="form-control select-picker" data-live-search="true">
                             <option value="">All Categories</option>
                             @if (ViewData["Categories"] is IEnumerable<Category> categories)
                             {
@@ -120,10 +120,10 @@
                         <label class="text-semibold">Price Range</label>
                         <div class="input-group">
                             <input type="number" name="minPrice" id="min-price-filter" placeholder="Min"
-                                   class="form-control price-input" value="@currentMinPrice" min="0" step="0.01">
+                                   class="form-control select-picker price-input" value="@currentMinPrice" min="0" step="0.01">
                             <span class="input-group-addon">-</span>
                             <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max"
-                                   class="form-control price-input" value="@currentMaxPrice" min="0" step="0.01">
+                                   class="form-control select-picker price-input" value="@currentMaxPrice" min="0" step="0.01">
                         </div>
                     </div>
                 </div>
@@ -140,6 +140,25 @@
 @section Scripts {
     <script type="text/javascript">
         $(function() {
+
+            function initializePlugins(container) {
+                // activate all themed selects within the given container
+                container.find('.select-picker').selectpicker();
+                // tooltips (if any)
+                container.find('[data-popup="tooltip"]').tooltip();
+            }
+
+            // Initialize STATIC controls at first load
+            // (keep these because some controls are outside #admin-book-container)
+            $('#sort-dropdown').selectpicker();
+            $('#author-filter').selectpicker();
+            $('#category-filter').selectpicker();
+
+            // Also run the generic initializer on the whole page once
+            initializePlugins($(document.body));
+
+
+
             var debounceTimeout;
 
             // Get current sort values
