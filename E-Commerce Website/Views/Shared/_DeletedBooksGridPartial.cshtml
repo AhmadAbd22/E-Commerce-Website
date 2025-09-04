@@ -1,0 +1,41 @@
+﻿@model ECommerceWebsite.Models.Helping_Classes.PagedResult<BookDto>
+
+<div class="row">
+    @if (!Model.Items.Any())
+    {
+        <div class="col-xs-12">
+            <div class="panel panel-flat text-center">
+                <i class="icon-trash icon-3x text-muted mb-20"></i>
+                <h4 class="text-muted">Recycle Bin is Empty</h4>
+                <p class="text-muted">No deleted books to display.</p>
+            </div>
+        </div>
+    }
+    else
+    {
+        @foreach (var book in Model.Items)
+        {
+            @await Html.PartialAsync("_AdminBookCardPartial", book)
+        }
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <nav>
+        <ul class="pagination">
+            <li class="@(Model.HasPreviousPage ? "" : "disabled")">
+                <a href="#" data-page="@(Model.CurrentPage - 1)">Previous</a>
+            </li>
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="@(i == Model.CurrentPage ? "active" : "")">
+                    <a href="#" data-page="@i">@i</a>
+                </li>
+            }
+            <li class="@(Model.HasNextPage ? "" : "disabled")">
+                <a href="#" data-page="@(Model.CurrentPage + 1)">Next</a>
+            </li>
+        </ul>
+    </nav>
+}

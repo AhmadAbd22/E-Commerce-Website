@@ -13,8 +13,13 @@
     <link href="~/assets/css/core.css" rel="stylesheet" type="text/css">
     <link href="~/assets/css/components.css" rel="stylesheet" type="text/css">
     <link href="~/assets/css/colors.css" rel="stylesheet" type="text/css">
+
     <!-- Toastr CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+
+    <!-- Select Picker CSS -->
+    <link href="~/assets/js/plugins/forms/selects/bootstrap_select.min.css" rel="stylesheet" type="text/css" />
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -43,9 +48,10 @@
     <!-- Core JS files -->
     <script type="text/javascript" src="~/assets/js/core/libraries/jquery.min.js"></script>
     <script type="text/javascript" src="~/assets/js/core/libraries/bootstrap.min.js"></script>
-    <!-- /core JS files -->
+
     <!-- Theme JS files -->
     <script type="text/javascript" src="~/assets/js/core/app.js"></script>
+    <script type="text/javascript" src="~/assets/js/plugins/forms/selects/bootstrap_select.min.js"></script>
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -59,7 +65,60 @@
             "timeOut": "4000"
         };
     </script>
+
+    <!-- Initialize plugins for user views -->
+    <script>
+        $(function() {
+            // Activate select-picker
+            $('.select-picker').selectpicker();
+
+            // Tooltip activation (if any tooltips used)
+            $('[data-popup="tooltip"]').tooltip();
+        });
+    </script>
+
+    <script>
+        $(document).on("click", ".viewProduct", function () {
+            var id = $(this).data("id");
+
+            $("#productModalBody").html(
+                '<div class="text-center p-4"><span class="spinner-border"></span> Loading...</div>'
+            );
+
+            $.get("@Url.Action("Details", "UserHome")", { id: id }, function (data) {
+                $("#productModalBody").html(data);
+                $("#productModal").modal("show");
+            }).fail(function () {
+                toastr.error("Could not load product details. Please try again.");
+            });
+        });
+    </script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
     @await Html.PartialAsync("_ToastNotifications")
+    @await Html.PartialAsync("_ScriptsHelper")
+
+    <!-- Product Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary">
+                    <h5 class="modal-title text-white">Product Details</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="productModalBody">
+                    <!-- Book details partial will load here -->
+                    <div class="text-center p-4">
+                        <span class="spinner-border"></span> Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /Product Modal -->
+
 </body>
 </html>

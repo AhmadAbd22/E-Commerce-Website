@@ -53,6 +53,7 @@
     <script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.date.js"></script>
     <script type="text/javascript" src="~/assets/js/core/app.js"></script>
 
+
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
@@ -70,5 +71,24 @@
 
     @await Html.PartialAsync("_ToastNotifications")
     @await Html.PartialAsync("_ScriptsHelper")
+    <!-- Admin Product View Modal -->
+    <div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="productModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Product Details</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="productModalBody">
+                    <div class="text-center">
+                        <span class="spinner-border"></span> Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

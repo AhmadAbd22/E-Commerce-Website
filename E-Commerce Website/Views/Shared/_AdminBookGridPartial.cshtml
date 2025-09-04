@@ -25,3 +25,37 @@
 <div class="panel-footer">
     @await Html.PartialAsync("_PaginationPartial", Model)
 </div>
+
+
+<!--  Shared Modal -->
+<div class="modal fade" id="adminBookModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Book Details</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body" id="adminBookModalBody">
+                <div class="text-center">
+                    <i class="icon-spinner2 spinner"></i> Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).on("click", ".admin-view-book-btn", function () {
+            var bookId = $(this).data("id");
+            $("#adminBookModal").modal("show");
+            $("#adminBookModalBody").html('<div class="text-center"><i class="icon-spinner2 spinner"></i> Loading...</div>');
+
+            $.get("/Admin/Details", { id: bookId }, function (data) {
+                $("#adminBookModalBody").html(data);
+            }).fail(function () {
+                $("#adminBookModalBody").html('<div class="alert alert-danger">Failed to load book details.</div>');
+            });
+        });
+    </script>
+}

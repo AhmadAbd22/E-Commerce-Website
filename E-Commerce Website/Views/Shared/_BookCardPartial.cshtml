@@ -1,44 +1,62 @@
 ﻿@model BookDto
 
-<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
-    <div class="panel panel-flat product-card">
+<div class="col-md-3 col-sm-6">
+    <div class="panel panel-flat">
         <div class="panel-body text-center">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive" style="max-height: 200px; margin: 0 auto;">
-            }
-            else
-            {
-                <div class="bg-light" style="height: 200px; display: flex; align-items: center; justify-content: center;">
-                    <i class="icon-book text-muted" style="font-size: 48px;"></i>
-                </div>
-            }
+            <!-- Book cover -->
+            <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive" style="height:200px; margin: 0 auto;" />
+
+            <!-- Book title -->
+            <h6 class="text-semibold mt-10">@Model.Title</h6>
+
+            <!-- Book author -->
+            <p class="text-muted">@Model.Author?.AuthorName</p>
+
+            <!-- Price -->
+            <h6 class="no-margin text-success">Rs. @Model.Price.ToString("N0")</h6>
+
+            <!-- View Product Button -->
+            <button class="btn btn-primary btn-sm mt-10" data-toggle="modal" data-id="@Model.Id" data-target="#bookModal_@Model.Id">
+                <i class="icon-eye"></i> View Product
+            </button>
         </div>
-        <div class="panel-body">
-            <h6 class="no-margin text-semibold">@Model.Title</h6>
-            @if (Model.Author != null)
-            {
-                <p class="text-muted">by @Model.Author.AuthorName</p>
-            }
-            <p class="text-size-large text-success">Rs. @Model.Price.ToString("F2")</p>
-            <p class="text-muted">Stock: @Model.Stock</p>
-        </div>
-        <div class="panel-body panel-body-accent">
-            <div class="row">
-                <div class="col-xs-6">
-                    <a href="@Url.Action("Details", "UserHome", new { id = Model.Id })" class="btn btn-default btn-block">
-                        <i class="icon-eye position-left"></i> View
-                    </a>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="bookModal_@Model.Id" tabindex="-1" role="dialog" aria-labelledby="bookModalLabel_@Model.Id" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h5 class="modal-title" id="bookModalLabel_@Model.Id">@Model.Title</h5>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body">
+                <div class="row">
+                    <!-- Book Image -->
+                    <div class="col-md-4">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="img-responsive" />
+                    </div>
+
+                    <!-- Book Details -->
+                    <div class="col-md-8">
+                        <h6>Author: <span class="text-semibold">@Model.Author?.AuthorName?</span></h6>
+                        <h6>Category: <span class="text-semibold">@Model.Category?.CategoryType</span></h6>
+                        <h6>Price: <span class="text-success">Rs. @Model.Price.ToString("N0")</span></h6>
+                        <p class="mt-10">@Model.Description</p>
+                    </div>
                 </div>
-                <div class="col-xs-6">
-                    <form method="post" action="@Url.Action("AddToCart", "Cart")">
-                        <input type="hidden" name="bookId" value="@Model.Id" />
-                        <input type="hidden" name="quantity" value="1" />
-                        <button type="submit" class="btn btn-success btn-block" @(Model.Stock <= 0 ? "disabled" : "")>
-                            <i class="icon-cart-add position-left"></i> Cart
-                        </button>
-                    </form>
-                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <a href="@Url.Action("AddToCart", "Cart", new { bookId = Model.Id })" class="btn btn-success">
+                    <i class="icon-cart"></i> Add to Cart
+                </a>
             </div>
         </div>
     </div>

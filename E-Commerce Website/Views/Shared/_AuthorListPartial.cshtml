@@ -23,15 +23,19 @@
                     <td class="text-center col-md-2">
                         <ul class="icons-list">
                             <li class="text-primary-600">
-                                <button type="button" class="btn btn-link edit-author-btn" data-toggle="modal" data-target="#addAuthorModal" data-author-id="@author.Id" data-author-name="@author.AuthorName" title="Edit">
+                                <button type="button" class="btn btn-link edit-author-btn" data-toggle="modal" data-target="#authorModal"
+                                        data-author-id="@author.Id"
+                                        data-author-name="@author.AuthorName">
                                     <i class="icon-pencil7 icon-2x"></i>
                                 </button>
                             </li>
                             <li class="text-danger-600">
                                     <input type="hidden" name="authorId" value="@author.Id" />
-                                <button type="submit" class="btn btn-link text-danger-600 delete-author-btn" data-toggle="modal" data-target="#addAuthorModal" data-author-id="@author.Id" data-author-name="@author.AuthorName" title="Delete">
-                                        <i class="icon-trash icon-2x"></i>
-                                    </button>
+                                <button type="button" class="btn btn-link text-danger-600 delete-author-btn" data-toggle="modal" data-target="#authorModal"
+                                        data-author-id="@author.Id"
+                                        data-author-name="@author.AuthorName">
+                                    <i class="icon-trash icon-2x"></i>
+                                </button>
                             </li>
                         </ul>
                     </td>
