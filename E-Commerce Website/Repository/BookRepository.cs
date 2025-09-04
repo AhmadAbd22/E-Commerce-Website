@@ -40,6 +40,7 @@ namespace ECommerceWebsite.Repository
         // Search Operations
         Task<IEnumerable<Book>> SearchActiveBooksAsync(string searchTerm);
         Task<PagedResult<Book>> SearchActiveBooksPagedAsync(string searchTerm, int pageNumber, int pageSize);
+        Task<PagedResult<Book>> SearchDeletedBooksPagedAsync(string searchTerm, int pageNumber, int pageSize);
 
         // Filter Operations
         Task<IEnumerable<Book>> FilterBooksAsync(Guid? authorId, decimal? minPrice, decimal? maxPrice);
@@ -53,6 +54,9 @@ namespace ECommerceWebsite.Repository
 
         // Combined Filter and Sort Operations
         Task<PagedResult<Book>> FilterAndSortBooksPagedAsync(
+                                    Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice,
+                                    string sortBy, string sortOrder, int pageNumber, int pageSize);
+        Task<PagedResult<Book>> FilterAndSortDeletedBooksPagedAsync(
                                     Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice,
                                     string sortBy, string sortOrder, int pageNumber, int pageSize);
         #endregion
@@ -305,6 +309,35 @@ namespace ECommerceWebsite.Repository
                 TotalCount = totalCount
             };
         }
+
+        public async Task<PagedResult<Book>> SearchDeletedBooksPagedAsync(string searchTerm, int pageNumber, int pageSize)
+        {
+            if (string.IsNullOrWhiteSpace(searchTerm))
+                return await GetDeletedBooksPagedAsync(pageNumber, pageSize);
+
+            searchTerm = searchTerm.Trim().ToLower();
+
+            var query = _context.Books
+                .Where(b => b.isActive == (int)enumStatus.Active &&
+                       (b.Title.ToLower().Contains(searchTerm) ||
+                       (b.Author != null && b.Author.AuthorName.ToLower().Contains(searchTerm))))
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .OrderByDescending(b => b.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Book>
+            {
+                Items = items,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+
         #endregion
 
         #region Filter Operations
@@ -377,6 +410,31 @@ namespace ECommerceWebsite.Repository
         {
             var query = _context.Books
                 .Where(b => b.isActive == (int)enumStatus.Active)
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .OrderByDescending(b => b.CreatedAt);
+
+            var totalCount = await query.CountAsync();
+
+            var items = await query
+                            .Skip((pageNumber - 1) * pageSize)
+                            .Take(pageSize)
+                            .ToListAsync();
+
+            return new PagedResult<Book>
+            {
+                Items = items,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+
+        public async Task<PagedResult<Book>> GetDeletedBooksPagedAsync(int pageNumber = 1, int pageSize = 9)
+        {
+            var query = _context.Books
+                .Where(b => b.isActive == (int)enumStatus.Inactive)
                 .Include(b => b.Author)
                 .Include(b => b.Category)
                 .OrderByDescending(b => b.CreatedAt);
@@ -505,6 +563,72 @@ namespace ECommerceWebsite.Repository
                 TotalCount = totalCount
             };
         }
+
+        public async Task<PagedResult<Book>> FilterAndSortDeletedBooksPagedAsync(
+            Guid? authorId, Guid? categoryId, decimal? minPrice, decimal? maxPrice,
+            string sortBy, string sortOrder, int pageNumber, int pageSize)
+        {
+            var query = _context.Books
+                .Include(b => b.Author)
+                .Include(b => b.Category)
+                .Where(b => b.isActive == (int)enumStatus.Inactive)
+                .AsQueryable();
+
+            // Apply Filters (if any)
+            if (authorId.HasValue && authorId != Guid.Empty)
+            {
+                query = query.Where(b => b.AuthorId == authorId.Value);
+            }
+
+            if (categoryId.HasValue && categoryId != Guid.Empty)
+            {
+                query = query.Where(b => b.CategoryId == categoryId.Value);
+            }
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(b => b.Price >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(b => b.Price <= maxPrice.Value);
+            }
+
+            query = (sortBy?.ToLower(), sortOrder?.ToLower()) switch
+            {
+                ("title", "desc") => query.OrderByDescending(b => b.Title).ThenByDescending(b => b.CreatedAt),
+                ("title", "asc") => query.OrderBy(b => b.Title).ThenByDescending(b => b.CreatedAt),
+
+                ("author", "desc") => query.OrderByDescending(b => b.Author != null ? b.Author.AuthorName : "").ThenByDescending(b => b.CreatedAt),
+                ("author", "asc") => query.OrderBy(b => b.Author != null ? b.Author.AuthorName : "").ThenByDescending(b => b.CreatedAt),
+
+                ("category", "desc") => query.OrderByDescending(b => b.Category != null ? b.Category.CategoryType : "").ThenByDescending(b => b.CreatedAt),
+                ("category", "asc") => query.OrderBy(b => b.Category != null ? b.Category.CategoryType : "").ThenByDescending(b => b.CreatedAt),
+
+                ("price", "desc") => query.OrderByDescending(b => b.Price).ThenByDescending(b => b.CreatedAt),
+                ("price", "asc") => query.OrderBy(b => b.Price).ThenByDescending(b => b.CreatedAt),
+
+                ("date", "desc") => query.OrderByDescending(b => b.CreatedAt),
+                ("date", "asc") => query.OrderBy(b => b.CreatedAt),
+
+                _ => query.OrderByDescending(b => b.CreatedAt) // Default sorting
+            };
+
+            // Execute with Pagination
+            var totalCount = await query.CountAsync();
+            var items = await query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            return new PagedResult<Book>
+            {
+                Items = items,
+                CurrentPage = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount
+            };
+        }
+
+
         #endregion
 
         #endregion
