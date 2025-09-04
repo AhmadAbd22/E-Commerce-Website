@@ -40,7 +40,7 @@ namespace ECommerceWebsite.Repository
             {
                 throw new InvalidOperationException($"An author with the name '{author.AuthorName}' already exists.");
             }
-   
+
             _context.Authors.Add(author);
             await _context.SaveChangesAsync();
         }
@@ -124,6 +124,12 @@ namespace ECommerceWebsite.Repository
             {
                 case "name_desc":
                     query = query.OrderByDescending(a => a.AuthorName);
+                    break;
+                case "date_desc":
+                    query = query.OrderByDescending(a => a.CreatedAt);
+                    break;
+                case "date_asc":
+                    query = query.OrderBy(a => a.CreatedAt);
                     break;
                 default: // "name_asc" or any other value
                     query = query.OrderBy(a => a.AuthorName);
