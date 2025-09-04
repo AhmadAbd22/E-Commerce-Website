@@ -97,7 +97,7 @@ namespace ECommerceWebsite.Controllers
                 var book = await _bookRepo.GetActiveBookByIdAsync(id);
                 if (book == null)
                 {
-                    TempData["Error"] = "Book not found!";
+                    TempData.SetError("The book you are looking for was not found.");
                     return RedirectToAction("UserHome");
                 }
 
@@ -119,11 +119,11 @@ namespace ECommerceWebsite.Controllers
                     PublicationDate = book.PublicationDate
                 };
 
-                return View("ViewProduct", bookDto);
+                return PartialView("_BookDetailsModalPartial", bookDto);
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "An error occurred while loading the book details.";
+                TempData.SetError("An error occurred while loading the book details.");
                 return RedirectToAction("UserHome");
             }
         }
