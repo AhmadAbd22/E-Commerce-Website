@@ -1,17 +1,21 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using ECommerceWebsite.Hubs;
 using ECommerceWebsite.Models;
 using ECommerceWebsite.Models.Dtos;
-using ECommerceWebsite.Repository;
-using System;
-using System.Threading.Tasks;
-using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Models.Enums;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
 using ECommerceWebsite.Models.Helping_Classes;
-using System.Globalization;
+using ECommerceWebsite.Models.Repository;
+using ECommerceWebsite.Repository;
+using ECommerceWebsite.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Globalization;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 
 namespace ECommerceWebsite.Controllers
@@ -30,12 +34,13 @@ namespace ECommerceWebsite.Controllers
         private readonly ICartRepository _cartRepo;
         
         private readonly Authorization _authorization;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public AdminController(IBookRepository bookRepo, IAuthorRepository authorRepo,
                                 ICategoryRepository categoryRepo, ICartRepository cartRepo,
                                 IOrderRepository orderRepo,
                                 IUserRepository userRepo,
-                                Authorization authorization)
+                                Authorization authorization, IHubContext<NotificationHub> hubContext)
         {
             _bookRepo = bookRepo;
             _authorRepo = authorRepo;
@@ -44,6 +49,7 @@ namespace ECommerceWebsite.Controllers
             _orderRepo = orderRepo;
             _userRepo = userRepo;
             _authorization = authorization;
+            _hubContext = hubContext;
         }
 
         #endregion
@@ -217,6 +223,8 @@ namespace ECommerceWebsite.Controllers
             };
 
             await _bookRepo.AddBookAsync(book);
+            TempData.SetSuccess($"<i class='{NotificationIcons.Success}'></i> '{book.Title}' has been added to the Catalog");
+            await _hubContext.Clients.All.SendAsync("ReceiveNotification", $"New book '{book.Title} by {book.Author}' added!");
             return RedirectToAction("Admin");
         }
 
@@ -756,12 +764,18 @@ namespace ECommerceWebsite.Controllers
                 return RedirectToAction("Orders");
             }
 
+            var previousStatus = order.OrderStatus;
             order.OrderStatus = status;
             order.UpdatedAt = DateTime.UtcNow;
 
             await _orderRepo.UpdateOrderAsync(order);
 
             TempData.SetSuccess( $"Order status has been updated to '{status}'.");
+
+            //Notify user and admins about the status update
+            await _hubContext.Clients.User(order.UserId.ToString()).SendAsync("ReceiveOrderStatusUpdate", $"Order {orderId.ToString("N").Substring(0, 8).ToUpper()} updated.");
+            await _hubContext.Clients.Group("Admins").SendAsync("AdminNotification", $"Order {orderId} updated.");
+
             return RedirectToAction("Orders");
         }
 

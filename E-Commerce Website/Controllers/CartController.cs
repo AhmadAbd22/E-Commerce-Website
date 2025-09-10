@@ -6,10 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using ECommerceWebsite.Models.Helping_Classes;
+using Microsoft.AspNetCore.SignalR;
+using ECommerceWebsite.Hubs;
+using ECommerceWebsite.Models.Enums;
 
 namespace ECommerceWebsite.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize(Roles = "Customer")]
     public class CartController : Controller
     {
         private readonly ICartRepository _cartRepo;
@@ -18,6 +21,7 @@ namespace ECommerceWebsite.Controllers
         private readonly IOrderRepository _orderRepo;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Authorization _authorization;
+        private readonly IHubContext<NotificationHub> _hubContext;
 
         public CartController(
             ICartRepository cartRepo,
@@ -25,7 +29,8 @@ namespace ECommerceWebsite.Controllers
             IOrderServiceRepository orderService,
             IOrderRepository orderRepo,
             IHttpContextAccessor httpContextAccessor,
-            Authorization authorization) 
+            Authorization authorization,
+            IHubContext<NotificationHub> hubContext) 
         {
             _cartRepo = cartRepo;
             _bookRepo = bookRepo;
@@ -33,6 +38,7 @@ namespace ECommerceWebsite.Controllers
             _orderRepo = orderRepo;
             _httpContextAccessor = httpContextAccessor;
             _authorization = authorization;
+            _hubContext = hubContext;
         }
 
         private bool IsCurrentUserCustomer()
@@ -296,7 +302,7 @@ namespace ECommerceWebsite.Controllers
             try
             {
                 var userId = _authorization.GetCurrentUserId();
-
+                
                 var order = await _orderService.PlaceOrderFromCartAsync(
                     userId,
                     checkoutDto.ShippingAddress,
@@ -304,7 +310,8 @@ namespace ECommerceWebsite.Controllers
                     checkoutDto.PhoneNumber
                 );
 
-                TempData.SetSuccess($"Order placed successfully! Order ID: {order.Id}");
+                TempData.SetSuccess($"Order placed successfully! Order ID: {order.Id.ToString("N").Substring(0,8)} by {order.User.FirstName}");
+                await _hubContext.Clients.Group("Admins").SendAsync("AdminNotification", $"New Order  { order.Id.ToString("N").Substring(0, 8).ToUpper()} placed by {order.UserId}");
                 return RedirectToAction("OrderConfirmation", new { orderId = order.Id });
             }
             catch (UnauthorizedAccessException)
@@ -432,6 +439,7 @@ namespace ECommerceWebsite.Controllers
             await _orderRepo.UpdateOrderAsync(order);
 
             TempData.SetSuccess("Your order has been successfully cancelled.");
+            await _hubContext.Clients.Group("Admins").SendAsync("AdminNotification", $"Order #{order.Id.ToString().Substring(0,8).ToUpper()} upated to {order.OrderStatus} ");
             return RedirectToAction("OrderHistory");
         }
 
@@ -500,6 +508,107 @@ namespace ECommerceWebsite.Controllers
                 System.Diagnostics.Debug.WriteLine($"Order history error: {ex.Message}");
                 TempData.SetError("An error occurred while loading your order history.");
                 return RedirectToAction("UserHome", "UserHome");
+            }
+        }
+
+        //   Get cart count for AJAX updates
+        [HttpGet]
+        public async Task<IActionResult> GetCartCount()
+        {
+            try
+            {
+                var userId = _authorization.GetCurrentUserId();
+                if (userId == Guid.Empty)
+                {
+                    return Json(new { count = 0 });
+                }
+
+                var count = await _cartRepo.GetCartItemCountAsync(userId);
+                return Json(new { count = count });
+            }
+            catch
+            {
+                return Json(new { count = 0 });
+            }
+        }
+
+        //   Method for AJAX Add to Cart calls
+        [HttpPost]
+        public async Task<IActionResult> Add(Guid bookId, int quantity = 1)
+        {
+            try
+            {
+                var userId = _authorization.GetCurrentUserId();
+
+                if (!IsCurrentUserCustomer())
+                {
+                    return Json(new { success = false, message = "Admin users are not allowed to add items to the cart." });
+                }
+
+                var book = await _bookRepo.GetActiveBookByIdAsync(bookId);
+
+                if (book == null)
+                {
+                    return Json(new { success = false, message = "The selected book could not be found." });
+                }
+
+                if (book.StockQuantity < quantity)
+                {
+                    return Json(new { success = false, message = "Not enough stock available for your request." });
+                }
+
+                // Check if item already exists in cart
+                var existingCartItems = await _cartRepo.GetCartItemsByUserIdAsync(userId);
+                var existingItem = existingCartItems.FirstOrDefault(ci => ci.BookId == bookId);
+
+                if (existingItem != null)
+                {
+                    // Update quantity of existing item
+                    var newQuantity = existingItem.Quantity + quantity;
+                    if (newQuantity > book.StockQuantity)
+                    {
+                        return Json(new { success = false, message = "Adding this quantity would exceed available stock." });
+                    }
+                    
+                    existingItem.Quantity = newQuantity;
+                    existingItem.UpdatedAt = DateTime.UtcNow;
+                    await _cartRepo.UpdateCartItemAsync(existingItem);
+                }
+                else
+                {
+                    // Add new item to cart
+                    var cartItem = new CartItem
+                    {
+                        UserId = userId,
+                        BookId = bookId,
+                        Quantity = quantity,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    await _cartRepo.AddToCartAsync(cartItem);
+                }
+
+                // Get updated cart count
+                var newCount = await _cartRepo.GetCartItemCountAsync(userId);
+
+                return Json(new { 
+                    success = true, 
+                    message = $"'{book.Title}' added to your cart successfully!",
+                    cartCount = newCount
+                });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Json(new { success = false, message = "Please log in to add items to your cart." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while adding item to cart." });
             }
         }
 
