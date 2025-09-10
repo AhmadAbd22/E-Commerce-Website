@@ -5,6 +5,7 @@ using ECommerceWebsite.Repository;
 using ECommerceWebsite.Models.Repository;
 using ECommerceWebsite.Services;
 using ECommerceWebsite.Models.Helping_Classes;
+using ECommerceWebsite.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ECommerceWebsiteDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
+
+//Real Time Notifications
+builder.Services.AddSignalR();
 
 //authorizaion
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -65,4 +69,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=SignUp}/{action=SignUp}/{id?}");
+app.MapHub<NotificationHub>("/NotificationHub");
 app.Run();
