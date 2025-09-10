@@ -31,8 +31,279 @@
                 </ul>
             </div>
         </div>
+        
+        <!--    Quantity Selection and Add to Cart Section -->
+        @if (Model.Stock > 0)
+        {
+            <hr>
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="text-semibold">Quantity:</label>
+                    <div class="input-group">
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default btn-sm" id="decreaseQty">
+                                <i class="icon-minus3"></i>
+                            </button>
+                        </span>
+                        <input type="number" class="form-control text-center" id="bookQuantity" value="1" min="1" max="@Model.Stock" readonly>
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default btn-sm" id="increaseQty">
+                                <i class="icon-plus3"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <label class="text-semibold">Subtotal:</label>
+                    <h4 class="text-primary" id="subtotalAmount">@Model.Price.ToString("C", new System.Globalization.CultureInfo("ur-PK"))</h4>
+                </div>
+                <div class="col-sm-4">
+                    <label class="text-semibold">&nbsp;</label>
+                    <div>
+                        <button type="button" class="btn btn-success btn-block" id="addToCartModalBtn" data-book-id="@Model.Id">
+                            <i class="icon-cart-plus position-left"></i> Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <hr>
+            <div class="alert alert-warning">
+                <i class="icon-warning22"></i> This book is currently out of stock.
+            </div>
+        }
+        
         <hr>
         <h6 class="text-semibold">Description</h6>
         <p>@Model.Description</p>
     </div>
 </div>
+
+<!--    JavaScript for quantity management and add to cart functionality -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        var bookPrice = @Model.Price;
+        var maxStock = @Model.Stock;
+        
+        // Quantity increase/decrease buttons
+        $('#increaseQty').click(function() {
+            var currentQty = parseInt($('#bookQuantity').val());
+            if (currentQty < maxStock) {
+                currentQty++;
+                $('#bookQuantity').val(currentQty);
+                updateSubtotal();
+            }
+        });
+        
+        $('#decreaseQty').click(function() {
+            var currentQty = parseInt($('#bookQuantity').val());
+            if (currentQty > 1) {
+                currentQty--;
+                $('#bookQuantity').val(currentQty);
+                updateSubtotal();
+            }
+        });
+        
+        // Update quantity when input changes
+        $('#bookQuantity').on('input', function() {
+            var qty = parseInt($(this).val());
+            if (qty < 1) {
+                $(this).val(1);
+            } else if (qty > maxStock) {
+                $(this).val(maxStock);
+            }
+            updateSubtotal();
+        });
+        
+        function updateSubtotal() {
+            var quantity = parseInt($('#bookQuantity').val());
+            var subtotal = bookPrice * quantity;
+            $('#subtotalAmount').text('Rs.' + subtotal.toFixed(2));
+        }
+        
+        // Add to cart functionality from modal
+        $('#addToCartModalBtn').click(function() {
+            var bookId = $(this).data('book-id');
+            var quantity = parseInt($('#bookQuantity').val());
+            
+            // Show loading state
+            var originalText = $(this).html();
+            $(this).prop('disabled', true).html('<i class="icon-spinner2 spinner"></i> Adding...');
+            
+            $.post('/Cart/Add', { 
+                bookId: bookId, 
+                quantity: quantity 
+            }, function(res) {
+                // Reset button state
+                $('#addToCartModalBtn').prop('disabled', false).html(originalText);
+                
+                if(res.success) { 
+                    // Show success message
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(res.message || 'Book added to cart!');
+                    } else {
+                        alert(res.message || 'Book added to cart!');
+                    }
+                    
+                    // Close modal and refresh cart count if needed
+                    $("#userBookModal").modal('hide'); 
+                    
+                    // Update cart count in navbar if function exists
+                    if (typeof updateCartCount === 'function') {
+                        // Use the cart count from the response if available
+                        if (res.cartCount !== undefined) {
+                            updateCartCount(res.cartCount);
+                        } else {
+                            updateCartCount();
+                        }
+                    }
+                } else { 
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(res.message || 'Failed to add book to cart.');
+                    } else {
+                        alert(res.message || 'Failed to add book to cart.');
+                    }
+                }
+            }).fail(function(xhr, status, error) {
+                // Reset button state on error
+                $('#addToCartModalBtn').prop('disabled', false).html(originalText);
+                
+                if (xhr.status === 401) {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning('Please log in to add items to cart.');
+                    } else {
+                        alert('Please log in to add items to cart.');
+                    }
+                    window.location.href = '/Login/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                } else {
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('An error occurred while adding item to cart. Please try again.');
+                    } else {
+                        alert('An error occurred while adding item to cart. Please try again.');
+                    }
+                }
+            });
+        });
+    });
+
+    <!--  JavaScript for Add to Cart functionality from book card -->
+    $(document).ready(function() {
+        // Add to cart from book card
+        $(document).on('click', '.add-to-cart-btn', function(e) {
+            e.preventDefault();
+            
+            var button = $(this);
+            var bookId = button.data('book-id');
+            
+            // Check if button is disabled or already loading
+            if (button.hasClass('disabled') || button.prop('disabled') || button.hasClass('loading')) {
+                return false;
+            }
+            
+            // Show loading state
+            var originalText = button.html();
+            button.addClass('loading')
+                  .prop('disabled', true)
+                  .html('<i class="icon-spinner2 spinner"></i> Adding...');
+            
+            // Make AJAX request
+            $.post('/Cart/Add', { 
+                bookId: bookId, 
+                quantity: 1 
+            }, function(res) {
+                // Reset button state
+                button.removeClass('loading')
+                      .prop('disabled', false)
+                      .html(originalText);
+                
+                if(res.success) { 
+                    // Show success message with toastr if available, otherwise use alert
+                    if (typeof toastr !== 'undefined') {
+                        toastr.success(res.message || 'Book added to cart!');
+                    } else {
+                        // Show a temporary success indicator on the button
+                        button.removeClass('btn-success')
+                              .addClass('btn-info')
+                              .html('<i class="icon-checkmark3"></i> Added!');
+                        
+                        setTimeout(function() {
+                            button.removeClass('btn-info')
+                                  .addClass('btn-success')
+                                  .html(originalText);
+                        }, 2000);
+                    }
+                    
+                    // Update cart count in navbar if function exists
+                    if (typeof updateCartCount === 'function') {
+                        // Use the cart count from the response if available
+                        if (res.cartCount !== undefined) {
+                            updateCartCount(res.cartCount);
+                        } else {
+                            updateCartCount();
+                        }
+                    }
+                } else { 
+                    // Show error message
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error(res.message || 'Failed to add book to cart.');
+                    } else {
+                        alert(res.message || 'Failed to add book to cart.');
+                    }
+                }
+            }).fail(function(xhr, status, error) {
+                // Reset button state on error
+                button.removeClass('loading')
+                      .prop('disabled', false)
+                      .html(originalText);
+                
+                if (xhr.status === 401) {
+                    // User not authenticated
+                    if (typeof toastr !== 'undefined') {
+                        toastr.warning('Please log in to add items to cart.');
+                    } else {
+                        alert('Please log in to add items to cart.');
+                    }
+                    
+                    // Redirect to login with return URL
+                    setTimeout(function() {
+                        window.location.href = '/Login/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                    }, 1500);
+                } else {
+                    // Other errors
+                    if (typeof toastr !== 'undefined') {
+                        toastr.error('An error occurred while adding item to cart. Please try again.');
+                    } else {
+                        alert('An error occurred while adding item to cart. Please try again.');
+                    }
+                }
+            });
+            
+            return false;
+        });
+    });
+
+</script>
+
+<!--   ADDED: Styles for the quantity selector and buttons -->
+<style>
+    .input-group {
+        width: 100%;
+    }
+    
+    #bookQuantity {
+        max-width: 80px;
+        text-align: center;
+    }
+    
+    .input-group-btn .btn {
+        padding: 4px 8px;
+        min-width: 30px;
+    }
+    
+    #subtotalAmount {
+        margin-top: 5px;
+        font-weight: bold;
+    }
+</style>
