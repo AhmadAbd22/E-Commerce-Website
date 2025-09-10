@@ -12,6 +12,7 @@ An ASP.NET Core MVC-based e-commerce platform made using the [Repository Design 
 - Cart persistence with history tracking after checkout
 - Separate active cart vs. past orders
 - Place orders
+- Real Time notifications using SignalR
 
 ### 🔐 Authentication
 - User registration and login
