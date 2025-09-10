@@ -250,6 +250,7 @@ namespace ECommerceWebsite.Repository
             if (book != null)
             {
                 book.isActive = (int)enumStatus.Inactive;
+                book.IsDeleted = true;
                 book.DeletedAt = DateTime.UtcNow;
                 _context.Books.Update(book);
                 await _context.SaveChangesAsync();
