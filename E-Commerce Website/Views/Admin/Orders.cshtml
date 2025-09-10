@@ -33,7 +33,7 @@
             <form id="filter-sort-form" class="form-inline">
                 <div class="form-group">
                     <label for="status-filter" class="control-label mr-10">Status:</label>
-                    <select id="status-filter" name="status" class="form-control">
+                    <select id="status-filter" name="status" class="select-picker" data-live-search="true">
                         <option value="" selected="@(string.IsNullOrEmpty(currentStatus))">All Statuses</option>
                         <option value="Pending" selected="@(currentStatus == "Pending")">Pending</option>
                         <option value="Confirmed" selected="@(currentStatus == "Confirmed")">Confirmed</option>
@@ -45,8 +45,8 @@
 
                 <div class="form-group ml-20">
                     <label for="sort-by" class="control-label mr-10">Sort By:</label>
-                    <select id="sort-by" name="sortBy" class="form-control">
-                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Newest First</option>
+                    <select id="sort-by" name="sortBy" class="select-picker" data-live-search="true">
+                        <option value="date_desc" selected="@(currentSortBy == "date_desc")">Newest First (Default)</option>
                         <option value="date_asc" selected="@(currentSortBy == "date_asc")">Oldest First</option>
                         <option value="total_desc" selected="@(currentSortBy == "total_desc")">Total (High to Low)</option>
                         <option value="total_asc" selected="@(currentSortBy == "total_asc")">Total (Low to High)</option>
@@ -56,48 +56,78 @@
         </div>
     </div>
 </div>
-    <div class="orders-container">
+    <div id="orders-container">
         @await Html.PartialAsync("_OrdersListPartial", Model)
     </div>
 
 
 @section Scripts {
-    <script type="text-javascript">
-        $(function() {
+    <script type="text/javascript">
+        $(function () {
+            var debounceTimeout;
+
+            // --- REUSABLE PLUGIN INITIALIZER ---
+            function initializePlugins(container) {
+                container.find('.select-picker').selectpicker();
+                container.find('[data-popup="tooltip"]').tooltip();
+            }
+
+            // Initialize static select pickers once (outside AJAX container)
+            initializePlugins($('.panel-body'));
+
+            // --- MAIN AJAX FUNCTION ---
             function fetchOrders(pageNumber) {
                 var status = $('#status-filter').val();
                 var sortBy = $('#sort-by').val();
-                var pageSize = $('#orders-container #page-size-selector').val() || 10;  // Read the page size from the dropdown inside the container. Default to 10.
+                var pageSize = $('#orders-container #page-size-selector').val() || 10;
 
-                // Add the new pageSize parameter to the request.
-                var url = '@Url.Action("Orders", "Admin")' +
-                    '?pageNumber=' + pageNumber +
-                    '&pageSize=' + pageSize +
-                    '&status=' + encodeURIComponent(status) +
-                    '&sortBy=' + encodeURIComponent(sortBy);
+                var url = '@Url.Action("Orders", "Admin")'
+                    + '?pageNumber=' + pageNumber
+                    + '&pageSize=' + pageSize
+                    + '&status=' + encodeURIComponent(status)
+                    + '&sortBy=' + encodeURIComponent(sortBy);
 
-                    $('#orders-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4></div>');
+                $('#orders-container').html(
+                    '<div class="panel panel-body text-center">' +
+                        '<h4><i class="icon-spinner2 spinner"></i> Loading Orders...</h4>' +
+                    '</div>'
+                );
 
-                $.get(url, function(data) {
+                $.get(url, function (data) {
                     $('#orders-container').html(data);
-                    $('#orders-container .bootstrap-select').selectpicker();
+                    initializePlugins($('#orders-container')); // re-init for new content
+                }).fail(function () {
+                    $('#orders-container').html(
+                        '<div class="alert alert-danger">⚠️ An error occurred while loading orders.</div>'
+                    );
                 });
             }
 
             // --- EVENT HANDLERS ---
 
-            $('.content').on('click', '#orders-container .pagination a', function(e) {
-                 e.preventDefault();
+            // Pagination
+            $('.content').on('click', '#orders-container .pagination a', function (e) {
+                e.preventDefault();
                 var page = $(this).data('page');
                 if (page) fetchOrders(page);
             });
 
-            $('#status-filter, #sort-by').on('change', function() {
+            // Status & sort filters
+            $('#status-filter, #sort-by').on('change', function () {
                 fetchOrders(1);
             });
 
-            $('#orders-container').on('change', '#page-size-selector', function() {
+            // Page size
+            $('#orders-container').on('change', '#page-size-selector', function () {
                 fetchOrders(1);
+            });
+
+            // Debounce search (if you later add #search-orders)
+            $('#search-orders').on('input', function () {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(function () {
+                    fetchOrders(1);
+                }, 300);
             });
         });
     </script>

@@ -65,8 +65,8 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="PhoneNumber" class="text-semibold">Phone Number *</label>
-                                    <input name="PhoneNumber" class="form-control" type="tel" placeholder="Enter phone number" required>
-                                    <span validation-for="PhoneNumber" class="text-danger"></span>
+                                    <input id ="PhoneNumber" name="PhoneNumber" class="form-control" type="tel" placeholder="e.g. 123-8765444" required>
+                                    <span id="PhoneNumber" class="text-danger"></span>
                                 </div>
                             </div>
                         </div>
@@ -118,7 +118,7 @@
 
                         <!-- Place Order Button -->
                         <div class="mt-20">
-                            <button type="submit" class="btn btn-success btn-block btn-lg">
+                            <button type="submit" class="btn btn-success btn-block btn-lg" id="PlaceOrderBtn">
                                 <i class="icon-credit-card position-left"></i> Place Order
                             </button>
                             <a href="@Url.Action("ViewCart", "Cart")" class="btn btn-default btn-block mt-10">
@@ -132,3 +132,33 @@
     </form>
 </div>
 <!-- /content area -->
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#PhoneNumber").on("blur keyup", function () {
+                var phone = $(this).val().trim();
+                var digits = phone.replace(/\D/g, "");
+
+                $.ajax({
+                    url: '@Url.Action("ValidatePhoneNumber", "Cart")',
+                    type: "POST",
+                    data: { phoneNumber: digits },
+                    success: function (response) {
+                        if (!response.isValid) {
+                            $("#PhoneNumberError").text(response.message);
+                            $("#PlaceOrderBtn").prop("disabled", true);
+                        } else {
+                            $("#PhoneNumberError").text("");
+                            $("#PlaceOrderBtn").prop("disabled", false);
+
+                            // Format number as 123-8765444 (3 + 8)
+                            if (digits.length === 11) {
+                                $("#PhoneNumber").val(digits.replace(/(\d{3})(\d{8})/, "$1-$2"));
+                            }
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

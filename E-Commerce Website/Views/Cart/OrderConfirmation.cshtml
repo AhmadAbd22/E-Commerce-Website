@@ -68,7 +68,7 @@
                         <div class="col-sm-6">
                             <h6 class="text-semibold">Order Information</h6>
                             <ul class="list-unstyled">
-                                <li><strong>Order ID:</strong> @Model.OrderId</li>
+                                <li><strong>Order ID:</strong> @Model.OrderId.ToString("N").Substring(0,8).ToUpper()</li>
                                 <li><strong>Order Date:</strong> @Model.OrderDate.ToString("dd mm, yyyy 'at' hh:mm tt")</li>
                                 <li><strong>Status:</strong> <span class="label label-success">@Model.OrderStatus</span></li>
                                 <li><strong>Estimated Delivery:</strong> @Model.EstimatedDeliveryDate.ToString("MMMM dd, yyyy")</li>
