@@ -17,6 +17,9 @@
     <!-- Toastr CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
+    <!-- SignalR-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
@@ -53,6 +56,8 @@
     <script type="text/javascript" src="~/assets/js/plugins/pickers/pickadate/picker.date.js"></script>
     <script type="text/javascript" src="~/assets/js/core/app.js"></script>
 
+    <!--SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 
     <!-- Toastr JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -62,7 +67,7 @@
         toastr.options = {
             "closeButton": true,
             "progressBar": true,
-            "positionClass": "toast-bottom-right",
+            "positionClass": "toast-top-right",
             "timeOut": "4000"
         };
     </script>
@@ -89,6 +94,42 @@
             </div>
         </div>
     </div>
+    <!--Script for SignalR-->
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/NotificationHub", { withCredentials: true })
+            .build();
 
+        connection.on("ReceiveNotification", function (message) {
+            toastr.info("Notification: " + message);
+        });
+
+        connection.on("ReceiveOrderStatusUpdate", function (orderId, status) {
+            toastr.info(`Order ${orderId} status: ${status}`);
+        });
+
+        connection.on("AdminNotification", function (message) {
+            toastr.success("Admin alert: " + message);
+        });
+
+        async function startConnection() {
+                    try {
+                        await connection.start();
+                        console.log("✅ SignalR connected.");
+                    } catch (err) {
+                        console.error("❌ SignalR connection failed:", err);
+                        // retry after 5s
+                        setTimeout(startConnection, 5000);
+                    }
+        }
+
+                // Auto-reconnect if disconnected
+                connection.onclose(async () => {
+                    console.warn("⚠️ SignalR disconnected. Reconnecting...");
+                    await startConnection();
+                });
+
+               startConnection();    
+    </script>
 </body>
 </html>

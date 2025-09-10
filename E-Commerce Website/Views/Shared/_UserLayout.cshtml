@@ -17,8 +17,11 @@
     <!-- Toastr CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
 
-    <!-- Select Picker CSS -->
-    <link href="~/assets/js/plugins/forms/selects/bootstrap_select.min.css" rel="stylesheet" type="text/css" />
+    <!-- SignalR-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+
+    @* <!-- Select Picker CSS -->
+    <link href="~/assets/js/plugins/forms/selects/bootstrap_select.min.css" rel="stylesheet" type="text/css" /> *@
 
     @await RenderSectionAsync("Styles", required: false)
 </head>
@@ -120,5 +123,47 @@
     </div>
     <!-- /Product Modal -->
 
+    <!--SignalR Script-->
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/NotificationHub", { withCredentials: true }) 
+            .configureLogging(signalR.LogLevel.Information)     //logs
+            .build();
+
+        // --- Register handlers for server messages ---
+        connection.on("ReceiveNotification", function (message) {
+            console.log("📩 Notification:", message);
+            toastr.info(message, "Notification"); 
+        });
+
+        connection.on("ReceiveOrderStatusUpdate", function (orderId, status) {
+            console.log(`📦 Order ${orderId} updated to: ${status}`);
+            toastr.success(`Order ${orderId} is now ${status}`, "Order Update");
+        });
+
+        connection.on("AdminNotification", function (message) {
+            console.log("👑 Admin notification:", message);
+            toastr.warning(message, "Admin");
+        });
+
+        async function startConnection() {
+            try {
+                await connection.start();
+                console.log("✅ SignalR connected.");
+            } catch (err) {
+                console.error("❌ SignalR connection failed:", err);
+                // retry after 5s
+                setTimeout(startConnection, 5000);
+            }
+        }
+
+        // Auto-reconnect if disconnected
+        connection.onclose(async () => {
+            console.warn("⚠️ SignalR disconnected. Reconnecting...");
+            await startConnection();
+        });
+
+        startConnection();
+    </script>
 </body>
 </html>

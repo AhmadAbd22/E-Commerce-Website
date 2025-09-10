@@ -138,7 +138,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="addToCartBtn"><i class="icon-cart-plus position-left"></i> Add to Cart</button>
             </div>
         </div>
     </div>
@@ -213,7 +212,100 @@
             });
             $('#user-filter-form').on('submit', function(e) { e.preventDefault(); fetchUserPage(1); });
 
-            // View Book Modal & Add to Cart
+            //   ADDED: Add to Cart functionality with event delegation for AJAX-loaded content
+            $(document).on('click', '.add-to-cart-btn', function(e) {
+                e.preventDefault();
+                
+                var button = $(this);
+                var bookId = button.data('book-id');
+                
+                // Check if button is disabled or already loading
+                if (button.hasClass('disabled') || button.prop('disabled') || button.hasClass('loading')) {
+                    return false;
+                }
+                
+                // Show loading state
+                var originalText = button.html();
+                button.addClass('loading')
+                      .prop('disabled', true)
+                      .html('<i class="icon-spinner2 spinner"></i> Adding...');
+                
+                // Make AJAX request
+                $.post('/Cart/Add', { 
+                    bookId: bookId, 
+                    quantity: 1 
+                }, function(res) {
+                    // Reset button state
+                    button.removeClass('loading')
+                          .prop('disabled', false)
+                          .html(originalText);
+                    
+                    if(res.success) { 
+                        // Show success message with toastr if available, otherwise use button animation
+                        if (typeof toastr !== 'undefined') {
+                            toastr.success(res.message || 'Book added to cart!');
+                        } else {
+                            // Show a temporary success indicator on the button
+                            button.removeClass('btn-success')
+                                  .addClass('btn-info')
+                                  .html('<i class="icon-checkmark3"></i> Added!');
+                        
+                            setTimeout(function() {
+                                button.removeClass('btn-info')
+                                      .addClass('btn-success')
+                                      .html(originalText);
+                            }, 2000);
+                        }
+                        
+                        // Update cart count in sidebar if function exists
+                        if (typeof updateSidebarCartCount === 'function') {
+                            // Use the cart count from the response if available
+                            if (res.cartCount !== undefined) {
+                                updateSidebarCartCount(res.cartCount);
+                            } else {
+                                updateSidebarCartCount();
+                            }
+                        }
+                    } else { 
+                        // Show error message
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error(res.message || 'Failed to add book to cart.');
+                        } else {
+                            alert(res.message || 'Failed to add book to cart.');
+                        }
+                    }
+                }).fail(function(xhr, status, error) {
+                    // Reset button state on error
+                    button.removeClass('loading')
+                          .prop('disabled', false)
+                          .html(originalText);
+                    
+                    if (xhr.status === 401) {
+                        // User not authenticated
+                        if (typeof toastr !== 'undefined') {
+                            toastr.warning('Please log in to add items to cart.');
+                        } else {
+                            alert('Please log in to add items to cart.');
+                        }
+                        
+                        // Redirect to login with return URL
+                        setTimeout(function() {
+                            window.location.href = '/Login/Login?returnUrl=' + encodeURIComponent(window.location.pathname);
+                        }, 1500);
+                    } else {
+                        // Other errors
+                        if (typeof toastr !== 'undefined') {
+                            toastr.error('An error occurred while adding item to cart. Please try again.');
+                        } else {
+                            alert('An error occurred while adding item to cart. Please try again.');
+                        }
+                    }
+                });
+                
+                return false;
+            });
+
+            // View Book Modal
             $(document).on('click', '.view-book-btn', function() {
                 var bookId = $(this).data('book-id');
 
@@ -225,19 +317,73 @@
                     $("#userBookModalBody").html(data);
                     var title = $(data).find('h3').first().text();
                     $("#userBookModalTitle").text(title || 'Book Details');
-
-                    // Add to Cart button
-                    $("#addToCartBtn").show().off('click').on('click', function() {
-                        $.post('/Cart/Add', { bookId: bookId, quantity: 1 }, function(res) {
-                            if(res.success) { alert('Book added to cart!'); $("#userBookModal").modal('hide'); }
-                            else { alert('Failed to add book to cart.'); }
-                        });
-                    });
                 }).fail(function() {
                     $("#userBookModalTitle").text('Error');
                     $("#userBookModalBody").html('<div class="alert alert-danger">Failed to load book details.</div>');
                 });
             });
+
+            // Reset modal state when closed
+            $('#userBookModal').on('hidden.bs.modal', function() {
+                $("#userBookModalTitle").text('Book Details');
+                $("#userBookModalBody").html('<div class="text-center"><i class="icon-spinner2 spinner icon-2x"></i> Loading...</div>');
+            });
         });
+
+        // Function to update cart count in sidebar (replaces navbar function)
+        function updateSidebarCartCount(newCount) {
+            if (newCount !== undefined) {
+                // Update the sidebar cart badge directly if count is provided
+                var sidebarBadge = $('#sidebarCartBadge');
+                var cartLink = $('#sidebarCartLink');
+                
+                if (newCount > 0) {
+                    if (sidebarBadge.length === 0) {
+                        cartLink.append('<span class="badge bg-success pull-right" id="sidebarCartBadge">' + newCount + '</span>');
+                    } else {
+                        sidebarBadge.text(newCount);
+                    }
+                    
+                    // Add pulse animation
+                    sidebarBadge.addClass('pulse-animation');
+                    setTimeout(function() {
+                        sidebarBadge.removeClass('pulse-animation');
+                    }, 2000);
+                } else {
+                    sidebarBadge.remove();
+                }
+            } else {
+                // Fetch cart count from server
+                $.get('/Cart/GetCartCount', function(data) {
+                    if (data.count !== undefined) {
+                        var sidebarBadge = $('#sidebarCartBadge');
+                        var cartLink = $('#sidebarCartLink');
+                        
+                        if (data.count > 0) {
+                            if (sidebarBadge.length === 0) {
+                                cartLink.append('<span class="badge bg-success pull-right" id="sidebarCartBadge">' + data.count + '</span>');
+                            } else {
+                                sidebarBadge.text(data.count);
+                            }
+                        } else {
+                            sidebarBadge.remove();
+                        }
+                    }
+                }).fail(function() {
+                    // If we can't get the count, do a full page reload
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1000);
+                });
+            }
+        }
+
+        //   LEGACY: Keep old function for backward compatibility but make it point to sidebar
+        function updateCartCount(newCount) {
+            // Redirect to sidebar function since cart is now in sidebar
+            if (typeof updateSidebarCartCount === 'function') {
+                updateSidebarCartCount(newCount);
+            }
+        }
     </script>
 }
