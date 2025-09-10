@@ -79,6 +79,7 @@ namespace ECommerceWebsite.Models.Helping_Classes
                                         : "Customer";
                 List<Claim> claims = new List<Claim>()
                 {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                     new Claim(ClaimTypes.Sid, user.Id.ToString()),
                     new Claim("EncId", user.Id.ToString()),
                     new Claim("UserName", user.FirstName + " " + user.LastName),
