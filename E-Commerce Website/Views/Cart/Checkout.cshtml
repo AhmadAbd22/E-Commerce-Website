@@ -65,7 +65,7 @@
                             <div class="col-sm-6">
                                 <div class="form-group">
                                     <label for="PhoneNumber" class="text-semibold">Phone Number *</label>
-                                    <input id ="PhoneNumber" name="PhoneNumber" class="form-control" type="tel" placeholder="e.g. 123-8765444" required>
+                                    <input id ="PhoneNumber" class="form-control" type="tel" placeholder="e.g. 123-8765444" required>
                                     <span id="PhoneNumber" class="text-danger"></span>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                         <!-- Order Totals -->
                         <div class="row mb-10">
                             <div class="col-xs-6">Subtotal:</div>
-                            <div class="col-xs-6 text-right">Rs. @Model.TotalAmount.ToString("F2")</div>
+                            <div class="col-xs-6 text-right">Rs. @Model.TotalAmount.ToString("N2")</div>
                         </div>
                         <div class="row mb-10">
                             <div class="col-xs-6">Shipping:</div>
@@ -113,7 +113,7 @@
                         <hr>
                         <div class="row">
                             <div class="col-xs-6"><strong>Total:</strong></div>
-                            <div class="col-xs-6 text-right"><strong>Rs. @Model.TotalAmount.ToString("F2")</strong></div>
+                            <div class="col-xs-6 text-right"><strong>Rs. @Model.TotalAmount.ToString("N2")</strong></div>
                         </div>
 
                         <!-- Place Order Button -->
@@ -135,30 +135,65 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $("#PhoneNumber").on("blur keyup", function () {
-                var phone = $(this).val().trim();
+
+            function validatePhone(showError = false) {
+                var phone = $("#PhoneNumber").val().trim();
                 var digits = phone.replace(/\D/g, "");
+                let isValid = true;
 
-                $.ajax({
-                    url: '@Url.Action("ValidatePhoneNumber", "Cart")',
-                    type: "POST",
-                    data: { phoneNumber: digits },
-                    success: function (response) {
-                        if (!response.isValid) {
-                            $("#PhoneNumberError").text(response.message);
-                            $("#PlaceOrderBtn").prop("disabled", true);
-                        } else {
-                            $("#PhoneNumberError").text("");
-                            $("#PlaceOrderBtn").prop("disabled", false);
-
-                            // Format number as 123-8765444 (3 + 8)
-                            if (digits.length === 11) {
-                                $("#PhoneNumber").val(digits.replace(/(\d{3})(\d{8})/, "$1-$2"));
-                            }
-                        }
+                if (digits.length !== 11 || !digits.startsWith("03")) {
+                    if (showError || digits.length > 0) {
+                        $("#PhoneNumberError").text("Enter a valid mobile number (e.g. 0333-8564345).");
                     }
-                });
+                    isValid = false;
+                } else {
+                    $("#PhoneNumberError").text("");
+                }
+
+                return isValid;
+            }
+
+            function validateForm(showError = false) {
+                var shippingAddress = $("textarea[name='ShippingAddress']").val().trim();
+                var city = $("input[name='City']").val().trim();
+                let isValid = true;
+
+                if (!validatePhone(showError)) isValid = false;
+                if (shippingAddress === "" || city === "") isValid = false;
+
+                $("#PlaceOrderBtn").prop("disabled", !isValid);
+            }
+
+            $("#PhoneNumber").on("input", function () {
+                var digits = $(this).val().replace(/\D/g, "");
+
+                if (digits.length > 11) {
+                    digits = digits.substring(0, 11);
+                }
+
+                // Format as 0333-1234567
+                if (digits.length > 4) {
+                    $(this).val(digits.replace(/(\d{4})(\d{0,7})/, "$1-$2"));
+                } else {
+                    $(this).val(digits);
+                }
+
+                // validate while typing, but only show error if invalid start
+                validateForm(false);
+                validatePhone(false);
             });
+
+            // Show error clearly when leaving the field
+            $("#PhoneNumber").on("blur", function () {
+                validateForm(true);
+            });
+
+            $("textarea[name='ShippingAddress'], input[name='City']").on("input", function () {
+                validateForm(false);
+            });
+
+            // Initial state
+            validateForm(false);
         });
     </script>
 }
