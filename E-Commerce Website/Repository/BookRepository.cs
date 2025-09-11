@@ -18,12 +18,14 @@ namespace ECommerceWebsite.Repository
         Task<Book?> GetActiveBookByIdAsync(Guid id);
         Task<IEnumerable<Book>> GetActiveBooksAsync();
         Task<IEnumerable<Book>> GetAllBooksAsync();
+        Task<Book?> GetBookByTitle(string title, string authorName);
         Task<Book?> GetBooksByTitle(string title);
         Task<IEnumerable<Book>> GetBooksByAuthorAsync(string name);
         Task<IEnumerable<Book>> GetBooksByAuthorAsync(Guid authorId);
         Task<IEnumerable<Book>> GetBooksByCategoryAsync(string categoryName);
         Task<IEnumerable<Book>> GetBooksByCategoryAsync(Guid categoryId);
         Task<IEnumerable<Book>> GetDeletedBooksAsync();
+        Task<PagedResult<Book>> GetDeletedBooksPagedAsync(int pageNumber = 1, int pageSize = 9);
         Task<IEnumerable<Book>> GetRecentBooksAsync(int count);
         Task<int> GetTotalBooksCountAsync();
         Task<bool> IsBookInCartAsync(Guid bookId);
@@ -34,6 +36,7 @@ namespace ECommerceWebsite.Repository
 
         // DELETE
         Task DeleteBookAsync(Guid id);
+        Task DeleteBookPermanently(Guid id);  // Not implemented (will affect the permanent delete button in DeletedBooks.cshtml)
         #endregion
 
         #region Search, Filter, Pagination & Sorting
@@ -111,6 +114,15 @@ namespace ECommerceWebsite.Repository
                 .Include(b => b.Author)
                 .Include(b => b.Category)
                 .ToListAsync();
+        }
+
+        public async Task<Book> GetBookByTitle(string title, string authorName)
+        {
+            return await _context.Books
+                .Include(b => b.Author)
+                .FirstOrDefaultAsync(b => b.Title.Trim() == title.Trim() 
+                                       && b.Author != null
+                                       && b.Author.AuthorName.ToLower() == authorName.ToLower());
         }
 
         public async Task<Book?> GetBooksByTitle(string title)
@@ -211,10 +223,8 @@ namespace ECommerceWebsite.Repository
         public async Task UpdateBookAsync(Book book)
         {
             var existingBook = await _context.Books.FindAsync(book.Id);
-            if (existingBook == null)
-                throw new KeyNotFoundException("Book not found");
 
-            existingBook.Title = book.Title;
+            existingBook.Title = book.Title;       //null check done in the controller
             existingBook.Description = book.Description;
             existingBook.Price = book.Price;
             existingBook.StockQuantity = book.StockQuantity;
@@ -222,6 +232,7 @@ namespace ECommerceWebsite.Repository
             existingBook.AuthorId = book.AuthorId;
             existingBook.ImageUrl = book.ImageUrl;
             existingBook.PublicationDate = book.PublicationDate;
+            existingBook.ISBN = book.ISBN;
 
             await _context.SaveChangesAsync();
         }
@@ -233,12 +244,8 @@ namespace ECommerceWebsite.Repository
             {
                 book.isActive = (int)enumStatus.Active;
                 book.DeletedAt = null;
-                _context.Books.Update(book);
+                book.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
-            }
-            else
-            {
-                throw new KeyNotFoundException("Book to restore not found");
             }
         }
         #endregion
@@ -252,13 +259,17 @@ namespace ECommerceWebsite.Repository
                 book.isActive = (int)enumStatus.Inactive;
                 book.IsDeleted = true;
                 book.DeletedAt = DateTime.UtcNow;
-                _context.Books.Update(book);
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(); //removed update
             }
-            else
-            {
-                throw new KeyNotFoundException("Book not found");
-            }
+        }
+
+        public Task DeleteBookPermanently(Guid id)
+        {
+            //await _context.Books
+            //    .Where(b => b.Id == id)
+            //    .ExecuteDeleteAsync();
+
+            throw new NotImplementedException("Permanent delete is not implemented to avoid accidental data loss.");
         }
         #endregion
 
@@ -319,7 +330,7 @@ namespace ECommerceWebsite.Repository
             searchTerm = searchTerm.Trim().ToLower();
 
             var query = _context.Books
-                .Where(b => b.isActive == (int)enumStatus.Active &&
+                .Where(b => b.isActive == (int)enumStatus.Inactive &&
                        (b.Title.ToLower().Contains(searchTerm) ||
                        (b.Author != null && b.Author.AuthorName.ToLower().Contains(searchTerm))))
                 .Include(b => b.Author)
