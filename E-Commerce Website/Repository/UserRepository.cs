@@ -59,7 +59,11 @@ namespace ECommerceWebsite.Repository
 
         public async Task<User?> GetUserByEmailAsync(string email)
         {
-            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email 
+                                    && u.isActive == (int)enumStatus.Active
+                                    && !u.IsDeleted);
         }
 
         public async Task<User?> GetUserByUsernameAsync(string username)
