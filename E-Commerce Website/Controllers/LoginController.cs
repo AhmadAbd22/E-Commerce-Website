@@ -67,12 +67,12 @@ namespace ECommerceWebsite.Controllers
 
             if (user.Role == (int)enumRole.Admin)
             {
-                TempData.SetSuccess("Welcome Back, Admin!");
+                TempData.SetSuccess($"Welcome Back, {user.FirstName}");
                 return RedirectToAction("Admin", "Admin");
             }
             else
             {
-                TempData.SetSuccess($"Welcome Back, {user.FirstName}!");
+                TempData.SetSuccess($"Welcome Back, {user.FirstName} {user.LastName}!");
                 return RedirectToAction("UserHome", "UserHome");
             }
         }
