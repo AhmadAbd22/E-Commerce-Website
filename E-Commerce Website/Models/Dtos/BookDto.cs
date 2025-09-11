@@ -10,6 +10,8 @@ public class BookDto
     public string Title { get; set; }
     public decimal Price { get; set; }
     public int Stock { get; set; }
+    public string ISBN { get; set; } = string.Empty;
+
     public Author? Author { get; set; }
     public Guid AuthorId { get; set; } 
     public IEnumerable<Author> AuthorsList { get; set; }
