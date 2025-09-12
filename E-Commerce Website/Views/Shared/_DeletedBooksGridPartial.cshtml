@@ -20,22 +20,6 @@
     }
 </div>
 
-@if (Model.TotalPages > 1)
-{
-    <nav>
-        <ul class="pagination">
-            <li class="@(Model.HasPreviousPage ? "" : "disabled")">
-                <a href="#" data-page="@(Model.CurrentPage - 1)">Previous</a>
-            </li>
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="@(i == Model.CurrentPage ? "active" : "")">
-                    <a href="#" data-page="@i">@i</a>
-                </li>
-            }
-            <li class="@(Model.HasNextPage ? "" : "disabled")">
-                <a href="#" data-page="@(Model.CurrentPage + 1)">Next</a>
-            </li>
-        </ul>
-    </nav>
-}
+<div class="panel-footer">
+    @await Html.PartialAsync("_PaginationPartial", Model)
+</div>

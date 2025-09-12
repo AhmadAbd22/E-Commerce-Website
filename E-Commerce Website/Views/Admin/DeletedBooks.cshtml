@@ -1,15 +1,18 @@
-﻿@model IEnumerable<BookDto>
+﻿@using ECommerceWebsite.Models.Helping_Classes
+@model PagedResult<BookDto>
 @{
-    ViewData["IsDeletedView"] = true;
     ViewData["Title"] = "Deleted Books";
+    Layout = "_AdminLayout";
 
     string currentSearch = ViewData["Search"] as string ?? "";
     Guid? currentAuthorId = ViewData["AuthorId"] as Guid?;
     Guid? currentCategoryId = ViewData["CategoryId"] as Guid?;
     decimal? currentMinPrice = ViewData["MinPrice"] as decimal?;
     decimal? currentMaxPrice = ViewData["MaxPrice"] as decimal?;
-
-    Layout = "_AdminLayout";
+    string currentSortBy = ViewData["SortBy"] as string ?? "";
+    string currentSortOrder = ViewData["SortOrder"] as string ?? "";
+    IEnumerable<Author> authors = ViewData["Authors"] as IEnumerable<Author> ?? new List<Author>();
+    IEnumerable<Category> categories = ViewData["Categories"] as IEnumerable<Category> ?? new List<Category>();
 }
 
 <!-- Page header -->
@@ -25,158 +28,217 @@
     <div class="breadcrumb-line">
         <ul class="breadcrumb">
             <li><a href="@Url.Action("Admin", "Admin")"><i class="icon-home2 position-left"></i> Home</a></li>
-            <li><a href="@Url.Action("Admin", "Admin")">Book Management</a></li>
             <li class="active">Deleted Books</li>
         </ul>
     </div>
 </div>
 <!-- /page header -->
-<!-- Search and filter form -->
-<div class="panel panel-flat">
-    <div class="panel-body">
-        <form action="@Url.Action("Admin","Admin")" method="get" id="filter-form">
-            <div class="row">
-                <div class="col-md-4">
+
+<div class="content">
+
+    <!-- Sort & filter panel -->
+    <div class="panel panel-flat">
+        <div class="panel-heading">
+            <h6 class="panel-title"><i class="icon-filter4 position-left"></i> Search, Filter & Sort Options</h6>
+        </div>
+        <div class="panel-body">
+            <div class="row mb-15">
+                <div class="col-md-3">
                     <div class="form-group">
-                        <label class="text-semibold">Search by Title/Author</label>
-                        <input type="search" name="search" id="search-input" class="form-control" placeholder="Type to search..." value="@currentSearch">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="text-semibold">By Author</label>
-                        <select name="authorId" id="author-filter" class="form-control select-picker" dropdown-menu>
-                            <option value="">All Authors</option>
-                            @if (ViewData["Authors"] is IEnumerable<Author> authors)
-                            {
-                                foreach (var author in authors)
-                                {
-                                    if (author.Id == currentAuthorId)
-                                    {
-                                        <option value="@author.Id" selected>@author.AuthorName</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@author.Id">@author.AuthorName</option>
-                                    }
-                                }
+                        <label class="text-semibold"><i class="icon-sort-amount-asc position-left"></i> Sort By</label>
+                        <select id="sort-dropdown" class="select-picker" data-live-search="true" data-width="100%">
+                            @{
+                                string currentSort = !string.IsNullOrEmpty(currentSortBy) ? $"{currentSortBy}|{currentSortOrder}" : "";
                             }
+                            <option value="" selected="@(string.IsNullOrEmpty(currentSortBy))">Default (Newest First)</option>
+                            <option value="title|asc" selected="@(currentSort == "title|asc")">Title (A-Z)</option>
+                            <option value="title|desc" selected="@(currentSort == "title|desc")">Title (Z-A)</option>
+                            <option value="author|asc" selected="@(currentSort == "author|asc")">Author (A-Z)</option>
+                            <option value="author|desc" selected="@(currentSort == "author|desc")">Author (Z-A)</option>
+                            <option value="category|asc" selected="@(currentSort == "category|asc")">Category (A-Z)</option>
+                            <option value="category|desc" selected="@(currentSort == "category|desc")">Category (Z-A)</option>
+                            <option value="price|asc" selected="@(currentSort == "price|asc")">Price (Low to High)</option>
+                            <option value="price|desc" selected="@(currentSort == "price|desc")">Price (High to Low)</option>
+                            <option value="date|desc" selected="@(currentSort == "date|desc")">Date (Newest First)</option>
+                            <option value="date|asc" selected="@(currentSort == "date|asc")">Date (Oldest First)</option>
                         </select>
                     </div>
                 </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="text-semibold">By Category</label>
-                        <select name="categoryId" id="category-filter" class="form-control select-picker" required>
-                            <option value="">All Categories</option>
-                            @if (ViewData["Categories"] is IEnumerable<Category> categories)
-                            {
-                                foreach (var category in categories)
-                                {
-                                    if (category.Id == currentCategoryId)
-                                    {
-                                        <option value="@category.Id" selected>@category.CategoryType</option>
-                                    }
-                                    else
-                                    {
-                                        <option value="@category.Id">@category.CategoryType</option>
-                                    }
-                                }
-                            }
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <label class="text-semibold">Price Range</label>
-                        <div class="input-group">
-                            <input type="number" name="minPrice" id="min-price-filter" placeholder="Min" class="form-control price-input" value="@currentMinPrice" min="0" step="10">
-                            <span class="input-group-addon">-</span>
-                            <input type="number" name="maxPrice" id="max-price-filter" placeholder="Max" class="form-control price-input" value="@currentMaxPrice min="0" step="10">
-                        </div>
-                    </div>
+                <div class="col-md-9 text-right">
+                    <button type="button" id="clear-all-btn" class="btn btn-default">
+                        <i class="icon-reset position-left"></i> Clear All
+                    </button>
                 </div>
             </div>
-        </form>
-    </div>
-</div>
 
-<!-- Content area -->
-<div class="content">
-    <div class="container-detached">
-        <div class="content-detached">
-            <!-- Grid of Deleted Books -->
-            <div class="row book-grid">
-                @if (!Model.Any())
-                {
-                    <div class="col-xs-12">
-                        <div class="panel panel-flat">
-                            <div class="panel-body text-center">
-                                <i class="icon-trash icon-3x text-muted mb-20"></i>
-                                <h4 class="text-muted">Recycle Bin is Empty</h4>
-                                <p class="text-muted">There are no deleted books to display.</p>
+            <hr class="content-divider">
+
+            <form id="filter-form">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="text-semibold"><i class="icon-search4 position-left"></i> Search by Title/Author</label>
+                            <input type="search" id="search-input" class="form-control"
+                                   placeholder="Type to search..." value="@currentSearch">
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="text-semibold">By Author</label>
+                            <select id="author-filter" class="select-picker" data-live-search="true" data-width="100%">
+                                <option value="">All Authors</option>
+                                @foreach (var author in authors)
+                                {
+                                    <option value="@author.Id" selected="@(author.Id == currentAuthorId)">
+                                        @author.AuthorName
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="text-semibold">By Category</label>
+                            <select id="category-filter" class="select-picker" data-live-search="true" data-width="100%">
+                                <option value="">All Categories</option>
+                                @foreach (var category in categories)
+                                {
+                                    <option value="@category.Id" selected="@(category.Id == currentCategoryId)">
+                                        @category.CategoryType
+                                    </option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label class="text-semibold">Price Range</label>
+                            <div class="input-group">
+                                <input type="number" id="min-price-filter" placeholder="Min" class="form-control price-input"
+                                       value="@currentMinPrice" min="0" step="10">
+                                <span class="input-group-addon">-</span>
+                                <input type="number" id="max-price-filter" placeholder="Max" class="form-control price-input"
+                                       value="@currentMaxPrice" min="0" step="10">
                             </div>
                         </div>
                     </div>
-                }
-                else
-                {
-                    @foreach (var book in Model)
-                    {
-                        @await Html.PartialAsync("_AdminBookCardPartial", book)
-                    }
-                }
-                <!-- This is the message that will show if no search results are found -->
-                <div class="col-xs-12" id="no-results-message" style="display: none;">
-                    <div class="alert alert-warning text-center">
-                        <i class="icon-notification2 position-left"></i>
-                        No deleted books found matching your search term.
-                    </div>
                 </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Restore Confirmation Modal -->
+    <div id="restoreBookModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" style="margin: 300px auto">
+            <div class="modal-content">
+                <form id="restoreBookForm" method="post" action="@Url.Action("RestoreBook", "Admin")">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Restore Book</h5>
+                        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="restoreBookMessage"></p>
+                        <input type="hidden" id="restoreBookId" name="Id" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success"> Restore</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
 
-<!-- /content area -->
+
+    <!-- AJAX Updatable Area -->
+    <div id="deleted-books-container">
+        @await Html.PartialAsync("_DeletedBooksGridPartial", Model)
+    </div>
+</div>
+
 @section Scripts {
     <script type="text/javascript">
-        $(function() {
+        $(function () {
+            var debounceTimeout;
 
-                function initializePlugins(container) {
-                    // activate all themed selects within the given container
-                    container.find('.select-picker').selectpicker();
-                    // tooltips (if any)
-                    container.find('[data-popup="tooltip"]').tooltip();
-                }
+            function initializePlugins(container) {
+                container.find('.select-picker').selectpicker();
+                container.find('[data-popup="tooltip"]').tooltip();
+            }
 
-                // Initialize STATIC controls at first load
-                // (keep these because some controls are outside #admin-book-container)
-                $('#sort-dropdown').selectpicker();
-                $('#author-filter').selectpicker();
-                $('#category-filter').selectpicker();
+            function fetchDeletedBooksPage(pageNumber) {
+                var search = $('#search-input').val();
+                var authorId = $('#author-filter').val();
+                var categoryId = $('#category-filter').val();
+                var minPrice = $('#min-price-filter').val();
+                var maxPrice = $('#max-price-filter').val();
+                var pageSize = $('#deleted-books-container #page-size-selector').val() || 10;
 
-            $('#deleted-book-search').on('keyup', function() {
-                var searchTerm = $(this).val().toLowerCase();
-                var visibleCount = 0;
+                var sortValue = $('#sort-dropdown').val();
+                var sortParts = sortValue ? sortValue.split('|') : ['', ''];
+                var sortBy = sortParts[0];
+                var sortOrder = sortParts[1];
 
-                $('.book-grid > div').each(function() {
-                    var bookCard = $(this);
-                    if (bookCard.find('.admin-book-card').length > 0) {
-                        var bookText = bookCard.text().toLowerCase();
-                        if (bookText.indexOf(searchTerm) > -1) {
-                            bookCard.show();
-                            visibleCount++;
-                        } else {
-                            bookCard.hide();
-                        }
-                    }
+                var url = `@Url.Action("DeletedBooks", "Admin")?pageNumber=${pageNumber}&pageSize=${pageSize}&search=${encodeURIComponent(search)}&authorId=${encodeURIComponent(authorId)}&categoryId=${encodeURIComponent(categoryId)}&minPrice=${encodeURIComponent(minPrice)}&maxPrice=${encodeURIComponent(maxPrice)}&sortBy=${encodeURIComponent(sortBy)}&sortOrder=${encodeURIComponent(sortOrder)}`;
+
+                $('#deleted-books-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading...</h4></div>');
+
+                $.get(url, function (data) {
+                    $('#deleted-books-container').html(data);
+                    initializePlugins($('#deleted-books-container'));
+                    $('#deleted-books-container .select-picker').selectpicker('refresh');
+                }).fail(function () {
+                    $('#deleted-books-container').html('<div class="alert alert-danger">An error occurred while loading data.</div>');
                 });
+            }
 
-                if (visibleCount === 0 && $('#deleted-book-search').val().length > 0) {
-                    $('#no-results-message').show();
-                } else {
-                    $('#no-results-message').hide();
-                }
+            // INITIALIZE
+            $('#sort-dropdown, #author-filter, #category-filter').selectpicker();
+            initializePlugins($(document.body));
+
+            // EVENTS
+            $('#sort-dropdown, #author-filter, #category-filter').on('change', function () { fetchDeletedBooksPage(1); });
+
+            $('#search-input, #min-price-filter, #max-price-filter').on('input', function () {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(function () { fetchDeletedBooksPage(1); }, 300);
+            });
+
+            $('#clear-all-btn').on('click', function () {
+                $('#search-input').val('');
+                $('#min-price-filter').val('');
+                $('#max-price-filter').val('');
+
+                $('#sort-dropdown').selectpicker('val', '');
+                $('#author-filter').selectpicker('val', '');
+                $('#category-filter').selectpicker('val', '');
+
+                fetchDeletedBooksPage(1);
+            });
+
+            $('#deleted-books-container').on('click', '.pagination a', function (e) {
+                e.preventDefault();
+                var page = $(this).data('page');
+                if (page) fetchDeletedBooksPage(page);
+            });
+
+            $('#deleted-books-container').on('change', '#page-size-selector', function () { fetchDeletedBooksPage(1); });
+
+            $('#deleted-books-container').on('click', '.restore-book-btn', function () {
+                var button = $(this);
+                $('#restoreBookId').val(button.data('book-id'));
+                $('#restoreBookMessage').html(`Do you want to restore the book "<strong>${button.data('book-title')}</strong>"?`);
+                $('#restoreBookModal').modal('show');
+            });
+
+            $('#deleted-books-container').on('click', '.permanent-delete-book-btn', function () {
+                var button = $(this);
+                $('#permanentDeleteBookId').val(button.data('book-id'));
+                $('#permanentDeleteBookMessage').html(`Are you sure you want to permanently delete "<strong>${button.data('book-title')}</strong>"? This cannot be undone.`);
+                $('#permanentDeleteBookModal').modal('show');
             });
         });
     </script>
