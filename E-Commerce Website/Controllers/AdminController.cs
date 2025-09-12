@@ -81,7 +81,7 @@ namespace ECommerceWebsite.Controllers
                 CurrentPage = pagedBooks.CurrentPage,
                 PageSize = pagedBooks.PageSize,
                 TotalCount = pagedBooks.TotalCount,
-                Items = pagedBooks.Items.Select(book => new BookDto
+                Items = [.. pagedBooks.Items.Select(book => new BookDto
                 {
                     Id = book.Id,
                     Title = book.Title,
@@ -94,7 +94,7 @@ namespace ECommerceWebsite.Controllers
                     Author = book.Author,
                     Category = book.Category,
                     ImageUrl = book.ImageUrl
-                }).ToList()
+                })] //.ToList() using ' [.. ' for simplicity
             };
 
             await PopulateViewDataForAdmin();
@@ -108,7 +108,7 @@ namespace ECommerceWebsite.Controllers
             ViewData["SortBy"] = sortBy;
             ViewData["SortOrder"] = sortOrder;
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             {
                 return PartialView("_AdminBookGridPartial", pagedDto);
             }
@@ -157,8 +157,8 @@ namespace ECommerceWebsite.Controllers
 
             var dto = new BookDto
             {
-                CategoriesList = categories.ToList(),
-                AuthorsList = authors.ToList()
+                CategoriesList = [.. categories],
+                AuthorsList = [.. authors]
             };
             return View(dto);
         }
@@ -204,8 +204,8 @@ namespace ECommerceWebsite.Controllers
             if (!imageSaved)
             {
                 ModelState.AddModelError("ImageFile", "Failed to save image.");
-                dto.CategoriesList = (await _categoryRepo.GetAllCategoriesAsync()).ToList();
-                dto.AuthorsList = (await _authorRepo.GetAllAuthorsAsync()).ToList();
+                dto.CategoriesList = [.. (await _categoryRepo.GetAllCategoriesAsync())];
+                dto.AuthorsList = [.. (await _authorRepo.GetAllAuthorsAsync())];
                 return View(dto);
             }
 
@@ -392,7 +392,7 @@ namespace ECommerceWebsite.Controllers
                 CurrentPage = pagedBooks.CurrentPage,
                 PageSize = pagedBooks.PageSize,
                 TotalCount = pagedBooks.TotalCount,
-                Items = pagedBooks.Items.Select(book => new BookDto
+                Items = [.. pagedBooks.Items.Select(book => new BookDto
                 {
                     Id = book.Id,
                     Title = book.Title,
@@ -405,10 +405,10 @@ namespace ECommerceWebsite.Controllers
                     Author = book.Author,
                     Category = book.Category,
                     ImageUrl = book.ImageUrl
-                }).ToList()
+                })]
             };
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             {
                 return PartialView("_AdminBookGridPartial", pagedDto);
             }
@@ -464,8 +464,8 @@ namespace ECommerceWebsite.Controllers
 
             var chartData = new ChartDataDto
             {
-                Labels = weeklySales.Select(w => $"Week {w.WeekNumber} ({w.StartDate:yyyy-MMM-dd})").ToList(),
-                Values = weeklySales.Select(w => w.TotalSales).ToList()
+                Labels = [.. weeklySales.Select(w => $"Week {w.WeekNumber} ({w.StartDate:yyyy-MMM-dd})")],
+                Values = [.. weeklySales.Select(w => w.TotalSales)]
             };
 
             return Json(chartData);
@@ -478,8 +478,8 @@ namespace ECommerceWebsite.Controllers
 
             var chartData = new ChartDataDto
             {
-                Labels = dailySales.Select(d => d.Date.ToString("yyyy-MMM-dd")).ToList(),
-                Values = dailySales.Select(d => d.TotalSales).ToList()
+                Labels = [.. dailySales.Select(d => d.Date.ToString("yyyy-MMM-dd"))],
+                Values = [.. dailySales.Select(d => d.TotalSales)]
             };
 
             return Json(chartData);
@@ -512,7 +512,7 @@ namespace ECommerceWebsite.Controllers
             ViewData["CurrentSearch"] = search;
             ViewData["CurrentSortBy"] = sortBy;
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             {
                 return PartialView("_AuthorListPartial", pagedAuthors);
             }
@@ -637,7 +637,7 @@ namespace ECommerceWebsite.Controllers
             ViewData["CurrentSearch"] = search;
             ViewData["CurrentSortBy"] = sortBy;
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             {
                 return PartialView("_CategoryListPartial", pagedCategories);
             }
@@ -792,7 +792,7 @@ namespace ECommerceWebsite.Controllers
                 TotalCount = pagedOrders.TotalCount
             };
 
-            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+            if (Request.Headers.XRequestedWith == "XMLHttpRequest")
             {
                 return PartialView("_OrdersListPartial", pagedResultDto);
             }
@@ -827,7 +827,7 @@ namespace ECommerceWebsite.Controllers
             TempData.SetSuccess($"Order status has been updated to '{status}'.");
 
             //Notify user and admins about the status update
-            await _hubContext.Clients.User(order.UserId.ToString()).SendAsync("ReceiveOrderStatusUpdate", $"Order {orderId.ToString("N").Substring(0, 8).ToUpper()} updated.");
+            await _hubContext.Clients.User(order.UserId.ToString()).SendAsync("ReceiveOrderStatusUpdate", $"Order {orderId.ToString("N")[..8].ToUpper()} updated.");   //Replaced Substring(0,8) to Range Operator for simplicity
             await _hubContext.Clients.Group("Admins").SendAsync("AdminNotification", $"Order {orderId} updated.");
 
             return RedirectToAction("Orders");
