@@ -37,7 +37,8 @@
                 Stock:
                 @if (Model.Stock > 0)
                 {
-                    <i class="icon-checkmark3"></i>@Model.Stock
+                    <i class="icon-checkmark3"></i>
+                    @Model.Stock
                 }
                 else
                 {
@@ -46,8 +47,6 @@
                 }
             </div>
         </div>
-
-
 
         <!-- Admin Action Buttons -->
         <div class="panel-body panel-body-accent">
@@ -60,15 +59,20 @@
                 <!-- Deleted Book Actions -->
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">
-                        <form method="post" action="@Url.Action("RestoreBook", "Admin")" style="display: inline-block; width: 100%;">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="submit" class="btn btn-success btn-sm btn-block" onclick="return confirm('Restore this book?')">
-                                <i class="icon-history position-left"></i> Restore
-                            </button>
-                        </form>
+                        <button type="button"
+                                class="btn btn-success btn-sm btn-block restore-book-btn"
+                                data-target="#restoreBookModal"
+                                data-book-id="@Model.Id"
+                                data-book-title="@Model.Title">
+                            <i class="icon-history position-left"></i> Restore
+                        </button>
                     </div>
                     <div class="btn-group">
-                        <button type="button" class="btn btn-danger btn-sm btn-block" onclick="permanentDeleteBook('@Model.Id', '@Model.Title')">
+                        <!-- Trigger Permanent Delete Modal //Function not implemented yet -->
+                        <button type="button"
+                                class="btn btn-danger btn-sm btn-block permanent-delete-book-btn"
+                                data-book-id="@Model.Id"
+                                data-book-title="@Model.Title">
                             <i class="icon-cross2 position-left"></i> Permanent Delete
                         </button>
                     </div>
@@ -82,28 +86,25 @@
                         <button type="button" class="btn btn-info btn-sm view-book-btn"
                                 data-toggle="modal"
                                 data-target="#modal_book_details"
-                                data-book-id="@Model.Id">
+                                data-book-id="@Model.Id"
+                                title="View">
                             <i class="icon-eye position-left"></i> View
                         </button>
                     </div>
                     <div class="btn-group">
-                        <a href="@Url.Action("Edit", "Admin", new { id = Model.Id })" class="btn btn-warning btn-sm">
+                        <a href="@Url.Action("Edit", "Admin", new { id = Model.Id })" class="btn btn-warning btn-sm" title="Edit">
                             <i class="icon-pencil position-left"></i> Edit
                         </a>
                     </div>
                     <div class="btn-group">
-                        <form method="post" action="@Url.Action("Delete", "Admin")" style="display: inline-block;">
-                            <input type="hidden" name="id" value="@Model.Id" />
-                            <button type="button"
-                                    class="btn btn-danger btn-sm delete-book-btn"
-                                    data-toggle="modal"
-                                    data-target="#bookModal"
-                                    data-book-id="@Model.Id"
-                                    data-book-title="@Model.Title"
-                                    title="Delete">
-                                <i class="icon-trash position-left"></i>Delete
-                            </button>
-                        </form>
+                        <!-- Delete opens the delete confirmation modal; handled by Admin.cshtml JS -->
+                        <button type="button"
+                                class="btn btn-danger btn-sm delete-book-btn"
+                                data-book-id="@Model.Id"
+                                data-book-title="@Model.Title"
+                                title="Delete">
+                            <i class="icon-trash position-left"></i> Delete
+                        </button>
                     </div>
                 </div>
             }
@@ -171,4 +172,3 @@
         border-bottom-right-radius: 4px;
     }
 </style>
-
