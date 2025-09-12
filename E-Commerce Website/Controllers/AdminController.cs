@@ -586,7 +586,7 @@ namespace ECommerceWebsite.Controllers
             catch (InvalidOperationException ex)
             {
                 ViewData["EmptyFields"] = ex.Message;
-                ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync(null, "name_asc", 1, 10);
+                ViewData["ExistingAuthors"] = await _authorRepo.GetAllAuthorsPagedAsync("", "name_asc", 1, 10);
                 ViewData["IsEditing"] = true;
                 return View("AddAuthor", dto);
             }
