@@ -193,186 +193,13 @@
 @section Scripts {
     <script type="text/javascript">
         $(function () {
+            var debounceTimeout;
 
             // --- REUSABLE PLUGIN INITIALIZER ---
             function initializePlugins(container) {
-                // activate all themed selects within the given container
                 container.find('.select-picker').selectpicker();
-                // tooltips (if any)
                 container.find('[data-popup="tooltip"]').tooltip();
             }
-
-            // Initialize STATIC controls at first load
-            // (keep these because some controls are outside #admin-book-container)
-            $('#sort-dropdown').selectpicker();
-            $('#author-filter').selectpicker();
-            $('#category-filter').selectpicker();
-
-            // Also run the generic initializer on the whole page once
-            initializePlugins($(document.body));
-
-            var debounceTimeout;
-             $(function() {
-            var debounceTimeout;
-
-            // Get current sort values
-            function getCurrentSortValues() {
-                var sortValue = $('#sort-dropdown').val();
-                if (!sortValue) return { sortBy: '', sortOrder: '' };
-
-                var parts = sortValue.split('|');
-                return {
-                    sortBy: parts[0] || '',
-                    sortOrder: parts[1] || ''
-                };
-            }
-
-            // Price input validation function
-            function validatePriceInput(input) {
-                var value = parseFloat(input.val());
-                if (value < 0 || isNaN(value)) {
-                    input.val('');
-                    return false;
-                }
-                return true;
-            }
-
-            // Reusable function to fetch results from the server
-            function fetchAdminPage(pageNumber) {
-                var search = $('#search-input').val();
-                var authorId = $('#author-filter').val();
-                var categoryId = $('#category-filter').val();
-                var minPrice = $('#min-price-filter').val();
-                var maxPrice = $('#max-price-filter').val();
-                var sortValues = getCurrentSortValues();
-                var pageSize = $('#admin-book-container #page-size-selector').val() || 9;
-
-                // Validate price inputs before making request
-                if (minPrice && parseFloat(minPrice) < 0) {
-                    $('#min-price-filter').val('');
-                    minPrice = '';
-                }
-                if (maxPrice && parseFloat(maxPrice) < 0) {
-                    $('#max-price-filter').val('');
-                    maxPrice = '';
-                }
-
-                var url = '@Url.Action("Admin", "Admin")' +
-                    '?pageNumber=' + pageNumber +
-                    '&pageSize=' + pageSize +
-                    '&search=' + encodeURIComponent(search) +
-                    '&authorId=' + encodeURIComponent(authorId) +
-                    '&categoryId=' + encodeURIComponent(categoryId) +
-                    '&minPrice=' + encodeURIComponent(minPrice) +
-                    '&maxPrice=' + encodeURIComponent(maxPrice) +
-                    '&sortBy=' + encodeURIComponent(sortValues.sortBy) +
-                    '&sortOrder=' + encodeURIComponent(sortValues.sortOrder);
-
-                $('#admin-book-container').html('<div class="panel panel-body text-center"><h4><i class="icon-spinner2 spinner"></i> Loading...</h4></div>');
-
-                $.get(url, function(data) {
-                    $('#admin-book-container').html(data);
-                }).fail(function() {
-                    $('#admin-book-container').html('<div class="alert alert-danger">An error occurred while loading data.</div>');
-                });
-            }
-
-            // --- EVENT HANDLERS ---
-
-            // Sort dropdown change
-            $('#sort-dropdown').on('change', function() {
-                fetchAdminPage(1);
-            });
-
-            // Clear all filters and sorting
-            $('#clear-all-btn').on('click', function() {
-                $('#search-input').val('');
-                $('#author-filter').val('');
-                $('#category-filter').val('');
-                $('#min-price-filter').val('');
-                $('#max-price-filter').val('');
-                $('#sort-dropdown').val('');
-                fetchAdminPage(1);
-            });
-
-            // Pagination clicks
-            $('#admin-book-container').on('click', '.pagination a', function(e) {
-                e.preventDefault();
-                var page = $(this).data('page');
-                if (page) {
-                    fetchAdminPage(page);
-                }
-            });
-
-            // Search and price inputs with debounce
-            $('#search-input, #min-price-filter, #max-price-filter').on('input', function() {
-                if ($(this).hasClass('price-input')) {
-                    validatePriceInput($(this));
-                }
-
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(function() {
-                    fetchAdminPage(1);
-                }, 300);
-            });
-
-            // Filter dropdowns
-            $('#author-filter, #category-filter').on('change', function() {
-                fetchAdminPage(1);
-            });
-
-            // Price input validation and restrictions
-            $('.price-input').on('input', function() {
-                var $this = $(this);
-                var value = $this.val();
-
-                value = value.replace(/[^0-9.]/g, '');
-                var parts = value.split('.');
-                if (parts.length > 2) {
-                    value = parts[0] + '.' + parts.slice(1).join('');
-                }
-
-                $this.val(value);
-
-                var numValue = parseFloat(value);
-                if (numValue < 0) {
-                    $this.val('');
-                }
-            });
-
-            // Prevent negative key inputs
-            $('.price-input').on('keydown', function(e) {
-                if ($.inArray(e.keyCode, [46, 8, 9, 27, 13]) !== -1 ||
-                    (e.keyCode === 65 && e.ctrlKey === true) ||
-                    (e.keyCode === 67 && e.ctrlKey === true) ||
-                    (e.keyCode === 86 && e.ctrlKey === true) ||
-                    (e.keyCode === 88 && e.ctrlKey === true) ||
-                    (e.keyCode >= 35 && e.keyCode <= 40)) {
-                    return;
-                }
-
-                if (e.keyCode === 109 || e.keyCode === 173 || e.keyCode === 189) {
-                    e.preventDefault();
-                    return;
-                }
-
-                if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) &&
-                    (e.keyCode < 96 || e.keyCode > 105) &&
-                    e.keyCode !== 190 && e.keyCode !== 110) {
-                    e.preventDefault();
-                }
-            });
-
-            // Form submission prevention
-            $('#filter-form').on('submit', function(e) {
-                e.preventDefault();
-                fetchAdminPage(1);
-            });
-
-             $('#admin-book-container').on('change', '#page-size-selector', function() {
-                fetchAdminPage(1);
-            });
-        });
 
             // --- MAIN AJAX FUNCTION ---
             function fetchAdminPage(pageNumber) {
@@ -382,6 +209,7 @@
                 var minPrice = $('#min-price-filter').val();
                 var maxPrice = $('#max-price-filter').val();
                 var pageSize = $('#admin-book-container #page-size-selector').val() || 10;
+
                 var sortValue = $('#sort-dropdown').val();
                 var sortParts = sortValue ? sortValue.split('|') : ['', ''];
                 var sortBy = sortParts[0];
@@ -393,32 +221,42 @@
 
                 $.get(url, function (data) {
                     $('#admin-book-container').html(data);
-                    // Re-init plugins for any new controls inside the partial
+
+                    // Reinitialize plugins for dynamic content
                     initializePlugins($('#admin-book-container'));
+                    $('#admin-book-container .select-picker').selectpicker('refresh');
                 }).fail(function () {
                     $('#admin-book-container').html('<div class="alert alert-danger">An error occurred while loading data.</div>');
                 });
             }
 
+            // --- INITIALIZATION ---
+            $('#sort-dropdown').selectpicker();
+            $('#author-filter').selectpicker();
+            $('#category-filter').selectpicker();
+            initializePlugins($(document.body));
+
             // --- EVENT HANDLERS ---
 
-            // Static elements
+            // Sort & filters
             $('#sort-dropdown, #author-filter, #category-filter').on('change', function () {
                 fetchAdminPage(1);
             });
 
+            // Search + Price inputs (debounced)
             $('#search-input, #min-price-filter, #max-price-filter').on('input', function () {
                 clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(function () { fetchAdminPage(1); }, 300);
+                debounceTimeout = setTimeout(function () {
+                    fetchAdminPage(1);
+                }, 300);
             });
 
+            // Clear filters
             $('#clear-all-btn').on('click', function () {
-                // Reset text/number inputs
                 $('#search-input').val('');
                 $('#min-price-filter').val('');
                 $('#max-price-filter').val('');
 
-                // Reset selects (styled)
                 $('#sort-dropdown').selectpicker('val', '');
                 $('#author-filter').selectpicker('val', '');
                 $('#category-filter').selectpicker('val', '');
@@ -426,13 +264,14 @@
                 fetchAdminPage(1);
             });
 
-            // Delegated handlers for dynamic elements inside the container
+            // Pagination
             $('#admin-book-container').on('click', '.pagination a', function (e) {
                 e.preventDefault();
                 var page = $(this).data('page');
                 if (page) fetchAdminPage(page);
             });
 
+            // Page size change
             $('#admin-book-container').on('change', '#page-size-selector', function () {
                 fetchAdminPage(1);
             });
@@ -465,30 +304,7 @@
                 });
             });
 
-            // Initial pass for dynamic area
-            initializePlugins($('#admin-book-container'));
-        });
-
-
-            $(function () {
-            // Delete Book
-            $('#book-list-container').on('click', '.delete-book-btn', function () {
-                var button = $(this);
-                var bookId = button.data('book-id');
-                var bookTitle = button.data('book-title');
-
-                var form = $('#bookForm');
-                form.attr('action', '@Url.Action("Delete", "Admin")');
-
-                $('#bookModalTitle').text('Delete Book');
-                $('#bookModalBodyContent').html(`
-                    <p>Are you sure you want to delete the book "<strong>${bookTitle}</strong>"? This action cannot be undone.</p>
-                `);
-                $('#bookModalSubmitButton').text('Delete').removeClass('btn-primary').addClass('btn-danger');
-                $('#bookId').val(bookId);
-            });
-
-                    // Delete Book Modal
+            // Delete modal
             $('#admin-book-container').on('click', '.delete-book-btn', function () {
                 var button = $(this);
                 var bookId = button.data('book-id');
@@ -497,12 +313,6 @@
                 $('#deleteBookId').val(bookId);
                 $('#deleteBookMessage').html(`Do you really want to delete the book "<strong>${bookTitle}</strong>"?`);
                 $('#deleteBookModal').modal('show');
-            });
-
-
-            // Keep normal POST submit (can switch to AJAX later if needed)
-            $('#bookForm').on('submit', function (e) {
-                // let it post normally
             });
         });
     </script>
