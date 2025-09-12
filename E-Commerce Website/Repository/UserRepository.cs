@@ -73,11 +73,7 @@ namespace ECommerceWebsite.Repository
 
         public async Task UpdateUserAsync(User user)
         {
-            var existingUser = await GetUserByIdAsync(user.Id);
-            if (existingUser == null)
-            {
-                throw new KeyNotFoundException("User not found");
-            }
+            var existingUser = await GetUserByIdAsync(user.Id) ?? throw new KeyNotFoundException("User not found");
 
             existingUser.FirstName = user.FirstName;
             existingUser.LastName = user.LastName;
