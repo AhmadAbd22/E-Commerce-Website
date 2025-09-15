@@ -1,11 +1,12 @@
+using ECommerceWebsite.Hubs;
+using ECommerceWebsite.Middleware;
+using ECommerceWebsite.Models.Context;
+using ECommerceWebsite.Models.Helping_Classes;
+using ECommerceWebsite.Models.Repository;
+using ECommerceWebsite.Repository;
+using ECommerceWebsite.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using ECommerceWebsite.Models.Context;
-using ECommerceWebsite.Repository;
-using ECommerceWebsite.Models.Repository;
-using ECommerceWebsite.Services;
-using ECommerceWebsite.Models.Helping_Classes;
-using ECommerceWebsite.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,20 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+else
+{
+    //custom exception middleware in development for better debugging
+    app.UseMiddleware<GlobalExceptionMiddleware>();
+}
+
+// Security headers middleware
+app.UseMiddleware<SecurityHeadersMiddleware>();
+
+// Rate limiting middleware (before authentication)
+app.UseMiddleware<RateLimitingMiddleware>();
+
+// Request logging middleware
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
@@ -64,6 +79,9 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// User activity tracking (after authentication)
+app.UseMiddleware<UserActivityMiddleware>();
 
 app.MapControllerRoute(
     name: "default",
