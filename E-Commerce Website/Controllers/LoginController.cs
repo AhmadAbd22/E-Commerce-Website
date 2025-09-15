@@ -85,5 +85,25 @@ namespace ECommerceWebsite.Controllers
             TempData.SetInfo("You have been successfully logged out.");
             return RedirectToAction("Login", "Login");
         }
+        public async Task<IActionResult> DeleteAccount()
+        {
+            var auth = new Authorization(_httpContextAccessor);
+            Guid userId = auth.GetCurrentUserId();
+            if (userId == Guid.Empty)
+            {
+                TempData.SetError("Unable to identify user. Please log in again.");
+                return RedirectToAction("Login", "Login");
+            }
+            var user = await _userRepo.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                TempData.SetError("User not found.");
+                return RedirectToAction("Login", "Login");
+            }
+            await _userRepo.DeleteUserAsync(userId);
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            TempData.SetSuccess("Your account has been successfully deleted.");
+            return RedirectToAction("Login", "Login");
+        }
     }
 }
