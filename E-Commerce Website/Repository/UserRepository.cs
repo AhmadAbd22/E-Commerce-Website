@@ -53,8 +53,7 @@ namespace ECommerceWebsite.Repository
 
         public async Task<User?> GetUserByIdAsync(Guid id)
         {
-            var user = await _context.Users.FindAsync(id);
-            return user;
+            return await _context.Users.FindAsync(id);
         }
 
         public async Task<User?> GetUserByEmailAsync(string email)
@@ -70,7 +69,19 @@ namespace ECommerceWebsite.Repository
         {
             return await _context.Users
                             .AsNoTracking()
-                            .FirstOrDefaultAsync(u => u.Username == username);
+                            //Projecting first to avoid fetching sensititve fields i.e Password
+                            .Select(u => new User
+                            {
+                                Id = u.Id,
+                                FirstName = u.FirstName,
+                                LastName = u.LastName,
+                                Username = u.Username,
+                                Password = u.Password,
+                                Role = u.Role,
+                                isActive = u.isActive,
+                                IsDeleted = u.IsDeleted
+                            })
+                            .FirstOrDefaultAsync();
         }
 
         public async Task UpdateUserAsync(User user)
