@@ -116,7 +116,7 @@ namespace ECommerceWebsite.Repository
                 .ToListAsync();
         }
 
-        public async Task<Book> GetBookByTitle(string title, string authorName)
+        public async Task<Book?> GetBookByTitle(string title, string authorName)
         {
             return await _context.Books
                 .Include(b => b.Author)
