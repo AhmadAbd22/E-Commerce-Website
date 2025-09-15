@@ -81,7 +81,7 @@ namespace ECommerceWebsite.Repository
                                 isActive = u.isActive,
                                 IsDeleted = u.IsDeleted
                             })
-                            .FirstOrDefaultAsync();
+                            .FirstOrDefaultAsync(u => u.Username == username);
         }
 
         public async Task UpdateUserAsync(User user)
