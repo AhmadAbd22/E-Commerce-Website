@@ -15,8 +15,8 @@ namespace ECommerceWebsite.Models.Dtos
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; }
 
-        [DataType(DataType.EmailAddress)]
-        public string ConfirmEmail { get; set; }
+        //[DataType(DataType.EmailAddress)]
+        //public string ConfirmEmail { get; set; }
 
         //[DataType(DataType.PhoneNumber)]
         //[StringLength(11, MinimumLength = 11, ErrorMessage = "Phone number must be exactly 11 digits.")]
