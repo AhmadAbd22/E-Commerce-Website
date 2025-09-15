@@ -11,23 +11,6 @@
     bool isLoginView = (ViewData["isLoginView"] as bool?) ?? false;
 }
 
-@if (!string.IsNullOrEmpty(usernameError))
-{
-	<div class="alert alert-danger">@usernameError</div>
-}
-@if (!string.IsNullOrEmpty(passwordError))
-{
-	<div class="alert alert-danger">@passwordError</div>
-}
-@if (!string.IsNullOrEmpty(existUser))
-{
-	<div class="alert alert-warning">@existUser</div>
-}
-@if (TempData["Message"] != null)
-{
-	<div class="alert alert-success">@TempData["Message"]</div>
-}
-
 <body class="login-container">
 	<!-- Page container -->
 	<div class="page-container">
