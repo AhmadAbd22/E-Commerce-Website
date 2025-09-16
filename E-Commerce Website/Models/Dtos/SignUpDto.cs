@@ -12,7 +12,8 @@ namespace ECommerceWebsite.Models.Dtos
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        [DataType(DataType.EmailAddress)]
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; }
 
         //[DataType(DataType.EmailAddress)]
