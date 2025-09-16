@@ -1,3 +1,4 @@
+using ECommerceWebsite.Models.Helping_Classes;
 using System.Diagnostics;
 using System.Text;
 
@@ -20,7 +21,7 @@ namespace ECommerceWebsite.Middleware
             var request = context.Request;
             
             // Skip logging for static assets
-            if (ShouldSkipLogging(request.Path))
+            if (RequestPathHelper.ShouldSkipLogging(request.Path))
             {
                 await _next(context);
                 return;
@@ -84,10 +85,5 @@ namespace ECommerceWebsite.Middleware
             return sensitiveEndpoints.Any(endpoint => path.StartsWithSegments(endpoint));
         }
 
-        private static bool ShouldSkipLogging(PathString path)
-        {
-            var skipPaths = new[] { "/css", "/js", "/images", "/favicon.ico", "/assets" };
-            return skipPaths.Any(skipPath => path.StartsWithSegments(skipPath));
-        }
     }
 }
