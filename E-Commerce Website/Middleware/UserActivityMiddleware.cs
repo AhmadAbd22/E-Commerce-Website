@@ -15,6 +15,12 @@ namespace ECommerceWebsite.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            if (RequestPathHelper.ShouldSkipLogging(context.Request.Path))
+            {
+                await _next(context);
+                return;
+            }
+
             // Track user activity for authenticated users
             if (context.User?.Identity?.IsAuthenticated == true)
             {
