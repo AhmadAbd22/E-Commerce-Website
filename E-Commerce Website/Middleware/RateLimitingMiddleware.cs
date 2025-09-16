@@ -71,10 +71,10 @@ namespace ECommerceWebsite.Middleware
 
             // Stricter limits for production
             if (endpoint.Contains("/Login") || endpoint.Contains("/SignUp"))
-                return (5, TimeSpan.FromMinutes(1)); // 5 requests per minute
+                return (15, TimeSpan.FromMinutes(1)); // 15 requests per minute
 
             if (endpoint.Contains("/Cart/Add") || endpoint.Contains("/Cart/PlaceOrder"))
-                return (10, TimeSpan.FromMinutes(1)); // 10 requests per minute
+                return (15, TimeSpan.FromMinutes(1)); // 15 requests per minute
 
             // Default limits
             return (100, TimeSpan.FromMinutes(1)); // 100 requests per minute
