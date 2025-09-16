@@ -17,7 +17,20 @@ namespace ECommerceWebsite.Middleware
             _logger = logger;
             _environment = environment;
         }
-
+        /// <summary>
+        /// context variable will get the information about the current HTTP request.
+        /// context.Request.Method: GET/POST/PUT/DELETE
+        /// context.Request.Scheme: HTTP or HTTPS
+        /// context.Request.Path: The URL path of the request.
+        /// context.Request.Host: The host (domain) of the request.
+        /// context.Request.QueryString: The query string parameters.
+        /// context.Request.Protocol: The HTTP protocol version (e.g., HTTP/2).
+        /// 
+        /// Example: Request = GET https://localhost:7059/UserHome/Details?id=e7514a55-d5ac-4628-9251-d8f749684b57 HTTP/2
+        /// 
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task InvokeAsync(HttpContext context)
         {
             if (RequestPathHelper.ShouldSkipLogging(context.Request.Path))
