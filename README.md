@@ -114,3 +114,9 @@ Cookie Authentication middleware with role-based access policies (`Admin`, `User
 6. Run the command ``` Add-Migration ``` in Package Manager Console.
 7. Run the command ``` Update-Database ``` in Package Manager Console. 
 8. Run the project (Ctrl + F5)
+
+
+--- 
+### 🗄️ Entity Relation Diagram (ERD)
+
+<img width="757" height="2092" alt="ERD" src="https://github.com/user-attachments/assets/29442d7d-01a3-472d-9396-e68ff8208494" />
