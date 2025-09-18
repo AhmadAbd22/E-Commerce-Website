@@ -49,7 +49,9 @@ namespace ECommerceWebsite.Middleware
                 "/Login", "/Logout", "/SignUp",
                 "/Cart/AddToCart", "/Cart/PlaceOrder",
                 "/Admin", "/Cart/Checkout",
-                "/Admin", "/Admin/UpdateOrderStatus"
+                "/Admin", "/Admin/UpdateOrderStatus",
+                "/Admin", "/Admin/AddAuthor",
+                "/Admin", "/Admin/AddCategory",
             };
 
             return significantPaths.Any(significantPath => path.StartsWithSegments(significantPath));
