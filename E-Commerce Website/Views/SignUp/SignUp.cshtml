@@ -1,249 +1,274 @@
 ﻿@using ECommerceWebsite.Models.Dtos
 @model SignUpDto
 @{
-	Layout = "_MinimumLayout"; 
-	ViewBag.Message = "Sign-up successful!";
+    Layout = "_MinimumLayout";
+    ViewBag.Message = "Sign-up successful!";
 }
 @{
-	var usernameError = ViewData["UsernameError"] as string;
-	var passwordError = ViewData["PasswordError"] as string;
-	var existUser = ViewData["ExistUser"] as string;
+    var usernameError = ViewData["UsernameError"] as string;
+    var passwordError = ViewData["PasswordError"] as string;
+    var existUser = ViewData["ExistUser"] as string;
     bool isLoginView = (ViewData["isLoginView"] as bool?) ?? false;
 }
 
 <body class="login-container">
-	<!-- Page container -->
-	<div class="page-container">
+    <!-- Page container -->
+    <div class="page-container">
 
-		<!-- Page content -->
-		<div class="page-content">
+        <!-- Page content -->
+        <div class="page-content">
 
-			<!-- Main content -->
-			<div class="content-wrapper">
+            <!-- Main content -->
+            <div class="content-wrapper">
 
-				<!-- Content area -->
-				<div class="content">
+                <!-- Content area -->
+                <div class="content">
 
-					<!-- Registration form -->
-					<form action="@Url.Action("SignUp","SignUp")" method="post">
-						<div class="row">
-								<div class="col-lg-6 col-lg-offset-3">
-									<div class="panel registration-form">
-										<div class="panel-body">
-											<div class="text-center">
-												<div class="icon-object border-success text-success"><i class="icon-plus3"></i></div>
-												<h5 class="content-group-lg">Create account <small class="display-block">All fields are required</small></h5>
-											</div>
+                    <!-- Registration form -->
+                    <form action="@Url.Action("SignUp","SignUp")" method="post">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="panel registration-form">
+                                    <div class="panel-body">
+                                        <span class="text-center">
+                                            <span class="icon-object border-success text-success"><i class="icon-plus3"></i></span>
+                                            <h5 class="content-group-lg">Create account <small class="display-block">All fields are required</small></h5>
+                                        </span>
 
-											<div id="passwordMismatchError" class="alert alert-danger" style="display: none">
-												<i class="icon-blocked position-left"></i>
-												Password Do Not Match!
-											</div>
+                                        <div class="form-group has-feedback">
+                                            <input type="hidden" name="id" />
+                                            <input type="text" name="Username" class="form-control" placeholder="Choose username" value="@(Model?.Username ?? "")" required>
+                                            <div class="form-control-feedback">
+                                                <i class="icon-user-plus text-muted"></i>
+                                            </div>
+                                        </div>
 
-											<div class="form-group has-feedback">
-												<input type="hidden" name="id" />
-												<input type="text" name="Username" class="form-control" placeholder="Choose username" required>
-												<div class="form-control-feedback">
-													<i class="icon-user-plus text-muted"></i>
-												</div>
-											</div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group has-feedback">
+                                                    <input type="text" id="userFirstName" name="FirstName" class="form-control" placeholder="First name" value="@(Model?.FirstName ?? "")" required>
+                                                    <div class="form-control-feedback">
+                                                        <i class="icon-user-check text-muted"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group has-feedback">
-														<input type="text" name="FirstName" class="form-control" placeholder="First name" required>
-														<div class="form-control-feedback">
-															<i class="icon-user-check text-muted"></i>
-														</div>
-													</div>
-												</div>
+                                            <div class="col-md-6">
+                                                <div class="form-group has-feedback">
+                                                    <input type="text" id="userLastName" name="LastName" class="form-control" placeholder="Last name" value="@(Model?.LastName ?? "")" required>
+                                                    <div class="form-control-feedback">
+                                                        <i class="icon-user-check text-muted"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span id="nameError" class="text-danger" style="display: none">
+                                                <i class="icon-blocked position-left"></i>
+                                                First and Last Name cannot contain any digits.
+                                            </span>
+                                        </div>
 
-												<div class="col-md-6">
-													<div class="form-group has-feedback">
-														<input type="text" name="LastName" class="form-control" placeholder="Second name" required>
-														<div class="form-control-feedback">
-															<i class="icon-user-check text-muted"></i>
-														</div>
-													</div>
-												</div>
-											</div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group has-feedback">
+                                                    <input type="password" name="Password" id="password" class="form-control" placeholder="Create password" required>
+                                                    <div class="form-control-feedback">
+                                                        <i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row">
-												<div class="col-md-6">
-													<div class="form-group has-feedback">
-														<input type="password" name="Password" id="password" class="form-control" placeholder="Create password" required>
-														<div class="form-control-feedback">
-															<i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
-														</div>
-													</div>
-												</div>
+                                            <div class="col-md-6">
+                                                <div class="form-group has-feedback">
+                                                    <input type="password" name="ConfirmPassword" id="confirmPassword" class="form-control" placeholder="Repeat password" required>
+                                                    <div class="form-control-feedback">
+                                                        <i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
+                                                    </div>
+                                                </div>
+                                                <span id="passwordMismatchError" class="text-danger" style="display: none">
+                                                    <i class="icon-blocked position-left"></i>
+                                                    Password Do Not Match!
+                                                </span>
+                                            </div>
+                                        </div>
 
-												<div class="col-md-6">
-													<div class="form-group has-feedback">
-														<input type="password" name="ConfirmPassword" id="confirmPassword" class="form-control" placeholder="Repeat password" required>
-														<div class="form-control-feedback">
-															<i class="icon-eye-blocked password-toggle text-muted" id="togglePassword" style="cursor:pointer;" title="Show password"></i>
-														</div>
-													</div>
-												</div>
-											</div>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group has-feedback">
+                                                    <input type="email" name="Email" class="form-control" placeholder="Your email" value="@(Model?.Email ?? "")" required>
+                                                    <div class="form-control-feedback">
+                                                        <i class="icon-mention text-muted"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
 
-											<div class="row">
-												<div class="col-md-12">
-													<div class="form-group has-feedback">
-														<input type="email" name="Email" class="form-control" placeholder="Your email" required>
-														<div class="form-control-feedback">
-															<i class="icon-mention text-muted"></i>
-														</div>
-													</div>
-												</div>
+                                            <div class="text-right">
+                                                <a href="@Url.Action("Login", "Login")" class="btn btn-link">
+                                                    <i class="icon-arrow-left13 position-left"></i> Back to login form
+                                                </a>
+                                                <button type="submit" class="btn bg-teal-400 btn-labeled btn-labeled-right ml-10"><b><i class="icon-plus3"></i></b> Create account</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- /registration form -->
+                    <!-- Footer -->
+                    <div class="footer text-muted text-center">
+                        &copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
+                    </div>
+                    <!-- /footer -->
 
-											<div class="text-right">
-												<a href="@Url.Action("Login", "Login")" class="btn btn-link">
-													<i class="icon-arrow-left13 position-left"></i> Back to login form
-												</a>
-												<button type="submit" class="btn bg-teal-400 btn-labeled btn-labeled-right ml-10"><b><i class="icon-plus3"></i></b> Create account</button>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-					</form>
-					<!-- /registration form -->
+                </div>
+                <!-- /content area -->
 
+            </div>
+            <!-- /main content -->
 
-					<!-- Footer -->
-					<div class="footer text-muted text-center">
-						&copy; 2015. <a href="#">Limitless Web App Kit</a> by <a href="http://themeforest.net/user/Kopyov" target="_blank">Eugene Kopyov</a>
-					</div>
-					<!-- /footer -->
+        </div>
+        <!-- /page content -->
 
-				</div>
-				<!-- /content area -->
-
-			</div>
-			<!-- /main content -->
-
-		</div>
-		<!-- /page content -->
-
-	</div>
-	<!-- /page container -->
+    </div>
+    <!-- /page container -->
 
 </body>
 
 
 
 @section Scripts {
-	<script type="text/javascript">
-		$(document).ready(function() {
-			// Password toggle functionality
-			function togglePasswordVisibility(toggleIcon, passwordField) {
-				if (passwordField.type === 'password') {
-					passwordField.type = 'text';
-					toggleIcon.removeClass('icon-eye-blocked').addClass('icon-eye');
-					toggleIcon.attr('title', 'Hide password');
-				} else {
-					passwordField.type = 'password';
-					toggleIcon.removeClass('icon-eye').addClass('icon-eye-blocked');
-					toggleIcon.attr('title', 'Show password');
-				}
-			}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            // Password toggle functionality
+            function togglePasswordVisibility(toggleIcon, passwordField) {
+                if (passwordField.type === 'password') {
+                    passwordField.type = 'text';
+                    toggleIcon.removeClass('icon-eye-blocked').addClass('icon-eye');
+                    toggleIcon.attr('title', 'Hide password');
+                } else {
+                    passwordField.type = 'password';
+                    toggleIcon.removeClass('icon-eye').addClass('icon-eye-blocked');
+                    toggleIcon.attr('title', 'Show password');
+                }
+            }
 
-			// Toggle password visibility for main password field
-			$('#togglePassword').on('click', function() {
-				var passwordField = document.getElementById('password');
-				togglePasswordVisibility($(this), passwordField);
-			});
+            // Toggle password visibility for main password field
+            $('#togglePassword').on('click', function() {
+                var passwordField = document.getElementById('password');
+                togglePasswordVisibility($(this), passwordField);
+            });
 
-			// Toggle password visibility for confirm password field
-			$('#toggleConfirmPassword').on('click', function() {
-				var confirmPasswordField = document.getElementById('confirmPassword');
-				togglePasswordVisibility($(this), confirmPasswordField);
-			});
+            // Toggle password visibility for confirm password field
+            $('#toggleConfirmPassword').on('click', function() {
+                var confirmPasswordField = document.getElementById('confirmPassword');
+                togglePasswordVisibility($(this), confirmPasswordField);
+            });
 
-			// Real-time password match validation
-			function validatePasswordMatch() {
-				var password = $('#password').val();
-				var confirmPassword = $('#confirmPassword').val();
-				var errorDiv = $('#passwordMismatchError');
+            // Real-time password match validation
+            function validatePasswordMatch() {
+                var password = $('#password').val();
+                var confirmPassword = $('#confirmPassword').val();
+                var errorDiv = $('#passwordMismatchError');
 
-				if (confirmPassword.length > 0 && password !== confirmPassword) {
-					errorDiv.show();
-					$('#confirmPassword').addClass('border-danger');
-					return false;
-				} else {
-					errorDiv.hide();
-					$('#confirmPassword').removeClass('border-danger');
-					return true;
-				}
-			}
+                if (confirmPassword.length > 0 && password !== confirmPassword) {
+                    errorDiv.show();
+                    $('#confirmPassword').addClass('border-danger');
+                    return false;
+                } else {
+                    errorDiv.hide();
+                    $('#confirmPassword').removeClass('border-danger');
+                    return true;
+                }
+            }
 
-			// Check password match on input
-			$('#password, #confirmPassword').on('input', function() {
-				validatePasswordMatch();
-			});
+            // Check password match on input
+            $('#password, #confirmPassword').on('input blur', function() {
+                validatePasswordMatch();
+            });
 
-			// Form submission validation
-			$('#signupForm').on('submit', function(e) {
-				var password = $('#password').val();
-				var confirmPassword = $('#confirmPassword').val();
+            // Form submission validation
+            $('#signupForm').on('submit', function(e) {
+                var password = $('#password').val();
+                var confirmPassword = $('#confirmPassword').val();
 
-				// Check if passwords match
-				if (password !== confirmPassword) {
-					e.preventDefault(); // Prevent form submission
-					$('#passwordMismatchError').show();
-					$('#confirmPassword').addClass('border-danger').focus();
+                // Check if passwords match
+                if (password !== confirmPassword) {
+                    e.preventDefault(); // Prevent form submission
+                    $('#passwordMismatchError').show();
+                    $('#confirmPassword').addClass('border-danger').focus();
 
-					// Scroll to the error message
-					$('html, body').animate({
-						scrollTop: $('#passwordMismatchError').offset().top - 100
-					}, 500);
+                    // Scroll to the error message
+                    $('html, body').animate({
+                        scrollTop: $('#passwordMismatchError').offset().top - 100
+                    }, 500);
 
-					return false;
-				}
+                    return false;
+                }
 
-				// Check if password is not empty
-				if (password.length === 0) {
-					e.preventDefault();
-					$('#password').focus();
-					return false;
-				}
+                // Check if password is not empty
+                if (password.length === 0) {
+                    e.preventDefault();
+                    $('#password').focus();
+                    return false;
+                }
 
-				return true;
-			});
+                return true;
+            });
 
-			// Remove error styling when user starts typing
-			$('#confirmPassword').on('focus input', function() {
-				$(this).removeClass('border-danger');
-			});
-		});
-	</script>
+            // Remove error styling when user starts typing
+            $('#confirmPassword').on('focus input', function() {
+                $(this).removeClass('border-danger');
+            });
+
+            function validateUserNames() {
+                var firstName = $('#userFirstName').val();
+                var lastName = $('#userLastName').val();
+                var errorDiv = $('#nameError');
+                
+                if (/\d/.test(firstName) || /\d/.test(lastName)) {
+                    errorDiv.show();
+                    $('#userFirstName, #userLastName').addClass('border-danger');
+                    return false;
+                } else {
+                    errorDiv.hide();
+                    $('#userFirstName, #userLastName').removeClass('border-danger');
+                    return true;
+                }
+            }
+
+            $('#userFirstName, #userLastName').on('input blur', function() {
+                validateUserNames();
+            });
+
+            $('#userFirstName, #userLastName').on('focus input', function() {
+                $(this).removeClass('border-danger');
+            });
+        });
+    </script>
 }
 
 @section Styles {
-	<style>
-		.border-danger {
-			border-color: #d32f2f !important;
-			box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
-		}
+    <style>
+        .border-danger {
+            border-color: #d32f2f !important;
+            box-shadow: 0 0 0 0.2rem rgba(211, 47, 47, 0.25);
+        }
 
-		.password-toggle {
-			z-index: 10;
-			pointer-events: auto;
-		}
+        .password-toggle {
+            z-index: 10;
+            pointer-events: auto;
+        }
 
-			.password-toggle:hover {
-				color: #666 !important;
-			}
+            .password-toggle:hover {
+                color: #666 !important;
+            }
 
-		.form-control-feedback {
-			pointer-events: none;
-		}
+        .form-control-feedback {
+            pointer-events: none;
+        }
 
-			.form-control-feedback .password-toggle {
-				pointer-events: auto;
-			}
-	</style>
+            .form-control-feedback .password-toggle {
+                pointer-events: auto;
+            }
+    </style>
 }
