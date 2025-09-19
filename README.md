@@ -28,6 +28,7 @@ An ASP.NET Core MVC-based e-commerce platform made using the [Repository Design 
 - Role-based access: `Admin` and `User`
 - Access control to prevent unauthorized page access
 - Custom `AccessDenied` view for blocked routes
+- Email domain and format validation
 
 ### 🖥️⇆🖥️ Middleware
 
