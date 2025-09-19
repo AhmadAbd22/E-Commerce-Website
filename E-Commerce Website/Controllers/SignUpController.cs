@@ -29,67 +29,85 @@ namespace ECommerceWebsite.Controllers
                 return View(signupDto);
             }
             //Checking Conditions  (TODO: check separately after testing)
-            if (string.IsNullOrEmpty(signupDto.Username) || string.IsNullOrEmpty(signupDto.Password) || 
-                string.IsNullOrEmpty(signupDto.FirstName) || string.IsNullOrEmpty(signupDto.LastName) ||
-                string.IsNullOrEmpty(signupDto.Email) )
-            {
-                TempData.SetError("All fields are required.");
-                return View(signupDto);
-            }
-
-            var validEmail = await EmailValidationHelper.IsEmailValidAsync(signupDto.Email);
-
-            if (!validEmail)
+            if (!AllFieldsAreEmpty(signupDto))
             {
 
-                var existingUser = await _userRepo.GetUserByEmailAsync(signupDto.Email);
-                if (existingUser != null)
+                if (!signupDto.FirstName.Any(char.IsDigit) || !signupDto.LastName.Any(char.IsDigit))
                 {
-                    TempData.SetWarning("User already exists with this email. Use another email");
-                    return View(signupDto);
+
+                    var validEmail = await EmailValidationHelper.IsEmailValidAsync(signupDto.Email);
+
+                    if (validEmail)
+                    {
+
+                        var existingUser = await _userRepo.GetUserByEmailAsync(signupDto.Email);
+                        if (existingUser != null)
+                        {
+                            TempData.SetWarning("User already exists with this email. Use another email");
+                            return View(signupDto);
+                        }
+
+                        if (signupDto.Password != signupDto.ConfirmPassword)
+                        {
+                            TempData.SetError("Passwords do not match.");
+                            return View(signupDto);
+                        }
+                    }
+                    else
+                    {
+                        TempData.SetError($"Invalid email format or email domain. Entered email {signupDto.Email}.");
+                        return View(signupDto);
+                    }
                 }
-
-                if (signupDto.Password != signupDto.ConfirmPassword)
+                else
                 {
-                    TempData.SetError("Passwords do not match.");
+                    TempData.SetInfo("Names cannot contain numbers.");
                     return View(signupDto);
                 }
             }
             else
             {
-                TempData.SetError($"Invalid email format or email domain. Entered email {signupDto.Email}." );
+                TempData.SetError("All fields are required.");
                 return View(signupDto);
             }
+            //Create new User 
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                Username = signupDto.Username,
+                FirstName = signupDto.FirstName,
+                LastName = signupDto.LastName,
+                Password = PasswordHelper.HashPassword(signupDto.Password),
+                Email = signupDto.Email,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Role = (int)enumRole.Customer,
+                IsDeleted = false,
+                isActive = (int)enumStatus.Active,
 
-
-                //Create new User 
-                var user = new User
-                {
-                    Id = Guid.NewGuid(),
-                    Username = signupDto.Username,
-                    FirstName = signupDto.FirstName,
-                    LastName = signupDto.LastName,
-                    Password = PasswordHelper.HashPassword(signupDto.Password),
-                    Email = signupDto.Email,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow,
-                    Role = (int)enumRole.Customer,
-                    IsDeleted = false,
-                    isActive = (int)enumStatus.Active,
-
-                    //TODO: Uncomment these after chanegs in Singup.cshtml
-                    //Address = signupDto.Address,
-                    //City = signupDto.City,
-                    //Province = signupDto.Province,
-                    //PostalCode = signupDto.PostalCode,
-                    //PhoneNumber = signupDto.PhoneNumber, 
-                    //DateOfBirth = signupDto.DOB,
-                };
+                //TODO: Uncomment these after chanegs in Singup.cshtml
+                //Address = signupDto.Address,
+                //City = signupDto.City,
+                //Province = signupDto.Province,
+                //PostalCode = signupDto.PostalCode,
+                //PhoneNumber = signupDto.PhoneNumber, 
+                //DateOfBirth = signupDto.DOB,
+            };
 
             await _userRepo.AddUserAsync(user);
 
             TempData.SetSuccess("Sign-up successful! Please log in to continue.");
             return RedirectToAction("Login", "Login");
+        }
+
+        private bool AllFieldsAreEmpty(SignUpDto dto)
+        {
+            return string.IsNullOrWhiteSpace(dto.Username) &&
+                   string.IsNullOrWhiteSpace(dto.Password) &&
+                   string.IsNullOrWhiteSpace(dto.ConfirmPassword) &&
+                   string.IsNullOrWhiteSpace(dto.FirstName) &&
+                   string.IsNullOrWhiteSpace(dto.LastName) &&
+                   string.IsNullOrWhiteSpace(dto.Email);
         }
     }
 }
